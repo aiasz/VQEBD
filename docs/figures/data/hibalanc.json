@@ -1,0 +1,38 @@
+{
+  "qiskit_statevector": {
+    "hartree_fock": -1.116998996754004,
+    "l0_full_ci": -1.1373060357534004,
+    "l1_exact": -1.137306035753399,
+    "l2_vqe": -1.137306035753391,
+    "mapping_error": 1.3322676295501878e-15,
+    "ansatz_error": 7.993605777301127e-15,
+    "total_error": 9.325873406851315e-15,
+    "optimizer": "SLSQP",
+    "n_evaluations": 14,
+    "precision": "complex128"
+  },
+  "cirq_simulator": {
+    "hartree_fock": -1.116998996754004,
+    "l0_full_ci": -1.1373060357534004,
+    "l1_exact": -1.137306035753399,
+    "l2_vqe": -1.1373060357533915,
+    "mapping_error": 1.3322676295501878e-15,
+    "ansatz_error": 7.549516567451064e-15,
+    "total_error": 8.881784197001252e-15,
+    "optimizer": "SLSQP",
+    "n_evaluations": 14,
+    "precision": "complex128"
+  },
+  "qsim": {
+    "hartree_fock": -1.116998996754004,
+    "l0_full_ci": -1.1373060357534004,
+    "l1_exact": -1.137306035753399,
+    "l2_vqe": -1.1373060067618002,
+    "mapping_error": 1.3322676295501878e-15,
+    "ansatz_error": 2.8991598899352766e-08,
+    "total_error": 2.8991600231620396e-08,
+    "optimizer": "Powell",
+    "n_evaluations": 409,
+    "precision": "complex64"
+  }
+}

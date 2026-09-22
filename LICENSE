@@ -1,10 +1,6 @@
 MIT License
 
-<<<<<<< HEAD
-Copyright (c) 2026 Kormos Attila and Claude AI (Anthropic)
-=======
-Copyright (c) 2026 aiasz
->>>>>>> a723700fbdcd3e9f4b407e2454840020b1c0146e
+Copyright (c) 2026 Kormos Attila (GitHub: aiasz) and Claude AI (Anthropic)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +19,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-<<<<<<< HEAD
 
 --------------------------------------------------------------------------------
 HARMADIK FELEK SZOFTVEREI / THIRD-PARTY SOFTWARE
 
 Ez a projekt harmadik felek szoftvereit használja, amelyek saját licenc alatt
 állnak. A teljes lista és a verziók: docs/references.md.
+
+This project uses third-party software licensed under their own terms. The full
+list with versions is in docs/references.md.
 
 FIGYELEM — Mitiq (GPL-3.0):
 A Mitiq csomag GPL-3.0 licencű. A VQEBD NEM linkeli be és NEM terjeszti újra a
@@ -43,5 +41,3 @@ The Mitiq package is licensed under GPL-3.0. VQEBD does NOT link against or
 redistribute Mitiq; it is used as an optional, runtime-loaded component confined
 to a single module (src/vqebd/mitigation/mitiq_zne.py). VQEBD is fully functional
 without it. See docs/adr/ADR-0003-mitigacios-architektura.md
-=======
->>>>>>> a723700fbdcd3e9f4b407e2454840020b1c0146e

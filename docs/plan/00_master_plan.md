@@ -155,7 +155,7 @@ méri. Részletek: [ADR-0006](../adr/ADR-0006-tobbplatformos-architektura.md).
 |---|---|---|---|
 | **IBM Quantum (Qiskit)** | Valódi 100+ qubites QPU **és** lokális Aer szimulátor; a legnagyobb tananyag- és közösségi bázis | a QPU-hozzáférés kvótás | Open Plan: **10 perc / 28 nap**, 20 perc felhasználás után egyszeri **+180 perc / 12 hónap** |
 | **Google Cirq** | Független implementáció, kétszeres pontosság (`complex128`) | nincs valódi hardver ebben a projektben; ~20 qubitig kényelmes | **nincs kvóta** |
-| **qsim** | C++-ban optimalizált; 24 qubiten **22× gyorsabb** a Cirqnél | **egyszeres pontosság** (`complex64`, ~10⁻⁷ Ha) | **nincs kvóta** |
+| **qsim** | C++-ban optimalizált; **4–9× gyorsabb** a Cirqnél (mért, 12–24 qubit) | **egyszeres pontosság** (`complex64`, ~10⁻⁷ Ha) | **nincs kvóta** |
 
 **Miért éri meg?** Három okból:
 
@@ -173,6 +173,41 @@ méri. Részletek: [ADR-0006](../adr/ADR-0006-tobbplatformos-architektura.md).
 tehát kémiailag jelentéktelen, de numerikusan mérhető. Ez nem a qsim hibája,
 hanem tudatos pontosság–sebesség kompromisszum, és a benchmark egyik
 **önálló eredménye**: megmutatja, hol érdemes a gyorsabb szimulátort választani.
+
+#### 3.3.1 Hozzájárul-e a több platform a pontossághoz? — a mért válasz
+
+A kérdés jogos, és a válasz árnyalt. Teljes kifejtés mérésekkel és ábrákkal:
+[`docs/01m_multiplatform.md`](../01m_multiplatform.md). Röviden:
+
+| Szempont | Hozzájárul? | Miért |
+|---|---|---|
+| Numerikus pontosság **javítása** | ❌ **Nem** | A platformok hibája korrelált (Qiskit ↔ Cirq: 2.2 × 10⁻¹⁵), a qsimé pedig szisztematikus kerekítés. Átlagolni félrevezető lenne. |
+| **Bizalom** a szám helyességében | ✅ Igen | Két független kódbázis (IBM, Google) gépi pontossággal egyezik. |
+| **Rejtett hibamódok** felderítése | ✅ **Igen, bizonyítottan** | Lásd az M13 megállapítást. |
+| **Fizikai** helyesség igazolása | ❌ Nem | Ezt az L0 (PySCF Full CI) adja — független elmélet, független implementáció, nem egy negyedik szimulátor. |
+| Kvótavédelem, skálázás | ✅ Igen | Két kvótamentes platform; a qsim 4–9× gyorsulás (mért, min-of-3 ismétlés, 12–24 qubit). |
+
+**M13 — a konkrét hozadék.** A Fázis 1M felderítette, hogy a **gradiens-alapú
+optimalizálók csendben téves minimumot találnak** egyszeres pontosságú
+platformon. A SciPy véges-differencia lépésköze `√ε₆₄ ≈ 1.49 × 10⁻⁸`, a qsim
+célfüggvény-zaja viszont `1.13 × 10⁻⁷` — **nagyobb a lépésköznél**, ezért a
+becsült gradiens zajból származik (mért hiba: **8 nagyságrend**).
+
+Mért következmény H2-re: az `SLSQP` a qsimen `1.5 × 10⁻²` Ha hibát ad (kémiai
+pontosság fölött, „sikeresen konvergált" állapotban), a `Powell` viszont
+`2.9 × 10⁻⁸`-at.
+
+**Ez egyetlen platformon nem derülhetett volna ki:** Qiskiten és Cirqen mind a
+nyolc vizsgált optimalizáló hibátlan. A hibamód a Fázis 1b (lövészaj) vagy a
+Fázis 2 (hardverzaj) során bukkant volna elő — ott viszont már **IBM-kvótát
+égetve**, és sikeres futásnak álcázva.
+
+A felfedezés beépült a rendszerbe: a `vqebd.platforms` minden platformhoz mért
+zajszintet és abból **számított** gradiens-biztonsági besorolást tárol, a
+`run_vqe()` pedig futásidejű figyelmeztetést ad a veszélyes kombinációkra.
+
+> **A lényeg:** a többplatformos futtatás nem *pontosabb számot* ad, hanem
+> **megbízhatóbb tudást arról, hogy a szám helyes-e**.
 
 ---
 

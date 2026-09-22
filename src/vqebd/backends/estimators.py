@@ -9,17 +9,23 @@ A VQE klasszikus optimalizáló-hurka egyetlen dolgot kér a kvantumos rétegtő
 Ez a modul ezt a leképezést csomagolja egy **hívható objektumba**. Az absztrakció
 haszna, hogy a VQE-hurok kódja azonos marad, akárhol fut a kiértékelés:
 
-=====================  =========================================  ==========
-``BackendKind``        Kiértékelés                                Fázis
-=====================  =========================================  ==========
-``statevector``        Zajmentes állapotvektor (egzakt)           1
-``aer_shot``           Véges lövésszám, zaj nélkül                1b
-``aer_noisy``          Zajos szimuláció valós kalibrációval       1b
-``ibm_qpu``            Valódi IBM kvantumprocesszor               2
-=====================  =========================================  ==========
+=====================  =========================================  ============  =====
+``BackendKind``        Kiértékelés                                Pontosság     Fázis
+=====================  =========================================  ============  =====
+``qiskit_statevector`` Qiskit, egzakt állapotvektor                complex128    1
+``cirq_simulator``     Google Cirq, egzakt állapotvektor           complex128    1M
+``qsim``               Google qsim, C++-ban optimalizált           complex64     1M
+``qiskit_aer_shot``    Véges lövésszám, zaj nélkül                 —             1b
+``qiskit_aer_noisy``   Zajos szimuláció valós kalibrációval        —             1b
+``ibm_qpu``            Valódi IBM kvantumprocesszor                —             2
+=====================  =========================================  ============  =====
 
-A Fázis 1 csak a ``statevector`` változatot valósítja meg; a többi a megfelelő
-fázisban kerül ide, változatlan interfésszel.
+A Fázis 1M három egzakt platformot valósít meg; a zajos és hardveres változatok
+a megfelelő fázisban kerülnek ide, **változatlan interfésszel**.
+
+A platformonkénti tolerancia és a gradiens-biztonság a :mod:`vqebd.platforms`
+modulban van nyilvántartva — a ``qsim`` egyszeres pontossága miatt ott
+deriváltmentes optimalizáló kell (ADR-0006).
 
 Miért V2 primitív?
 ------------------
@@ -41,6 +47,17 @@ from vqebd.config import BackendKind
 from vqebd.seeds import SeedSet
 
 __all__ = ["EnergyEvaluator", "StatevectorEnergyEvaluator", "make_energy_evaluator"]
+
+
+def known_backends() -> list[str]:
+    """Az ismert platform-backend azonosítók, hibaüzenetekhez.
+
+    Késleltetett import a :mod:`vqebd.platforms` modulból, hogy a
+    modulbetöltési sorrend ne számítson.
+    """
+    from vqebd.platforms import PLATFORMS
+
+    return sorted(PLATFORMS)
 
 
 class EnergyEvaluator(ABC):
@@ -148,8 +165,6 @@ def make_energy_evaluator(
 
         return QsimEnergyEvaluator(circuit, observable, seed_transpiler=seeds.transpiler)
 
-    # A típusellenőrző szerint ez elérhetetlen (a BackendKind kimerítő), de
-    # futásidőben érkezhet érvénytelen string is — ezért maradjon a védelem.
-    from vqebd.platforms import PLATFORMS
-
-    raise ValueError(f"ismeretlen backend: {kind!r}. Ismert backendek: {sorted(PLATFORMS)}")
+    # A típusellenőrző szerint ide nem juthatunk (a BackendKind kimerítő Literal),
+    # de futásidőben érkezhet érvénytelen string is — ezért marad a védelem.
+    raise ValueError(f"ismeretlen backend: {kind!r}. Ismert backendek: {known_backends()}")

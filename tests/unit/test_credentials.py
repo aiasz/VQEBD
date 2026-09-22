@@ -23,8 +23,8 @@ from vqebd.credentials import (
 
 pytestmark = pytest.mark.unit
 
-# Nem valódi token: 44 karakteres álérték, a formátum utánzására.
-FAKE_TOKEN = "T3stT0k3n" + "x" * 30 + "End"
+# Nem valódi token: az IBM Cloud API-kulcsok 44 karakteresek, ezt utánozzuk.
+FAKE_TOKEN = "T3stT0k3n" + "x" * 32 + "End"
 
 
 # --- Maszkolás ---------------------------------------------------------------
@@ -34,7 +34,7 @@ def test_mask_secret_hides_the_middle() -> None:
     masked = mask_secret(FAKE_TOKEN)
     assert FAKE_TOKEN not in masked
     assert masked.startswith("T3s")
-    assert "44 karakter" in masked
+    assert f"{len(FAKE_TOKEN)} karakter" in masked
 
 
 def test_mask_secret_hides_short_values_completely() -> None:
@@ -99,9 +99,7 @@ def test_short_token_error_does_not_leak_the_value() -> None:
 # --- Betöltési források ------------------------------------------------------
 
 
-def test_loads_from_environment_variable(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_loads_from_environment_variable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("IBM_QUANTUM_TOKEN", FAKE_TOKEN)
     credentials = load_ibm_credentials(tmp_path)
     assert credentials.reveal() == FAKE_TOKEN
@@ -180,9 +178,7 @@ def test_missing_credentials_raise_with_all_sources_listed(
     assert "IBM.token" in message
 
 
-def test_json_without_a_key_field_raises(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_json_without_a_key_field_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("IBM_QUANTUM_TOKEN", raising=False)
     (tmp_path / "IBM.token").write_text(json.dumps({"name": "x", "note": "y"}), encoding="utf-8")
     with pytest.raises(CredentialsNotFoundError, match="apikey"):

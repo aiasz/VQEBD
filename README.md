@@ -2,9 +2,10 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.2.0-orange.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-1%2F10%20lezárva-yellow.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-248%20zöld-brightgreen.svg)](docs/testing/TR-F01_vqe_mag.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.3.0-orange.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-1M%2F10%20lezárva-yellow.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-332%20zöld-brightgreen.svg)](docs/testing/TR-F01M_tobbplatform.md)
+[![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
@@ -21,15 +22,17 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 1 lezárva (`v0.2.0`)** — a VQE-mag működik és
-validált. A zajos szimuláció a Fázis 1b-től, a valódi hardver a Fázis 2-től jön.
+Jelenlegi állapot: **Fázis 1M lezárva (`v0.3.0`)** — a VQE-mag működik, és
+**három platformon** (Qiskit, Cirq, qsim) validált. Az IBM Quantum hozzáférés
+ellenőrizve: 3 db 156 qubites Heron QPU elérhető.
 
 | Fázis | Tartalom | Állapot |
 |---|---|---|
 | 0 | Repó + Docker alapinfrastruktúra | ✅ **Lezárva** (`v0.1.0`) |
 | 1 | H2-VQE szimulátoron | ✅ **Lezárva** (`v0.2.0`) |
+| **1M** | **Többplatformos validáció (Qiskit ↔ Cirq ↔ qsim)** *(új, ADR-0006)* | ✅ **Lezárva** (`v0.3.0`) |
 | 1b | Zajos szimuláció FakeBackend-en *(új, a TR-000 alapján)* | ⏳ Következő |
-| 2 | Egyszeri futás valódi IBM-hardveren | ⬜ Tervezett |
+| 2 | Egyszeri futás valódi IBM-hardveren | 🔓 **Feloldva** (hozzáférés kész) |
 | 3 | Hibaenyhítés (ZNE + mérési hibaenyhítés) | ⬜ Tervezett |
 | 4 | Adatséma és perzisztens tárolás | ⬜ Tervezett |
 | 5 | Batch futtatás, több molekula | ⬜ Tervezett |
@@ -90,26 +93,48 @@ paritás, Bravyi–Kitaev) egymástól függetlenül ugyanezt adja.
 
 Részletek: [`docs/testing/TR-F01_vqe_mag.md`](docs/testing/TR-F01_vqe_mag.md).
 
+### Fázis 1M — három platform, egyetlen eredmény
+
+| Platform | Optimalizáló | E (Ha) | Eltérés a Qiskittől |
+|---|---|---|---|
+| `qiskit_statevector` | SLSQP | −1.137306035753 | referencia |
+| `cirq_simulator` | SLSQP | −1.137306035753 | **4.4 × 10⁻¹⁶** |
+| `qsim` | Powell | −1.137306006762 | **2.9 × 10⁻⁸** |
+
+![Optimalizáló × platform mátrix](docs/figures/fig02_optimalizalo_matrix.png)
+
+**A fázis legfontosabb felfedezése:** a **gradiens-alapú optimalizálók csendben
+téves minimumot találnak** egyszeres pontosságú (`complex64`) platformon. A SciPy
+véges-differencia lépésköze `1.49 × 10⁻⁸`, a qsim célfüggvény-zaja viszont
+`1.13 × 10⁻⁷` — nagyobb a lépésköznél, ezért a becsült gradiens **8
+nagyságrenddel** téved. Az `SLSQP` a qsimen `1.5 × 10⁻²` Ha hibát ad
+(„sikeresen konvergált" állapotban), a `Powell` viszont `2.9 × 10⁻⁸`-at.
+
+**Ez egyetlen platformon nem derülhetett volna ki** — Qiskiten és Cirqen mind a
+nyolc optimalizáló hibátlan. Részletek és az ábrák:
+[`docs/01m_multiplatform.md`](docs/01m_multiplatform.md).
+
+
 ### Gyors indítás
 
 ```bash
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (248 teszt)
+make test       # teljes tesztkészlet (332 teszt)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.2.0 python -m vqebd
+docker run --rm vqebd:0.3.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.2.0 .
-docker run --rm vqebd:0.2.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.3.0 .
+docker run --rm vqebd:0.3.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -121,6 +146,8 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/00_master_plan.md`](docs/plan/00_master_plan.md) | **Bővített mesterterv** — architektúra, referenciaszintek, politikák, kockázatok |
 | [`docs/plan/phase_00.md`](docs/plan/phase_00.md) | A Fázis 0 részletes terve |
 | [`docs/plan/phase_01.md`](docs/plan/phase_01.md) | A Fázis 1 részletes terve |
+| [`docs/plan/phase_01m.md`](docs/plan/phase_01m.md) | A Fázis 1M részletes terve |
+| [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
@@ -136,6 +163,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [0003](docs/adr/ADR-0003-mitigacios-architektura.md) | Pluginalapú hibaenyhítés, **saját ISA-biztos ZNE** (a Mitiq ISA-áramkörön qubiteket veszít) |
 | [0004](docs/adr/ADR-0004-adattarolas.md) | SQLite kanonikus tároló, sémaverziózással, FAIR-elvek szerint |
 | [0005](docs/adr/ADR-0005-determinizmus.md) | Minden véletlenforrás explicit seedet kap, és rekordba kerül |
+| [0006](docs/adr/ADR-0006-tobbplatformos-architektura.md) | **A platform önálló benchmark-dimenzió** — Qiskit ↔ Cirq ↔ qsim |
 
 ### Módszertani alapelvek
 
@@ -194,15 +222,17 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 1 completed (`v0.2.0`)** — the VQE core is working and
-validated. Noisy simulation starts at Phase 1b, real hardware at Phase 2.
+Current status: **Phase 1M completed (`v0.3.0`)** — the VQE core works and is
+validated on **three platforms** (Qiskit, Cirq, qsim). IBM Quantum access has
+been verified: 3 × 156-qubit Heron QPUs available.
 
 | Phase | Content | Status |
 |---|---|---|
 | 0 | Repo + Docker base infrastructure | ✅ **Completed** (`v0.1.0`) |
 | 1 | H2-VQE on simulator | ✅ **Completed** (`v0.2.0`) |
+| **1M** | **Multi-platform validation (Qiskit ↔ Cirq ↔ qsim)** *(new, ADR-0006)* | ✅ **Completed** (`v0.3.0`) |
 | 1b | Noisy simulation on FakeBackend *(new, based on TR-000)* | ⏳ Next |
-| 2 | Single run on real IBM hardware | ⬜ Planned |
+| 2 | Single run on real IBM hardware | 🔓 **Unblocked** (access verified) |
 | 3 | Error mitigation (ZNE + measurement error mitigation) | ⬜ Planned |
 | 4 | Data schema and persistent storage | ⬜ Planned |
 | 5 | Batch runs, multiple molecules | ⬜ Planned |
@@ -264,26 +294,48 @@ parity, Bravyi–Kitaev) independently give the same result.
 
 Details: [`docs/testing/TR-F01_vqe_mag.md`](docs/testing/TR-F01_vqe_mag.md).
 
+### Phase 1M — Three Platforms, One Result
+
+| Platform | Optimizer | E (Ha) | Deviation from Qiskit |
+|---|---|---|---|
+| `qiskit_statevector` | SLSQP | −1.137306035753 | reference |
+| `cirq_simulator` | SLSQP | −1.137306035753 | **4.4 × 10⁻¹⁶** |
+| `qsim` | Powell | −1.137306006762 | **2.9 × 10⁻⁸** |
+
+![Optimizer × platform matrix](docs/figures/fig02_optimalizalo_matrix.png)
+
+**The key finding of this phase:** **gradient-based optimizers silently converge
+to a wrong minimum** on single-precision (`complex64`) platforms. SciPy's
+finite-difference step is `1.49 × 10⁻⁸`, but qsim's objective-function noise is
+`1.13 × 10⁻⁷` — larger than the step, so the estimated gradient is off by **8
+orders of magnitude**. On qsim, `SLSQP` yields a `1.5 × 10⁻²` Ha error while
+reporting successful convergence; `Powell` yields `2.9 × 10⁻⁸`.
+
+**This could not have been discovered on a single platform** — on Qiskit and Cirq
+all eight optimizers work flawlessly. Details and figures:
+[`docs/01m_multiplatform.md`](docs/01m_multiplatform.md).
+
+
 ### Quick Start
 
 ```bash
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (248 tests)
+make test       # full test suite (332 tests)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.2.0 python -m vqebd
+docker run --rm vqebd:0.3.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.2.0 .
-docker run --rm vqebd:0.2.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.3.0 .
+docker run --rm vqebd:0.3.0 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -295,6 +347,8 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/00_master_plan.md`](docs/plan/00_master_plan.md) | **Extended master plan** — architecture, reference levels, policies, risks |
 | [`docs/plan/phase_00.md`](docs/plan/phase_00.md) | Detailed Phase 0 plan |
 | [`docs/plan/phase_01.md`](docs/plan/phase_01.md) | Detailed Phase 1 plan |
+| [`docs/plan/phase_01m.md`](docs/plan/phase_01m.md) | Detailed Phase 1M plan |
+| [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |

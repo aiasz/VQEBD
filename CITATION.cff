@@ -5,11 +5,11 @@ cff-version: 1.2.0
 title: "VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard"
 message: "Ha ezt a szoftvert használod, kérjük, az alábbiak szerint hivatkozz rá."
 type: software
-version: 0.2.0
+version: 0.3.0
 date-released: "2026-09-22"
 license: MIT
-repository-code: "https://github.com/kormosattila/vqebd"
-url: "https://github.com/kormosattila/vqebd"
+repository-code: "https://github.com/aiasz/VQEBD"
+url: "https://github.com/aiasz/VQEBD"
 
 authors:
   - family-names: Kormos

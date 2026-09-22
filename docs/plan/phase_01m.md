@@ -29,7 +29,7 @@ Emellett három gyakorlati haszon:
 | Haszon | Miért számít |
 |---|---|
 | **Kvótavédelem** | Az IBM Open Plan **10 perc QPU-idő / 28 nap**. A Fázis 2 kódja két kvótamentes platformon próbálható ki előbb. |
-| **Skálázás** | A qsim 24 qubiten **22× gyorsabb** a Cirqnél — a Fázis 5 nagyobb rendszereihez döntő. |
+| **Skálázás** | A qsim **4–9× gyorsabb** a Cirqnél (mért, 12–24 qubit) — a Fázis 5 nagyobb rendszereihez lényeges. |
 | **Publikációs érték** | A platformok pontosság–sebesség kompromisszuma **önálló benchmark-eredmény**. |
 
 ---

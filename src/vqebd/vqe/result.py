@@ -190,8 +190,7 @@ class VQEResult:
             + (" (2-qubit redukcióval)" if self.two_qubit_reduction else ""),
             f"Áramkör ............. {self.n_qubits} qubit, {self.n_parameters} paraméter, "
             f"{self.n_hamiltonian_terms} Pauli-tag",
-            f"Backend ............. {self.config.backend} "
-            f"[{self.platform}, {self.precision}]",
+            f"Backend ............. {self.config.backend} [{self.platform}, {self.precision}]",
             f"Optimalizáló ........ {self.config.optimizer.method} "
             f"({self.n_iterations} iteráció, {self.n_function_evaluations} kiértékelés)",
             "",

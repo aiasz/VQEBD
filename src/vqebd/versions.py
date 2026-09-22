@@ -34,6 +34,7 @@ TRACKED_PACKAGES: Final[tuple[str, ...]] = (
     "scipy",
     "mitiq",
     "cirq-core",
+    "qsimcirq",
 )
 """A nyomon követett csomagok.
 

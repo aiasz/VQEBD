@@ -28,13 +28,14 @@ Licenc: MIT
 from __future__ import annotations
 
 import time
+import warnings
 
 from vqebd.backends.estimators import make_energy_evaluator
 from vqebd.chemistry.mapping import map_to_qubits
 from vqebd.chemistry.problem import build_electronic_structure
 from vqebd.chemistry.reference import collect_references
 from vqebd.config import VQEConfig
-from vqebd.platforms import platform_of
+from vqebd.platforms import check_optimizer_compatibility, platform_of
 from vqebd.seeds import SeedSet
 from vqebd.versions import environment_fingerprint, package_versions
 from vqebd.vqe.ansatz import build_ansatz
@@ -63,6 +64,12 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     started = time.perf_counter()
     seeds = SeedSet.derive(config.seed)
     platform = platform_of(config.backend)
+
+    # A gradiens-alapú optimalizálók alacsony pontosságú platformon CSENDBEN
+    # téves minimumot találnak (TR-F01M). Ezt nem hagyjuk szó nélkül.
+    incompatibility = check_optimizer_compatibility(config.backend, config.optimizer.method)
+    if incompatibility is not None:
+        warnings.warn(incompatibility, RuntimeWarning, stacklevel=2)
 
     structure = build_electronic_structure(config.molecule)
     hamiltonian = map_to_qubits(

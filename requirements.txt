@@ -42,11 +42,19 @@ cirq-core==1.4.1         # Független szimulátor-implementáció.
 qsimcirq==0.22.1         # C++-ban optimalizált állapotvektor-szimulátor.
                          # FIGYELEM: EGYSZERES pontosságú (`complex64`), ezért ~1e-7 Ha
                          # hibát ad. Ez mért, dokumentált kompromisszum, nem hiba:
-                         # cserébe 24 qubiten 22x gyorsabb a cirq.Simulator-nál.
-                         # Pontosság-kapcsoló a QSimOptions-ben NINCS.
+                         # cserébe 4-9x gyorsabb a cirq.Simulator-nál (mért, 12-24 qubit,
+                         # min-of-3 ismétlés). Pontosság-kapcsoló a QSimOptions-ben NINCS.
+                         # FIGYELEM: gradiens-alapú optimalizálóval NEM használható
+                         # (a zajszint > véges-differencia lépésköz) — ADR-0006.
 
 # --- Kvantumkémia ----------------------------------------------------------
 pyscf==2.14.0            # Hartree–Fock és Full CI referencia (L0 szint)
+
+# --- Ábrakészítés ------------------------------------------------------------
+matplotlib==3.11.2       # a mérési ábrák generálásához (scripts/gen_report_figures.py).
+                         # Tranzitívan amúgy is települne, de az ábrák KÖZVETLEN
+                         # függősége, ezért explicit pin: egy csendes verzióváltás
+                         # megváltoztathatná a generált ábrákat.
 
 # --- Rejtett függőség ------------------------------------------------------
 ply==3.11                # A mitiq qiskit<->cirq konverziója ezt igényli

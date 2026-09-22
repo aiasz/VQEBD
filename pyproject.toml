@@ -42,10 +42,10 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/kormosattila/vqebd"
-Documentation = "https://github.com/kormosattila/vqebd/tree/main/docs"
-Repository = "https://github.com/kormosattila/vqebd"
-Changelog = "https://github.com/kormosattila/vqebd/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/aiasz/VQEBD"
+Documentation = "https://github.com/aiasz/VQEBD/tree/main/docs"
+Repository = "https://github.com/aiasz/VQEBD"
+Changelog = "https://github.com/aiasz/VQEBD/blob/main/CHANGELOG.md"
 
 [tool.setuptools.dynamic]
 version = { file = "VERSION" }
@@ -116,9 +116,19 @@ exclude = ["scripts/spike/"]
 [[tool.mypy.overrides]]
 module = [
     "qiskit.*", "qiskit_aer.*", "qiskit_nature.*", "qiskit_ibm_runtime.*",
-    "mitiq.*", "cirq.*", "pyscf.*", "scipy.*",
+    "mitiq.*", "pyscf.*", "scipy.*",
 ]
 ignore_missing_imports = true
+
+# A Cirq és a qsim SZÁLLÍT típusstubokat (py.typed), de a névteret implicit
+# re-exportokkal építi fel (`from cirq.ops import X` helyett `cirq.X`). A mypy
+# strict módban ezt `attr-defined` hibaként jelzi, holott a használat helyes és
+# a Cirq dokumentált API-ja. Ezért ezekre a modulokra engedjük az implicit
+# re-exportot — a saját kódunk típusellenőrzése változatlanul szigorú marad.
+[[tool.mypy.overrides]]
+module = ["cirq.*", "qsimcirq.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
 
 #-----------------------------------------------------------------------------
 # pytest

@@ -33,6 +33,10 @@ REQUIRED_PINS: dict[str, str] = {
     "qiskit-ibm-runtime": "0.41.1",
     "pyscf": "2.14.0",
     "ply": "3.11",
+    # Fázis 1M — a második platform (ADR-0006)
+    "cirq-core": "1.4.1",
+    "qsimcirq": "0.22.1",
+    "matplotlib": "3.11.2",
 }
 
 # A mitiq GPL-3.0 licencű; opcionális, futásidőben betöltött komponens (ADR-0003).
@@ -167,7 +171,7 @@ def test_tracked_packages_cover_the_direct_dependencies(
     from vqebd.versions import TRACKED_PACKAGES
 
     tracked = {re.sub(r"[-_.]+", "-", name).lower() for name in TRACKED_PACKAGES}
-    untracked = sorted(set(direct_pins) - tracked - {"ply"})
+    untracked = sorted(set(direct_pins) - tracked - {"ply", "matplotlib"})
     assert not untracked, (
         f"nem követett közvetlen függőségek: {untracked}. "
         "Vedd fel őket a vqebd.versions.TRACKED_PACKAGES listába."

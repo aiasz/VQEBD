@@ -215,8 +215,7 @@ def _from_token_file(root: Path) -> IbmCredentials | None:
 
     if not isinstance(payload, dict):
         raise CredentialsNotFoundError(
-            f"a(z) {TOKEN_FILENAME} JSON-tartalma nem objektum, hanem "
-            f"{type(payload).__name__}"
+            f"a(z) {TOKEN_FILENAME} JSON-tartalma nem objektum, hanem {type(payload).__name__}"
         )
 
     for key in ("apikey", "api_key", "token"):

@@ -44,7 +44,7 @@ Docker Compose v5.0.0-desktop.1 · Git 2.50.1
 ## 3. Telepítés
 
 ```bash
-git clone https://github.com/kormosattila/vqebd.git
+git clone https://github.com/aiasz/VQEBD.git
 cd vqebd
 ```
 
@@ -76,24 +76,24 @@ docker compose -f docker/docker-compose.yml run --rm app python --version
 
 ```powershell
 # Építés
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.1.0 .
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.3.0 .
 
 # AC-0.2 — Python-verzió
-docker run --rm vqebd:0.1.0 python --version
+docker run --rm vqebd:0.3.0 python --version
 
 # AC-0.4 — nem-root futás (a várt kimenet 1000, NEM 0)
-docker run --rm vqebd:0.1.0 id -u
+docker run --rm vqebd:0.3.0 id -u
 
 # AC-0.5 — determinizmus
-docker run --rm vqebd:0.1.0 printenv PYTHONHASHSEED
+docker run --rm vqebd:0.3.0 printenv PYTHONHASHSEED
 
 # AC-0.3 — a szállított image beépített tesztjei
-docker run --rm -e VQEBD_IN_CONTAINER=1 vqebd:0.1.0 python -m pytest tests -ra
+docker run --rm -e VQEBD_IN_CONTAINER=1 vqebd:0.3.0 python -m pytest tests -ra
 
 # Teljes tesztkészlet a repóval (a repó-hatókörű tesztek is futnak)
 docker run --rm -v "${PWD}:/repo:ro" -e VQEBD_REPO_ROOT=/repo `
   -e PYTHONPATH=/repo/src -e VQEBD_IN_CONTAINER=1 -w /repo `
-  vqebd:0.1.0 python -m pytest tests -ra -p no:cacheprovider
+  vqebd:0.3.0 python -m pytest tests -ra -p no:cacheprovider
 ```
 
 ### 4.4 Várt kimenetek

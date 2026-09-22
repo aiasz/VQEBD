@@ -12,7 +12,99 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 1b** — zajos szimuláció FakeBackend-en, kvótamentesen (`v0.3.0`).
+- **Fázis 1b** — zajos szimuláció FakeBackend-en, kvótamentesen (`v0.4.0`).
+- **Fázis 2** — valódi IBM QPU-futtatás (`ibm_kingston`), teljes dokumentációval.
+
+---
+
+## [0.3.0] — 2026-09-22
+
+**Fázis 1M lezárva — Többplatformos validáció (Qiskit ↔ Cirq ↔ qsim).**
+
+Az alaptervhez képest **új fázis**. Indoka: egy benchmark, amelynek eredménye
+egyetlen könyvtár sajátossága lehet, nem benchmark. A platform önálló
+benchmark-dimenzióvá vált (ADR-0006).
+
+### Hozzáadva
+
+#### Második platform
+- `cirq-core 1.4.1` és `qsimcirq 0.22.1` a stackben. Az újabb Cirq-ágak
+  `numpy>=1.25`, illetve `numpy~=2.1` korlátja miatt kizárva; az 1.4.1 egyúttal
+  a Mitiq `cirq-core<1.5.0` pinjével is kompatibilis (Fázis 3).
+- `vqebd.platforms` — platform-metaadatok: számábrázolás, **mért zajszint**,
+  tolerancia, gradiens-biztonság, ajánlott optimalizáló.
+- `vqebd.backends.conversion` — Qiskit → Cirq konverzió (Hamilton-operátor és
+  áramkör), **mátrixszinten validálva**.
+- `vqebd.backends.cirq_estimators` — `CirqEnergyEvaluator`, `QsimEnergyEvaluator`.
+- CLI: `--backend qiskit_statevector | cirq_simulator | qsim`.
+
+#### IBM-hitelesítés (a Fázis 2 előkészítése)
+- `vqebd.credentials` — token betöltése három forrásból (környezeti változó →
+  `.env` → `IBM.token` JSON), **maszkolt `repr()`-rel**; a titok csak explicit
+  `reveal()` hívással érhető el.
+- `scripts/check_ibm_access.py` — **kvótamentes** hozzáférés-ellenőrzés
+  (csak olvasás), fiókdiagnosztikával.
+
+#### Vizualizáció
+- `scripts/gen_report_figures.py` — 5 ábra a **tényleges mérési adatokból**,
+  CVD-validált palettával. A nyers adatok `docs/figures/data/*.json`.
+
+#### Dokumentáció
+- `docs/01m_multiplatform.md` — **„Hozzájárul-e a több platform a pontossághoz?"**
+  — a mért, őszinte válasz, azzal együtt, hogy mit **nem** ad.
+- `docs/plan/phase_01m.md`, `docs/adr/ADR-0006`, `TP-F01M` + `TR-F01M`.
+
+### Mért eredmények (H2, 0.735 Å, STO-3G)
+
+| Platform | Optimalizáló | E (Ha) | Eltérés a Qiskittől |
+|---|---|---|---|
+| `qiskit_statevector` | SLSQP | −1.137306035753 | referencia |
+| `cirq_simulator` | SLSQP | −1.137306035753 | **4.4 × 10⁻¹⁶** |
+| `qsim` | Powell | −1.137306006762 | **2.9 × 10⁻⁸** |
+
+Qubit-sorrend (endianness) mátrixszintű igazolása:
+fordított sorrenddel `max|ΔM| = 0.00`, egyenessel **1.59**.
+
+### A fázis legfontosabb felfedezése
+
+**A gradiens-alapú optimalizálók csendben téves minimumot találnak egyszeres
+pontosságú platformon.** A SciPy véges-differencia lépésköze
+`√ε₆₄ ≈ 1.49 × 10⁻⁸`, a qsim célfüggvény-zaja viszont `1.13 × 10⁻⁷` — nagyobb a
+lépésköznél, ezért a becsült gradiens zajból származik (**8 nagyságrend** hiba).
+
+| Optimalizáló | Qiskit | Cirq | qsim |
+|---|---|---|---|
+| SLSQP (gradiens) | 9 × 10⁻¹⁵ | 9 × 10⁻¹⁵ | **1.5 × 10⁻² ✗** |
+| TNC (gradiens) | 1 × 10⁻¹³ | 4 × 10⁻¹⁵ | **2.0 × 10⁻² ✗** |
+| Powell (deriváltmentes) | 1 × 10⁻¹⁵ | 0 | **2.9 × 10⁻⁸ ✅** |
+
+**Ez egyetlen platformon nem derülhetett volna ki**: Qiskiten és Cirqen mind a
+nyolc optimalizáló hibátlan. A hibamód a Fázis 1b-ben vagy 2-ben bukkant volna
+elő — ott viszont már IBM-kvótát égetve, „sikeresen konvergált" futásnak álcázva.
+
+Beépítve: a `run_vqe()` futásidejű `RuntimeWarning`-ot ad a veszélyes
+kombinációkra, és minden platformnak van **mért** ajánlott optimalizálója.
+
+### Változott (törő)
+- **`BackendKind` átnevezés:** `"statevector"` → `"qiskit_statevector"`.
+  Indok: a platform nélküli név három egzakt szimulátor mellett félreérthető.
+- A `VQEResult` új mezői: `platform`, `precision`, `backend_tolerance_ha`,
+  és a `within_backend_tolerance` tulajdonság.
+
+### Javítva
+- **Commitolt merge-konfliktusok** a `.gitignore` és a `LICENSE` fájlokban (a
+  távoli repó csatolása után). A titokvédelem sértetlen maradt — ellenőrizve:
+  a token egyetlen commitban sem szerepel.
+- **Nem reprodukálható teljesítmény-állítás:** egy korábbi, egyszeri mérés 24
+  qubiten 22-szeres qsim-gyorsulást közölt. Ismételt méréssel (min-of-3) a valós
+  tartomány **3.6–9.1×**. Minden dokumentum javítva.
+- `mypy`: a Cirq implicit re-exportjaihoz célzott override — a saját kód
+  ellenőrzése változatlanul szigorú.
+
+### Megjegyzés
+A `matplotlib` explicit pint kapott: tranzitívan amúgy is települne, de az
+ábrák közvetlen függősége, és egy csendes verzióváltás megváltoztathatná a
+generált ábrákat.
 
 ---
 
@@ -176,6 +268,7 @@ A `requirements.txt` ebben a fázisban **szándékosan üres** — az alapterv e
 szerint a Fázis 0 image nem tartalmazhat kvantumkönyvtárat. A teljes, már feloldott
 stack a Fázis 1-ben kerül be.
 
-[Unreleased]: https://github.com/kormosattila/vqebd/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/kormosattila/vqebd/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/kormosattila/vqebd/releases/tag/v0.1.0
+[Unreleased]: https://github.com/aiasz/VQEBD/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/aiasz/VQEBD/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/aiasz/VQEBD/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/aiasz/VQEBD/releases/tag/v0.1.0

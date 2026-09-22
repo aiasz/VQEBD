@@ -152,11 +152,21 @@ Ismeretlen kapu esetén **azonnali `ValueError`**, nem néma kihagyás.
 
 ### Energia-egyezés
 
-| Platform | E (Ha) | Eltérés a Qiskittől |
-|---|---|---|
-| `qiskit_statevector` | −1.137306035753 | referencia |
-| `cirq_simulator` | −1.137306035753 | **−2.22 × 10⁻¹⁵** |
-| `qsim` | −1.137305744285 | **+2.91 × 10⁻⁷** |
+Mindegyik platform a **hozzá mért** ajánlott optimalizálóval (lásd lent a
+gradiens-biztonsági szakaszt):
+
+| Platform | Optimalizáló | E (Ha) | Eltérés a Qiskittől |
+|---|---|---|---|
+| `qiskit_statevector` | SLSQP | −1.137306035753 | referencia |
+| `cirq_simulator` | SLSQP | −1.137306035753 | **4.4 × 10⁻¹⁶** |
+| `qsim` | **Powell** | −1.137306006762 | **2.9 × 10⁻⁸** |
+
+> **Fontos árnyalat.** A spike korábbi mérése a qsimre `+2.91 × 10⁻⁷` eltérést
+> adott — ott azonban a **Qiskit által megtalált optimális paramétereket**
+> értékeltük ki, nem a qsim saját optimalizálásának eredményét. A két szám nem
+> mond ellent egymásnak: az egyik a *kiértékelés* pontosságát méri, a másik a
+> *teljes VQE-futásét*. Ez a különbség vezetett a gradiens-biztonsági
+> felfedezéshez.
 
 ### A qsim eltérésének oka — **egyszeres pontosság**
 
@@ -179,12 +189,19 @@ a qsim hibája (~10⁻⁷ Ha) **négy nagyságrenddel** a kémiai pontosság
 
 ### Teljesítmény (GHZ-lánc + forgatások, egy szálon)
 
+Mért értékek (**3 ismétlésből a legrövidebb** — az időmérés zaja csak hozzáadni tud):
+
 | Qubit | `cirq.Simulator` | `qsim` | Gyorsulás |
 |---|---|---|---|
-| 12 | 0.003 s | 0.001 s | 4.5× |
-| 16 | 0.010 s | 0.001 s | 6.8× |
-| 20 | 0.119 s | 0.010 s | 11.9× |
-| **24** | **17.380 s** | **0.791 s** | **22.0×** |
+| 12 | 0.0024 s | 0.0006 s | 4.2× |
+| 16 | 0.0046 s | 0.0009 s | 4.9× |
+| 20 | 0.0747 s | 0.0082 s | 9.1× |
+| **24** | **2.2274 s** | **0.4697 s** | **4.7×** |
+
+> **Korrigált állítás.** E dokumentum korábbi változata 24 qubiten 22-szeres
+> gyorsulást közölt egyetlen mérés alapján. Ismételt méréssel ez **nem
+> reprodukálható**; a valós tartomány **3.6–9.1×**. A javítás oka: az egyszeri
+> mérés hideg gyorsítótárral futott, és a mérési zajt nem szűrtük.
 
 A `qsim` alapértelmezett `cpu_threads = 1`. Több szál gyorsítana, de a
 lebegőpontos összegzés sorrendje szálszám-függő lenne — ez sértené az
@@ -193,6 +210,48 @@ determinizmus elsőbbséget élvez a sebességgel szemben**; a szálszám
 konfigurálható, de az alapértelmezés 1 marad, és a rekord tárolja.
 
 Mért determinizmus: a `qsim` háromszori futtatása **bitre azonos** eredményt ad.
+
+---
+
+### A legfontosabb hozadék: az optimalizáló × pontosság kölcsönhatás
+
+A platform-dimenzió **azonnal megtérült**: felderített egy csendes hibamódot,
+amelyet egyetlen platformon lehetetlen lett volna észrevenni.
+
+**A jelenség.** A gradiens-alapú SciPy-optimalizálók véges differenciákkal
+becsülnek gradienst, `h = √ε₆₄ ≈ 1.49 × 10⁻⁸` lépésközzel. Ha a célfüggvény zaja
+nagyobb ennél, a becsült gradiens **zajból** származik.
+
+Mért érték az optimum közelében:
+
+| Platform | `f(x+h) − f(x)` | Becsült gradiens |
+|---|---|---|
+| `qiskit_statevector` | +6.66 × 10⁻¹⁶ | +4.47 × 10⁻⁸ ✅ |
+| `cirq_simulator` | +2.22 × 10⁻¹⁶ | +1.49 × 10⁻⁸ ✅ |
+| **`qsim`** | **−1.13 × 10⁻⁷** | **−7.61** ❌ |
+
+**A következmény.** H2-re, a Full CI-hez mért hiba:
+
+| Optimalizáló | Típus | Qiskit | Cirq | qsim |
+|---|---|---|---|---|
+| SLSQP | gradiens | 9 × 10⁻¹⁵ | 9 × 10⁻¹⁵ | **1.5 × 10⁻² ✗** |
+| TNC | gradiens | 1 × 10⁻¹³ | 4 × 10⁻¹⁵ | **2.0 × 10⁻² ✗** |
+| Powell | deriváltmentes | 1 × 10⁻¹⁵ | 0 | **2.9 × 10⁻⁸ ✅** |
+| Nelder-Mead | deriváltmentes | 1 × 10⁻¹⁵ | 4 × 10⁻¹⁶ | **9.9 × 10⁻⁹ ✅** |
+
+*(✗ = kémiai pontosság fölött, „sikeresen konvergált" állapotban)*
+
+**A döntés.** A `PlatformInfo` mostantól tárolja a **mért** `noise_floor_ha`
+értéket, és abból **számítja** a `gradient_safe` besorolást
+(küszöb: a lépésköz századrésze). Minden platformnak van mért
+`recommended_optimizer`-e, és a `run_vqe()` **futásidejű figyelmeztetést** ad a
+veszélyes kombinációkra — mert a csendes hibás eredmény veszélyesebb a hangos
+hibánál.
+
+**Miért számít ez a további fázisokra.** Ugyanez a hibamód fog jelentkezni a
+Fázis 1b-ben (lövészaj) és a Fázis 2-ben (hardverzaj), ahol a zajszint
+nagyságrendekkel nagyobb. A Fázis 1M tehát **előre megoldotta** a Fázis 1b
+optimalizáló-választását — kvótamentesen.
 
 ---
 

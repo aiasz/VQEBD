@@ -38,7 +38,7 @@ class QuadraticEvaluator(EnergyEvaluator):
 
     @property
     def kind(self) -> BackendKind:
-        return "statevector"
+        return "qiskit_statevector"
 
     def evaluate(self, parameters: Sequence[float]) -> float:
         return sum((p - c) ** 2 for p, c in zip(parameters, self.center, strict=True)) + self.offset

@@ -23,9 +23,8 @@ pytest.importorskip("pyscf", reason="a Fázis 1 kvantum-stackjét igényli")
 pytest.importorskip("cirq", reason="a Fázis 1M Cirq-platformját igényli")
 pytest.importorskip("qsimcirq", reason="a Fázis 1M qsim-platformját igényli")
 
-import numpy as np
-
 import cirq
+import numpy as np
 
 from vqebd.backends.conversion import (
     CIRQ_BASIS_GATES,
@@ -37,8 +36,15 @@ from vqebd.backends.conversion import (
 from vqebd.chemistry.mapping import map_to_qubits
 from vqebd.chemistry.molecule import h2
 from vqebd.chemistry.problem import build_electronic_structure
-from vqebd.config import BackendKind, MapperKind, MoleculeSpec, VQEConfig
-from vqebd.platforms import PLATFORMS, platform_of
+from vqebd.config import BackendKind, MapperKind, MoleculeSpec, OptimizerSpec, VQEConfig
+from vqebd.platforms import (
+    DERIVATIVE_FREE_OPTIMIZERS,
+    GRADIENT_BASED_OPTIMIZERS,
+    PLATFORMS,
+    SCIPY_FINITE_DIFFERENCE_STEP,
+    check_optimizer_compatibility,
+    platform_of,
+)
 from vqebd.seeds import SeedSet
 from vqebd.vqe.ansatz import build_ansatz
 from vqebd.vqe.result import VQEResult
@@ -54,6 +60,15 @@ MATRIX_TOLERANCE = 1e-12
 
 
 def _config(backend: BackendKind = "qiskit_statevector", **kwargs: object) -> VQEConfig:
+    """Konfiguráció a platformhoz **mért** alapértelmezésekkel.
+
+    Az optimalizálót nem rögzítjük globálisan: a ``qsim`` egyszeres pontossága
+    miatt ott deriváltmentes módszer kell (lásd ``test_gradient_safety`` és
+    ADR-0006). Ez maga is a többplatformos vizsgálat eredménye.
+    """
+    kwargs.setdefault(
+        "optimizer", OptimizerSpec(method=platform_of(backend).recommended_optimizer, maxiter=2000)
+    )
     return VQEConfig(molecule=h2(0.735), backend=backend, **kwargs)  # type: ignore[arg-type]
 
 
@@ -133,9 +148,7 @@ def test_converted_hamiltonian_has_the_same_ground_state(hamiltonian: object) ->
     qubits = cirq.LineQubit.range(operator.num_qubits)
     pauli_sum = to_cirq_pauli_sum(operator, qubits)
 
-    eigen_cirq = float(
-        np.linalg.eigvalsh(pauli_sum.matrix(qubits=cirq_qubit_order(qubits)))[0]
-    )
+    eigen_cirq = float(np.linalg.eigvalsh(pauli_sum.matrix(qubits=cirq_qubit_order(qubits)))[0])
     eigen_qiskit = float(np.linalg.eigvalsh(operator.to_matrix())[0])
     assert eigen_cirq == pytest.approx(eigen_qiskit, abs=1e-12)
 
@@ -169,7 +182,7 @@ def test_ac_1m_4_circuit_conversion_preserves_the_state(hamiltonian: object) -> 
         cirq.Simulator(dtype=np.complex128)
         .simulate(converted, qubit_order=cirq_qubit_order(qubits))
         .final_state_vector,
-        dtype=complex,
+        dtype=np.complex128,
     )
 
     overlap = abs(complex(np.vdot(state_cirq, state_qiskit)))
@@ -228,8 +241,7 @@ def test_ac_1m_6_cirq_agrees_with_qiskit(
     qiskit_energy = results_by_backend["qiskit_statevector"].energy
     cirq_energy = results_by_backend["cirq_simulator"].energy
     assert cirq_energy == pytest.approx(qiskit_energy, abs=1e-9), (
-        f"cirq={cirq_energy:.12f} qiskit={qiskit_energy:.12f} "
-        f"d={cirq_energy - qiskit_energy:.3e}"
+        f"cirq={cirq_energy:.12f} qiskit={qiskit_energy:.12f} d={cirq_energy - qiskit_energy:.3e}"
     )
 
 
@@ -244,8 +256,7 @@ def test_ac_1m_7_qsim_agrees_with_qiskit(
     qiskit_energy = results_by_backend["qiskit_statevector"].energy
     qsim_energy = results_by_backend["qsim"].energy
     assert qsim_energy == pytest.approx(qiskit_energy, abs=1e-5), (
-        f"qsim={qsim_energy:.12f} qiskit={qiskit_energy:.12f} "
-        f"d={qsim_energy - qiskit_energy:.3e}"
+        f"qsim={qsim_energy:.12f} qiskit={qiskit_energy:.12f} d={qsim_energy - qiskit_energy:.3e}"
     )
 
 
@@ -255,9 +266,7 @@ def test_ac_1m_8_every_platform_is_chemically_accurate(
 ) -> None:
     """Mindhárom platform kémiai pontosságon belül van a Full CI-hez képest."""
     result = results_by_backend[backend]
-    assert result.within_chemical_accuracy, (
-        f"{backend}: hiba {result.error_vs_reference:.3e} Ha"
-    )
+    assert result.within_chemical_accuracy, f"{backend}: hiba {result.error_vs_reference:.3e} Ha"
 
 
 @pytest.mark.parametrize("backend", ALL_BACKENDS)
@@ -300,8 +309,7 @@ def test_ac_1m_9_determinism_per_platform(backend: BackendKind) -> None:
     first = run_vqe(config)
     second = run_vqe(config)
     assert first.energy == second.energy, (
-        f"{backend}: {first.energy!r} != {second.energy!r} "
-        f"(d={first.energy - second.energy:.3e})"
+        f"{backend}: {first.energy!r} != {second.energy!r} (d={first.energy - second.energy:.3e})"
     )
 
 
@@ -376,9 +384,8 @@ def test_x1m1_all_platforms_agree_for_every_mapper(mapper: MapperKind) -> None:
         backend: run_vqe(_config(backend, mapper=mapper)).energy for backend in ALL_BACKENDS
     }
     spread = max(energies.values()) - min(energies.values())
-    assert spread < 1e-5, (
-        f"{mapper}: a platformok szórása {spread:.3e} Ha — "
-        + ", ".join(f"{b}={e:.12f}" for b, e in energies.items())
+    assert spread < 1e-5, f"{mapper}: a platformok szórása {spread:.3e} Ha — " + ", ".join(
+        f"{b}={e:.12f}" for b, e in energies.items()
     )
 
 
@@ -392,11 +399,178 @@ def test_x1m4_platforms_agree_along_the_dissociation_curve(distance: float) -> N
     """
     molecule = MoleculeSpec(name="H2", atom=f"H 0 0 0; H 0 0 {distance}", bond_length=distance)
     energies = {
-        backend: run_vqe(VQEConfig(molecule=molecule, backend=backend), compute_fci=False).energy
+        backend: run_vqe(
+            VQEConfig(
+                molecule=molecule,
+                backend=backend,
+                optimizer=OptimizerSpec(
+                    method=platform_of(backend).recommended_optimizer, maxiter=2000
+                ),
+            ),
+            compute_fci=False,
+        ).energy
         for backend in ALL_BACKENDS
     }
     spread = max(energies.values()) - min(energies.values())
-    assert spread < 1e-5, (
-        f"r={distance} Å: a platformok szórása {spread:.3e} Ha — "
-        + ", ".join(f"{b}={e:.12f}" for b, e in energies.items())
+    assert spread < 1e-5, f"r={distance} Å: a platformok szórása {spread:.3e} Ha — " + ", ".join(
+        f"{b}={e:.12f}" for b, e in energies.items()
+    )
+
+
+# =============================================================================
+# A TÖBBPLATFORMOS VIZSGÁLAT HOZADÉKA — az optimalizáló × pontosság kölcsönhatás
+# =============================================================================
+#
+# Ez a szakasz a Fázis 1M legfontosabb eredményét rögzíti. A felfedezés NEM
+# jöhetett volna elő egyetlen platformon: a Qiskiten és a Cirqen mind a nyolc
+# vizsgált optimalizáló hibátlanul működik. Csak a qsim bevonásával derült ki,
+# hogy a gradiens-alapú módszerek CSENDBEN téves minimumot találnak, ha a
+# célfüggvény zaja meghaladja a véges-differencia lépésközt.
+#
+# Ugyanez a hibamód fog jelentkezni a Fázis 1b-ben (lövészaj) és a Fázis 2-ben
+# (hardverzaj) — ott viszont már IBM-kvótát égetve derülne ki.
+
+
+def test_finite_difference_step_is_the_documented_scipy_default() -> None:
+    """A dokumentált lépésköz valóban a SciPy alapértelmezése: ``sqrt(eps)``."""
+    assert (
+        pytest.approx(float(np.sqrt(np.finfo(float).eps)), rel=1e-12)
+        == SCIPY_FINITE_DIFFERENCE_STEP
+    )
+
+
+@pytest.mark.parametrize("backend", ALL_BACKENDS)
+def test_noise_floor_is_measured_not_guessed(backend: BackendKind) -> None:
+    """A nyilvántartott zajszint egyezik a ténylegesen mérttel.
+
+    A célfüggvényt az optimum közelében kiértékeljük, majd egy
+    véges-differencia lépésnyivel elmozdítva újra. A különbség nagyságrendje a
+    platform zajszintje. Ha a nyilvántartás elcsúszna a valóságtól, a
+    gradiens-biztonsági döntés is hibás lenne.
+    """
+    from vqebd.backends.estimators import make_energy_evaluator
+    from vqebd.config import AnsatzSpec
+
+    structure = build_electronic_structure(h2(0.735))
+    qubit_hamiltonian = map_to_qubits(structure, "parity", two_qubit_reduction=True)
+    seeds = SeedSet.derive(20260922)
+    bundle = build_ansatz(structure, qubit_hamiltonian, AnsatzSpec(), seeds)
+
+    evaluator = make_energy_evaluator(backend, bundle.circuit, qubit_hamiltonian.operator, seeds)
+    base_point = [0.0, 0.0, -0.1117685][: bundle.num_parameters]
+    shifted_point = list(base_point)
+    shifted_point[-1] += SCIPY_FINITE_DIFFERENCE_STEP
+
+    observed = abs(evaluator(shifted_point) - evaluator(base_point))
+    declared = platform_of(backend).noise_floor_ha
+
+    # A mért változás nem haladhatja meg a nyilvántartott zajszint tízszeresét.
+    assert observed <= declared * 10.0, (
+        f"{backend}: a mért zaj {observed:.3e} Ha, a nyilvántartott "
+        f"{declared:.3e} Ha — a PlatformInfo felülvizsgálandó"
+    )
+
+
+@pytest.mark.parametrize("backend", ALL_BACKENDS)
+def test_gradient_safety_matches_the_noise_floor(backend: BackendKind) -> None:
+    """A ``gradient_safe`` besorolás a zajszintből következik, nem vélekedésből."""
+    info = platform_of(backend)
+    expected = info.noise_floor_ha < SCIPY_FINITE_DIFFERENCE_STEP * 1e-2
+    assert info.gradient_safe is expected
+
+    if info.precision == "complex64":
+        assert not info.gradient_safe, (
+            "egyszeres pontosságú platformon a véges differenciás gradiens nem lehet megbízható"
+        )
+
+
+def test_qsim_is_flagged_as_gradient_unsafe() -> None:
+    """A qsim kifejezetten gradiens-veszélyesnek van jelölve.
+
+    Ez a mért tény kodifikálása: az SLSQP a qsimen 1.46e-02 Ha hibát adott,
+    miközben a Powell 2.90e-08-at (TR-F01M).
+    """
+    info = platform_of("qsim")
+    assert not info.gradient_safe
+    assert info.recommended_optimizer in DERIVATIVE_FREE_OPTIMIZERS
+    assert info.gradient_error_factor > 1.0, (
+        "a qsim zajszintje a véges-differencia lépésköz FÖLÖTT kell legyen"
+    )
+
+
+@pytest.mark.parametrize("backend", ["qiskit_statevector", "cirq_simulator"])
+def test_double_precision_platforms_are_gradient_safe(backend: BackendKind) -> None:
+    """Kétszeres pontosságon a gradiens-alapú optimalizálás megbízható."""
+    info = platform_of(backend)
+    assert info.gradient_safe
+    assert info.recommended_optimizer in GRADIENT_BASED_OPTIMIZERS
+
+
+@pytest.mark.parametrize("method", sorted(GRADIENT_BASED_OPTIMIZERS))
+def test_gradient_optimizer_on_qsim_raises_a_warning(method: str) -> None:
+    """Gradiens-alapú optimalizáló a qsimen **figyelmeztetést** kap.
+
+    A csendes hibás eredmény a legveszélyesebb hibamód: a futás „sikeres", a
+    szám viszont rossz. Ezért a rendszer kimondja.
+    """
+    warning = check_optimizer_compatibility("qsim", method)
+    assert warning is not None
+    assert method in warning
+    assert "MEGBÍZHATATLAN" in warning
+    assert "Powell" in warning  # az ajánlott alternatíva szerepel
+
+
+@pytest.mark.parametrize("method", sorted(DERIVATIVE_FREE_OPTIMIZERS))
+def test_derivative_free_optimizer_on_qsim_is_accepted(method: str) -> None:
+    """Deriváltmentes optimalizáló a qsimen nem vált ki figyelmeztetést."""
+    assert check_optimizer_compatibility("qsim", method) is None
+
+
+@pytest.mark.parametrize("method", sorted(GRADIENT_BASED_OPTIMIZERS))
+def test_gradient_optimizer_on_double_precision_is_accepted(method: str) -> None:
+    """Kétszeres pontosságú platformon a gradiens-alapú módszer rendben van."""
+    assert check_optimizer_compatibility("qiskit_statevector", method) is None
+
+
+def test_runner_warns_about_incompatible_optimizer() -> None:
+    """A ``run_vqe`` futásidőben is figyelmeztet a veszélyes kombinációra."""
+    config = VQEConfig(
+        molecule=h2(0.735),
+        backend="qsim",
+        optimizer=OptimizerSpec(method="SLSQP", maxiter=100),
+    )
+    with pytest.warns(RuntimeWarning, match="MEGBÍZHATATLAN"):
+        run_vqe(config, compute_fci=False)
+
+
+def test_derivative_free_optimizer_rescues_qsim_accuracy() -> None:
+    """A deriváltmentes optimalizáló **nagyságrendekkel** jobb eredményt ad qsimen.
+
+    Ez a teszt közvetlenül bizonyítja a Fázis 1M hozadékát: ugyanaz a platform,
+    ugyanaz a feladat, csak az optimalizáló más — és az eredmény négy
+    nagyságrendet javul.
+    """
+    molecule = h2(0.735)
+    gradient_based = run_vqe(
+        VQEConfig(
+            molecule=molecule,
+            backend="qsim",
+            optimizer=OptimizerSpec(method="SLSQP", maxiter=2000),
+        )
+    )
+    derivative_free = run_vqe(
+        VQEConfig(
+            molecule=molecule,
+            backend="qsim",
+            optimizer=OptimizerSpec(method="Powell", maxiter=2000),
+        )
+    )
+
+    assert abs(derivative_free.error_vs_reference) < abs(gradient_based.error_vs_reference), (
+        f"a deriváltmentes optimalizáló nem javított: "
+        f"Powell {derivative_free.error_vs_reference:.3e} vs "
+        f"SLSQP {gradient_based.error_vs_reference:.3e}"
+    )
+    assert derivative_free.within_chemical_accuracy, (
+        f"a Powell sem érte el a kémiai pontosságot: {derivative_free.error_vs_reference:.3e} Ha"
     )
