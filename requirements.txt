@@ -1,0 +1,32 @@
+# =============================================================================
+# VQEBD — futásidejű függőségek
+# =============================================================================
+# FÁZIS 0: szándékosan ÜRES.
+#
+# Az alapterv (quantum-benchmark-projektterv.md, Fázis 0) előírja:
+#   "Egyetlen minimális Dockerfile, amely csak Python 3.11 + pip-et telepít,
+#    semmi kvantumkönyvtárat még."
+#
+# Indok: a Fázis 0 célja annak igazolása, hogy a konténer-infrastruktúra
+# önmagában működik. Ha a kvantumkönyvtárak is itt lennének, egy build-hiba
+# esetén nem tudnánk szétválasztani az infrastruktúra és a függőségek hibáját.
+#
+# A teljes, már feloldott és funkcionálisan igazolt stack a FÁZIS 1-ben kerül
+# ide, pontos == pinnekkel:
+#
+#   numpy==1.26.4            # mitiq korlátja: numpy<2.0  (ADR-0001, M1)
+#   scipy==1.13.1
+#   qiskit==1.4.6            # az utolsó, numpy 1.x-et engedő ág
+#   qiskit-aer==0.17.2
+#   qiskit-nature==0.7.2     # a 0.8.0 numpy>=2-t követel -> kizárva
+#   qiskit-ibm-runtime==0.41.1
+#   pyscf==2.14.0
+#   ply==3.11                # a mitiq qiskit-interfészének REJTETT függősége (M2)
+#
+# A mitiq (GPL-3.0) NEM ide, hanem a requirements-mitiq.txt fájlba kerül:
+# opcionális, futásidőben betöltött komponens (ADR-0003, licencelkülönítés).
+#
+# Lásd:
+#   docs/adr/ADR-0001-technologiai-stack.md
+#   docs/testing/TR-000_spike.md
+# =============================================================================

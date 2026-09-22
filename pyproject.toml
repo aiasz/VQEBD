@@ -1,0 +1,145 @@
+#-----------------------------------------------------------------------------
+# VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard
+# Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+# Licenc: MIT
+#-----------------------------------------------------------------------------
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vqebd"
+description = "VQE-alapú kvantumkémiai benchmark hibaenyhítési stratégiák összehasonlítására"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11,<3.13"        # alsó: a projekt célja; felső: mitiq<3.13 (ADR-0001)
+dynamic = ["version"]                   # igazságforrás: a VERSION fájl
+
+authors = [
+    { name = "Kormos Attila", email = "kormosa@gmail.com" },
+    { name = "Claude AI (Anthropic, Claude Opus 5)" },
+]
+maintainers = [
+    { name = "Kormos Attila", email = "kormosa@gmail.com" },
+]
+keywords = [
+    "quantum-computing", "vqe", "quantum-chemistry", "error-mitigation",
+    "benchmark", "qiskit", "zero-noise-extrapolation", "nisq",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Operating System :: POSIX :: Linux",
+]
+
+# Fázis 0: szándékosan üres. A kvantum-stack a Fázis 1-ben kerül be,
+# a TR-000 spike-ban feloldott, rögzített verziókkal (ADR-0001).
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/kormosattila/vqebd"
+Documentation = "https://github.com/kormosattila/vqebd/tree/main/docs"
+Repository = "https://github.com/kormosattila/vqebd"
+Changelog = "https://github.com/kormosattila/vqebd/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["vqebd*"]
+
+[tool.setuptools.package-data]
+vqebd = ["py.typed"]
+
+#-----------------------------------------------------------------------------
+# Ruff — lint és formázás
+#-----------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "scripts", "dashboard"]
+extend-exclude = ["scripts/spike"]       # a spike-szkriptek nem termelési kód (TR-000)
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle hibák
+    "W",    # pycodestyle figyelmeztetések
+    "F",    # pyflakes
+    "I",    # isort — importrendezés
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "C4",   # flake8-comprehensions
+    "PTH",  # flake8-use-pathlib
+    "RUF",  # ruff-specifikus szabályok
+    "ARG",  # nem használt argumentumok
+    "PIE",  # flake8-pie
+    "RET",  # flake8-return
+]
+ignore = [
+    "RUF001",  # ambiguous-unicode-character-string — magyar szövegben téves riasztás
+    "RUF002",  # ugyanaz docstringben
+    "RUF003",  # ugyanaz kommentben
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ARG"]                     # pytest fixture-ök gyakran "nem használtak"
+
+[tool.ruff.lint.isort]
+known-first-party = ["vqebd"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+#-----------------------------------------------------------------------------
+# mypy — statikus típusellenőrzés
+#-----------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+files = ["src/vqebd", "tests", "scripts/gen_references.py"]
+strict = true
+warn_unreachable = true
+pretty = true
+show_error_codes = true
+exclude = ["scripts/spike/"]
+
+# A kvantum-stack nagy részének nincs típus-annotációja (Fázis 1-től releváns).
+[[tool.mypy.overrides]]
+module = [
+    "qiskit.*", "qiskit_aer.*", "qiskit_nature.*", "qiskit_ibm_runtime.*",
+    "mitiq.*", "cirq.*", "pyscf.*", "scipy.*",
+]
+ignore_missing_imports = true
+
+#-----------------------------------------------------------------------------
+# pytest
+#-----------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-q",
+    "--strict-markers",
+    "--strict-config",
+    "--import-mode=importlib",
+]
+markers = [
+    "unit: gyors, izolált egységteszt (kvantumszimuláció nélkül)",
+    "integration: több modul együtt, szimulátorral",
+    "validation: fizikai helyesség irodalmi/egzakt referenciával szemben",
+    "slow: 10 másodpercnél hosszabb futás",
+    "hardware: valódi IBM QPU-t igényel (CI-ben SOHA nem fut)",
+    "requires_mitiq: a telepített, opcionális mitiq csomagot igényli",
+]
+filterwarnings = [
+    "error::DeprecationWarning:vqebd.*",   # a SAJÁT kódunk elavultsága hiba
+]

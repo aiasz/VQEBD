@@ -1,0 +1,88 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# VQEBD — .gitignore
+# FIGYELEM: a titkokra vonatkozó szabályokat (.env, *.token, stb.) automatikus
+# teszt őrzi: tests/unit/test_secrets_hygiene.py. Ne töröld őket.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# --- Titkok ---------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.token
+*.secret
+*.pem
+*.key
+secrets/
+.qiskit/
+qiskit-ibm.json
+
+# --- Futásidőben keletkező adat -------------------------------------------
+# A KÖNYVTÁRAK megmaradnak (.gitkeep), csak a TARTALMUK van kizárva. Git nem tud
+# fájlt visszaengedni egy kizárt könyvtárból, ezért `dir/*` és nem `dir/` a minta.
+data/db/*
+data/raw/*
+data/exports/*
+!data/db/.gitkeep
+!data/raw/.gitkeep
+!data/exports/.gitkeep
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+pip-wheel-metadata/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtuális környezetek -------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# --- Tesztelés és lefedettség ----------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# --- Jupyter ---------------------------------------------------------------
+.ipynb_checkpoints/
+
+# --- Docker ----------------------------------------------------------------
+.docker/
+
+# --- Szerkesztők és operációs rendszer --------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Generált ábrák (a docs/figures/ csak a véglegeseket tartalmazza) -------
+docs/figures/tmp/
+
+# --- Streamlit -------------------------------------------------------------
+.streamlit/secrets.toml

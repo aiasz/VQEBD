@@ -1,0 +1,49 @@
+# =============================================================================
+# VQEBD — docker-compose (Fázis 0)
+# Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+# =============================================================================
+# Fázis 0-ban SZÁNDÉKOSAN csak egyetlen szolgáltatás van. Célja, hogy a
+# `docker compose` útvonal már most teszteltessen — a `scheduler`, `dashboard`
+# és opcionális `db` szolgáltatások a Fázis 6–8-ban kerülnek ide.
+#
+# Futtatás a repó gyökeréből:
+#   docker compose -f docker/docker-compose.yml build
+#   docker compose -f docker/docker-compose.yml run --rm app python --version
+# =============================================================================
+
+name: vqebd
+
+services:
+  app:
+    build:
+      context: ..                 # a build-kontextus a repó GYÖKERE, nem a docker/ mappa
+      dockerfile: docker/Dockerfile
+      platforms:
+        - linux/amd64             # lebegőpontos determinizmus (ADR-0005)
+      args:
+        APP_UID: "1000"
+        APP_GID: "1000"
+    image: vqebd:0.1.0
+    container_name: vqebd-app
+    init: true                    # helyes jelkezelés (Ctrl+C), zombie-folyamatok elkerülése
+    working_dir: /app
+    environment:
+      PYTHONHASHSEED: "0"
+      PYTHONPATH: /app/src
+      TZ: Europe/Budapest
+    env_file:
+      - path: ../.env             # az IBM-token ide kerül (Fázis 2); SOHA nem a repóba
+        required: false           # Fázis 0-ban még nincs .env — ne akadjon el
+    volumes:
+      # Fejlesztői bind-mount: a forrás és a tesztek élőben szerkeszthetők,
+      # újraépítés nélkül. A `data/` nevesített volume-ként, hogy a konténerben
+      # keletkezett fájlok ne szennyezzék a gazdagép jogosultságait.
+      - ../src:/app/src:ro
+      - ../tests:/app/tests:ro
+      - ../scripts:/app/scripts:ro
+      - vqebd-data:/app/data
+    command: ["python", "--version"]
+
+volumes:
+  vqebd-data:
+    name: vqebd-data

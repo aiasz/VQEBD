@@ -1,0 +1,55 @@
+# VQEBD — .dockerignore
+# Cél: kicsi build-kontextus és annak garantálása, hogy titok soha ne kerüljön
+# az image rétegeibe.
+
+# --- Titkok (SOHA ne kerüljenek az image-be) -------------------------------
+.env
+.env.*
+!.env.example
+*.token
+*.secret
+*.pem
+*.key
+secrets/
+.qiskit/
+
+# --- Verziókezelés ---------------------------------------------------------
+.git
+.gitignore
+.gitattributes
+.github
+
+# --- Adat (volume-on csatoljuk, nem az image-be) --------------------------
+data/
+*.sqlite
+*.db
+
+# --- Python melléktermékek -------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# --- Gyorsítótárak ---------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Dokumentáció (nem kell a futtatáshoz) ---------------------------------
+docs/
+*.md
+!README.md
+
+# --- Spike-szkriptek (csak reprodukálásra valók) ---------------------------
+scripts/spike/
+
+# --- Szerkesztők -----------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

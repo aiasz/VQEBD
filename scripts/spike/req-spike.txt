@@ -1,0 +1,9 @@
+numpy==1.26.4
+scipy==1.13.1
+qiskit==1.4.6
+qiskit-aer==0.17.2
+qiskit-nature==0.7.2
+qiskit-algorithms==0.3.1
+qiskit-ibm-runtime==0.41.1
+mitiq==0.47.0
+pyscf==2.14.0

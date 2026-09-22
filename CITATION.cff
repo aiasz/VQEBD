@@ -1,0 +1,106 @@
+# Citation File Format 1.2.0 — https://citation-file-format.github.io/
+# Ez a fájl teszi géppel idézhetővé a projektet (GitHub "Cite this repository",
+# Zenodo, Zotero). A Fázis 9-ben ide kerül a Zenodo által generált DOI is.
+cff-version: 1.2.0
+title: "VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard"
+message: "Ha ezt a szoftvert használod, kérjük, az alábbiak szerint hivatkozz rá."
+type: software
+version: 0.1.0
+date-released: "2026-09-22"
+license: MIT
+repository-code: "https://github.com/kormosattila/vqebd"
+url: "https://github.com/kormosattila/vqebd"
+
+authors:
+  - family-names: Kormos
+    given-names: Attila
+    email: kormosa@gmail.com
+  - name: "Claude AI (Anthropic, Claude Opus 5)"
+    alias: "Claude Opus 5"
+
+abstract: >-
+  Konténerizált, reprodukálható benchmark-rendszer kis molekulák (H2, LiH, BeH2)
+  elektronszerkezeti alapállapoti energiájának Variational Quantum Eigensolver
+  (VQE) alapú számítására. A rendszer ugyanazt a számítást öt referenciaszinten
+  futtatja — klasszikus egzakt (FCI), a qubit-Hamilton-operátor egzakt
+  diagonalizációja, zajmentes állapotvektor, véges lövésszám, valamint zajos
+  szimulátor vagy valódi IBM QPU —, így a leképezési, ansatz-, statisztikus és
+  hardverzajból származó hibákat külön-külön számszerűsíti. Több hibaenyhítési
+  stratégiát (zero-noise extrapoláció saját ISA-biztos implementációval, Mitiq
+  referencia-implementációval és az IBM Runtime beépített változatával, valamint
+  mérési hibaenyhítéssel) hasonlít össze azonos feltételek mellett. Minden
+  eredményt sémaverziózott, a teljes szoftverkörnyezetet rögzítő adatbázisban
+  tárol, és interaktív dashboardon jelenít meg.
+
+keywords:
+  - quantum computing
+  - variational quantum eigensolver
+  - quantum chemistry
+  - quantum error mitigation
+  - zero-noise extrapolation
+  - benchmarking
+  - reproducibility
+  - NISQ
+  - Qiskit
+
+references:
+  - type: article
+    title: "A variational eigenvalue solver on a photonic quantum processor"
+    doi: "10.1038/ncomms5213"
+    year: 2014
+    journal: "Nature Communications"
+    volume: "5"
+    authors:
+      - family-names: Peruzzo
+        given-names: A.
+      - family-names: McClean
+        given-names: J.
+      - family-names: Shadbolt
+        given-names: P.
+      - family-names: Yung
+        given-names: M.-H.
+      - family-names: Zhou
+        given-names: X.-Q.
+      - family-names: Love
+        given-names: P. J.
+      - family-names: Aspuru-Guzik
+        given-names: A.
+      - family-names: O'Brien
+        given-names: J. L.
+  - type: article
+    title: "Error Mitigation for Short-Depth Quantum Circuits"
+    doi: "10.1103/PhysRevLett.119.180509"
+    year: 2017
+    journal: "Physical Review Letters"
+    volume: "119"
+    authors:
+      - family-names: Temme
+        given-names: K.
+      - family-names: Bravyi
+        given-names: S.
+      - family-names: Gambetta
+        given-names: J. M.
+  - type: article
+    title: "Mitiq: A software package for error mitigation on noisy quantum computers"
+    doi: "10.22331/q-2022-08-11-774"
+    year: 2022
+    journal: "Quantum"
+    volume: "6"
+    authors:
+      - family-names: LaRose
+        given-names: R.
+      - family-names: Mari
+        given-names: A.
+      - family-names: Kaiser
+        given-names: S.
+  - type: generic
+    title: "Quantum computing with Qiskit"
+    doi: "10.48550/arXiv.2405.08810"
+    year: 2024
+    authors:
+      - family-names: Javadi-Abhari
+        given-names: A.
+      - family-names: Treinish
+        given-names: M.
+      - family-names: Krsulich
+        given-names: K.

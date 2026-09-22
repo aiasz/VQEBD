@@ -1,0 +1,128 @@
+# =============================================================================
+# VQEBD — folyamatos integráció
+# Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+# =============================================================================
+# Alapelv: a CI ugyanazt futtatja, amit a fejlesztő helyben — KONTÉNERBEN.
+# Nincs külön "CI-környezet", amely eltérhetne a fejlesztőitől.
+#
+# A `hardware` jelölésű teszteket a CI SOHA nem futtatja (IBM-kvótavédelem).
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main, "phase/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: vqebd:ci
+
+jobs:
+  build-and-check:
+    name: Build, lint, típusellenőrzés, teszt
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Buildx beállítása
+        uses: docker/setup-buildx-action@v3
+
+      - name: Image építése
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          tags: ${{ env.IMAGE }}
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # --- AC-0.2, AC-0.4, AC-0.5: a SZÁLLÍTOTT image önellenőrzése -----------
+      - name: "AC-0.2 — Python-verzió"
+        run: |
+          set -euo pipefail
+          version="$(docker run --rm "$IMAGE" python --version)"
+          echo "$version"
+          echo "$version" | grep -qE '^Python 3\.11\.' \
+            || { echo "::error::AC-0.2 megbukott: $version"; exit 1; }
+
+      - name: "AC-0.4 — a konténer nem root-ként fut"
+        run: |
+          set -euo pipefail
+          uid="$(docker run --rm "$IMAGE" id -u)"
+          echo "uid=$uid"
+          [ "$uid" != "0" ] || { echo "::error::AC-0.4 megbukott: root-ként fut"; exit 1; }
+
+      - name: "AC-0.5 — PYTHONHASHSEED=0"
+        run: |
+          set -euo pipefail
+          seed="$(docker run --rm "$IMAGE" printenv PYTHONHASHSEED)"
+          echo "PYTHONHASHSEED=$seed"
+          [ "$seed" = "0" ] || { echo "::error::AC-0.5 megbukott: $seed"; exit 1; }
+
+      # --- AC-0.9: minőségi kapuk --------------------------------------------
+      - name: "AC-0.9 — ruff check"
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo "$IMAGE" python -m ruff check .
+
+      - name: "AC-0.9 — ruff format ellenőrzése"
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo "$IMAGE" python -m ruff format --check .
+
+      - name: "AC-0.9 — mypy (strict)"
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo \
+            -e MYPY_CACHE_DIR=/tmp/mypy_cache "$IMAGE" python -m mypy
+
+      # --- AC-0.3, AC-0.6, AC-0.7, AC-0.8: tesztek ---------------------------
+      - name: "Teljes tesztkészlet (repó-hatókörrel)"
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" \
+            -e VQEBD_REPO_ROOT=/repo \
+            -e PYTHONPATH=/repo/src \
+            -e VQEBD_IN_CONTAINER=1 \
+            -w /repo "$IMAGE" \
+            python -m pytest tests -ra -m "not hardware" -p no:cacheprovider
+
+      - name: "AC-0.3 — a szállított image beépített tesztjei (mount nélkül)"
+        run: |
+          docker run --rm -e VQEBD_IN_CONTAINER=1 "$IMAGE" \
+            python -m pytest tests -ra -m "not hardware" -p no:cacheprovider
+
+  # ---------------------------------------------------------------------------
+  # A hivatkozásjegyzék épsége: minden DOI feloldható-e még?
+  # Külön job, mert külső szolgáltatástól (Crossref/DataCite) függ, és egy
+  # átmeneti API-kimaradás nem buktathatja a fő pipeline-t.
+  # ---------------------------------------------------------------------------
+  references:
+    name: Hivatkozások DOI-validálása
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: DOI-k feloldása és a jegyzék újragenerálása
+        run: python scripts/gen_references.py --out /tmp/references.md --raw /tmp/raw.json
+      - name: Eltérés jelzése
+        run: |
+          if ! diff -q docs/references.md /tmp/references.md >/dev/null 2>&1; then
+            echo "::warning::A docs/references.md eltér az újragenerált változattól."
+            diff -u docs/references.md /tmp/references.md || true
+          fi
