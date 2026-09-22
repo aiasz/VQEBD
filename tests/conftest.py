@@ -76,6 +76,16 @@ def repo_root() -> Path:
     return REPO_ROOT
 
 
+# A kvantum-stacket igénylő tesztmodulok a szabványos `pytest.importorskip`-et
+# használják modulszinten, pl.:
+#
+#     pytest.importorskip("qiskit_nature", reason="a Fázis 1 kvantum-stackjét igényli")
+#
+# Ez nem igényel kereszt-modul importot a tests csomagból (ami az
+# `--import-mode=importlib` mellett törékeny lenne), és a kihagyás indoklása
+# megjelenik a `pytest -ra` kimenetben.
+
+
 @pytest.fixture(scope="session")
 def in_container() -> bool:
     """Igaz, ha a teszt konténerben fut.

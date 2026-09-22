@@ -2,8 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.1.0-orange.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-0%2F10%20lezárva-yellow.svg)](docs/plan/00_master_plan.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.2.0-orange.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-1%2F10%20lezárva-yellow.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-248%20zöld-brightgreen.svg)](docs/testing/TR-F01_vqe_mag.md)
 
 > Reprodukálható, konténerizált benchmark kis molekulák VQE-alapú
 > alapállapoti-energia számítására, hibaenyhítési stratégiák összehasonlításával —
@@ -16,14 +17,14 @@
 ## ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 0 lezárva (`v0.1.0`)** — alapinfrastruktúra.
-A kvantumszámítási funkciók a Fázis 1-től kerülnek be.
+Jelenlegi állapot: **Fázis 1 lezárva (`v0.2.0`)** — a VQE-mag működik és
+validált. A zajos szimuláció a Fázis 1b-től, a valódi hardver a Fázis 2-től jön.
 
 | Fázis | Tartalom | Állapot |
 |---|---|---|
 | 0 | Repó + Docker alapinfrastruktúra | ✅ **Lezárva** (`v0.1.0`) |
-| 1 | H2-VQE szimulátoron | ⏳ Következő |
-| 1b | Zajos szimuláció FakeBackend-en *(új, a TR-000 alapján)* | ⬜ Tervezett |
+| 1 | H2-VQE szimulátoron | ✅ **Lezárva** (`v0.2.0`) |
+| 1b | Zajos szimuláció FakeBackend-en *(új, a TR-000 alapján)* | ⏳ Következő |
 | 2 | Egyszeri futás valódi IBM-hardveren | ⬜ Tervezett |
 | 3 | Hibaenyhítés (ZNE + mérési hibaenyhítés) | ⬜ Tervezett |
 | 4 | Adatséma és perzisztens tárolás | ⬜ Tervezett |
@@ -72,6 +73,21 @@ Mért példa (H2, 0.735 Å, STO-3G, `FakeManilaV2` zajmodell — részletek:
 
 *(✅ = kémiai pontosságon belül, |Δ| < 1.6 mHa)*
 
+### Fázis 1 — mért eredmény (H2, 0.735 Å, STO-3G, zajmentes)
+
+| Szint | Energia (Ha) | Hiba |
+|---|---|---|
+| Hartree–Fock | −1.1169989968 | — |
+| **L0 — PySCF Full CI** | **−1.1373060358** | referencia |
+| **L1 — egzakt diagonalizáció** | **−1.1373060358** | leképezés: **+1.33 × 10⁻¹⁵ Ha** |
+| **L2 — VQE** | **−1.1373060358** | ansatz: **+7.99 × 10⁻¹⁵ Ha** |
+
+**Visszanyert korrelációs energia: 100.000000 %.** A hiba a kémiai pontosság
+(1.59 × 10⁻³ Ha) nagyjából 10⁻¹²-szerese. Három leképezés (Jordan–Wigner,
+paritás, Bravyi–Kitaev) egymástól függetlenül ugyanezt adja.
+
+Részletek: [`docs/testing/TR-F01_vqe_mag.md`](docs/testing/TR-F01_vqe_mag.md).
+
 ---
 
 ## Gyors indítás
@@ -80,15 +96,20 @@ Mért példa (H2, 0.735 Å, STO-3G, `FakeManilaV2` zajmodell — részletek:
 git clone https://github.com/kormosattila/vqebd.git
 cd vqebd
 make build      # Docker-image építése
-make verify     # a szállított image önellenőrzése
-make test       # teljes tesztkészlet
+make test       # teljes tesztkészlet (248 teszt)
+```
+
+Az első kvantumszámítás futtatása:
+
+```bash
+docker run --rm vqebd:0.2.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.1.0 .
-docker run --rm vqebd:0.1.0 python --version
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.2.0 .
+docker run --rm vqebd:0.2.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -101,6 +122,8 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 |---|---|
 | [`docs/plan/00_master_plan.md`](docs/plan/00_master_plan.md) | **Bővített mesterterv** — architektúra, referenciaszintek, politikák, kockázatok |
 | [`docs/plan/phase_00.md`](docs/plan/phase_00.md) | A Fázis 0 részletes terve |
+| [`docs/plan/phase_01.md`](docs/plan/phase_01.md) | A Fázis 1 részletes terve |
+| [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
 | [`docs/adr/`](docs/adr/) | Architektúra-döntések (ADR-0001…0005) |

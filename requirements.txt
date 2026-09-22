@@ -1,32 +1,63 @@
 # =============================================================================
 # VQEBD — futásidejű függőségek
 # =============================================================================
-# FÁZIS 0: szándékosan ÜRES.
+# MINDEN VERZIÓ RÖGZÍTETT (==). Ez nem óvatosság, hanem a projekt terméke:
+# a benchmark értéke a reprodukálhatóságán áll.
 #
-# Az alapterv (quantum-benchmark-projektterv.md, Fázis 0) előírja:
-#   "Egyetlen minimális Dockerfile, amely csak Python 3.11 + pip-et telepít,
-#    semmi kvantumkönyvtárat még."
+# A verziókészlet NEM a "legfrissebb mindenből" elv szerint állt össze, hanem egy
+# mért kényszer mentén (docs/adr/ADR-0001-technologiai-stack.md):
 #
-# Indok: a Fázis 0 célja annak igazolása, hogy a konténer-infrastruktúra
-# önmagában működik. Ha a kvantumkönyvtárak is itt lennének, egy build-hiba
-# esetén nem tudnánk szétválasztani az infrastruktúra és a függőségek hibáját.
+#   A mitiq 0.47.0 (a legfrissebb kiadás) `numpy<2.0`-ra épül, a Qiskit 2.x viszont
+#   `numpy>=2.0`-t követel. A kettő egy környezetbe NEM telepíthető:
 #
-# A teljes, már feloldott és funkcionálisan igazolt stack a FÁZIS 1-ben kerül
-# ide, pontos == pinnekkel:
+#     ERROR: ResolutionImpossible
+#         qiskit 2.5.2 depends on numpy<3 and >=2.0
+#         mitiq 0.47.0 depends on numpy<2.0.0 and >=1.22.0
 #
-#   numpy==1.26.4            # mitiq korlátja: numpy<2.0  (ADR-0001, M1)
-#   scipy==1.13.1
-#   qiskit==1.4.6            # az utolsó, numpy 1.x-et engedő ág
-#   qiskit-aer==0.17.2
-#   qiskit-nature==0.7.2     # a 0.8.0 numpy>=2-t követel -> kizárva
-#   qiskit-ibm-runtime==0.41.1
-#   pyscf==2.14.0
-#   ply==3.11                # a mitiq qiskit-interfészének REJTETT függősége (M2)
+# Az alábbi készlet ennek a kényszernek a megoldása, és a TR-000 spike négy
+# mérési körében funkcionálisan is igazolt.
 #
-# A mitiq (GPL-3.0) NEM ide, hanem a requirements-mitiq.txt fájlba kerül:
-# opcionális, futásidőben betöltött komponens (ADR-0003, licencelkülönítés).
+# A TRANZITÍV függőségek pontos verzióit a requirements.lock rögzíti.
+# =============================================================================
+
+# --- Numerikus alapréteg ---------------------------------------------------
+numpy==1.26.4            # a mitiq numpy<2.0 korlátja miatt; az utolsó 1.x kiadás
+scipy==1.13.1            # a VQE optimalizáló-hurok (ADR-0002); numpy 1.26-tal bizonyított
+
+# --- Kvantumszámítás -------------------------------------------------------
+qiskit==1.4.6            # az utolsó, numpy 1.x-et engedő ág (kiadva 2026-06-12)
+qiskit-aer==0.17.2       # szimuláció; a Fázis 1b-től zajmodellekkel
+qiskit-nature==0.7.2     # elektronszerkezet; a 0.8.0 numpy>=2-t követel -> kizárva
+qiskit-ibm-runtime==0.41.1  # az utolsó, qiskit>=1.4.1-et engedő verzió.
+                            # Támogatja az `ibm_quantum_platform` csatornát (mérve:
+                            # TR-000, 1. kör / 11. lépés) — a 2025 júliusában
+                            # megszűnt `ibm_quantum` csatorna helyett.
+
+# --- Kvantumkémia ----------------------------------------------------------
+pyscf==2.14.0            # Hartree–Fock és Full CI referencia (L0 szint)
+
+# --- Rejtett függőség ------------------------------------------------------
+ply==3.11                # A mitiq qiskit<->cirq konverziója ezt igényli
+                         # (`cirq.contrib.qasm_import`), de a mitiq ALAPtelepítése
+                         # nem húzza be. A `mitiq[qiskit]` extra behúzná, ám az
+                         # egyúttal qiskit-ibm-runtime~=0.37.0-t is lepinnelne,
+                         # ami már nem éri el az aktuális IBM Quantum Platformot.
+                         # Ezért közvetlen függőség. NE TÖRÖLD.
+                         # (TR-000, M2 megállapítás.)
+
+# =============================================================================
+# SZÁNDÉKOSAN NEM ITT:
 #
-# Lásd:
-#   docs/adr/ADR-0001-technologiai-stack.md
-#   docs/testing/TR-000_spike.md
+#   mitiq  -> requirements-mitiq.txt
+#             GPL-3.0 licencű, a VQEBD viszont MIT. Opcionális, futásidőben
+#             betöltött komponensként használjuk, egyetlen modulba zárva.
+#             Nélküle a rendszer teljes funkcionalitással működik.
+#             Lásd: docs/adr/ADR-0003-mitigacios-architektura.md
+#
+#   qiskit-algorithms
+#         -> tranzitívan települ (a qiskit-nature függősége), de NEM HÍVJUK.
+#            A saját VQE-hurok V2 primitívekkel készül, hogy a kód Qiskit 2.x-re
+#            átvihető maradjon. A tiltást automatikus teszt őrzi:
+#            tests/unit/test_package.py::test_no_qiskit_algorithms_import_in_source
+#            Lásd: docs/adr/ADR-0002-sajat-vqe-hurok.md
 # =============================================================================

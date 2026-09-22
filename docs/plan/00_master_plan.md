@@ -165,7 +165,7 @@ A Mitiq `qiskit` extrája ezt meg is erősíti: `qiskit~=1.4.2`, `qiskit-aer~=0.
 | qiskit | **1.4.6** | Az utolsó, numpy 1.x-et engedő ág (2026-06-12, aktívan karbantartott). |
 | qiskit-aer | **0.17.2** | `qiskit>=1.1.0`; zajos szimuláció + `from_backend`. |
 | qiskit-nature | **0.7.2** | A 0.8.0 `numpy>=2`-t követel → kizárva. |
-| qiskit-algorithms | **0.3.1** | Csak a qiskit-nature tranzitív függősége; **nem hívjuk** (ADR-0002). |
+| qiskit-algorithms | *(nem pinnelt)* | A qiskit-nature tranzitív függősége; **nem hívjuk** (ADR-0002), ezért nem pinneljük. A Fázis 1 image-ében 0.4.0-ra oldódik fel; a tényleges verziót a `requirements.lock` rögzíti. |
 | qiskit-ibm-runtime | **0.41.1** | Az utolsó, `qiskit>=1.4.1`-et engedő; **támogatja az `ibm_quantum_platform` csatornát**. |
 | mitiq | **0.47.0** | Referencia-implementáció a ZNE keresztvalidációhoz. |
 | **ply** | **3.11** | **Rejtett függőség** — a Mitiq qiskit↔cirq konverziója nélküle `ModuleNotFoundError`. |

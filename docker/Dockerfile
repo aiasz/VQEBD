@@ -2,11 +2,11 @@
 # VQEBD — Fázis 0 alap-image
 # Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
 # =============================================================================
-# Terv: docs/plan/phase_00.md, 3.2. szakasz
+# Terv: docs/plan/phase_00.md (3.2), docs/plan/phase_01.md (5.)
 #
-# Ez az image SZÁNDÉKOSAN nem tartalmaz kvantumkönyvtárat. A Fázis 0 célja annak
-# igazolása, hogy a konténer-infrastruktúra önmagában működik; a teljes stack a
-# Fázis 1-ben kerül be (ADR-0001, docs/testing/TR-000_spike.md).
+# A Fázis 0-ban ez az image szándékosan nem tartalmazott kvantumkönyvtárat, hogy
+# az infrastruktúra önmagában igazolható legyen. A Fázis 1-től a teljes, az
+# ADR-0001-ben rögzített és a TR-000 spike-ban funkcionálisan igazolt stack benne van.
 # =============================================================================
 
 # Az alap-image DIGEST-tel rögzítve: a tag idővel más image-re mutathat, a digest
@@ -28,6 +28,14 @@ LABEL org.opencontainers.image.title="VQEBD" \
       org.opencontainers.image.source="https://github.com/kormosattila/vqebd" \
       org.opencontainers.image.documentation="https://github.com/kormosattila/vqebd/tree/main/docs"
 
+# --- Rendszerszintű függőségek ----------------------------------------------
+# libgomp1: a PySCF és a NumPy/SciPy OpenMP-futásideje. A csomagok mind
+# manylinux wheel-ként települnek, ezért fordítóra (build-essential) nincs
+# szükség — ez ~250 MB-tal kisebb image-et ad.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libgomp1 \
+ && rm -rf /var/lib/apt/lists/*
+
 # --- Környezeti változók -----------------------------------------------------
 ENV PYTHONHASHSEED=0 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -35,10 +43,18 @@ ENV PYTHONHASHSEED=0 \
     PYTHONPATH=/app/src \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_ROOT_USER_ACTION=ignore
-# PYTHONHASHSEED=0 : determinizmus — a Python hash-randomizáció kikapcsolása
-#                    (ADR-0005, 5. véletlenforrás)
-# PYTHONPATH       : src-layout importálhatósága `pip install` nélkül is
+    PIP_ROOT_USER_ACTION=ignore \
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1
+# PYTHONHASHSEED=0   : determinizmus — a Python hash-randomizáció kikapcsolása
+#                      (ADR-0005, 5. véletlenforrás)
+# PYTHONPATH         : src-layout importálhatósága `pip install` nélkül is
+# *_NUM_THREADS=1    : a többszálú BLAS/OpenMP redukciók összegzési sorrendje
+#                      futásonként eltérhet, ami az utolsó bitekben ingadozó
+#                      energiát adna. Egyetlen szálon a lebegőpontos összegzés
+#                      determinisztikus — ez az AC-1.6 (bitre azonosság) feltétele.
+#                      (R1.2 kockázat, docs/plan/phase_01.md)
 
 # --- Nem-root felhasználó ----------------------------------------------------
 # Indok: biztonság, és hogy a bind-mountolt fájlok ne kerüljenek root tulajdonba

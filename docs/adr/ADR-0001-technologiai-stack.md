@@ -93,12 +93,26 @@ scipy           1.13.1
 qiskit          1.4.6       # az utolsó, numpy 1.x-et engedő ág (2026-06-12)
 qiskit-aer      0.17.2
 qiskit-nature   0.7.2       # a 0.8.0 numpy>=2-t követel -> kizárva
-qiskit-algorithms 0.3.1     # csak tranzitív; NEM hívjuk (ADR-0002)
 qiskit-ibm-runtime 0.41.1   # az utolsó, qiskit>=1.4.1-et engedő
-mitiq           0.47.0
+mitiq           0.47.0      # opcionális, külön fájlban (ADR-0003, licencelkülönítés)
 ply             3.11        # a mitiq[qiskit] extra rejtett függősége (M2)
 pyscf           2.14.0
 ```
+
+### A `qiskit-algorithms` **nincs** pinnelve — és ez szándékos
+
+A TR-000 spike a `qiskit-algorithms==0.3.1`-et **explicit pinnel** telepítette, mert
+a spike célja a metszet létezésének igazolása volt. A termelési `requirements.txt`-ben
+viszont **nem szerepel**: a `qiskit-nature 0.7.2` tranzitív függősége, és a pip a
+mindenkori kompatibilis legfrissebbre oldja fel (a Fázis 1 image-ében: **0.4.0**).
+
+Ez elfogadható, mert az [ADR-0002](ADR-0002-sajat-vqe-hurok.md) értelmében **nem
+hívjuk** — a VQE-hurkot saját, V2 primitívekre épülő kóddal írjuk. A tiltást
+automatikus teszt kényszeríti ki
+(`tests/unit/test_package.py::test_no_qiskit_algorithms_import_in_source`).
+
+Ha a jövőben mégis szükség lenne rá, akkor — és csak akkor — kap explicit pint.
+A ténylegesen telepített verziót a `requirements.lock` mindig rögzíti.
 
 ### A `ply` külön kezelése
 

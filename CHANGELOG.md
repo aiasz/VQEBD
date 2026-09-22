@@ -12,7 +12,95 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 1** — H2-VQE szimulátoron, L0/L1/L2 keresztvalidációval (`v0.2.0`).
+- **Fázis 1b** — zajos szimuláció FakeBackend-en, kvótamentesen (`v0.3.0`).
+
+---
+
+## [0.2.0] — 2026-09-22
+
+**Fázis 1 lezárva — H2-VQE szimulátoron.**
+
+Az első valódi kvantumszámítás. A modul kiszámolja a H2 alapállapoti energiáját,
+és — ami módszertanilag legalább ennyire fontos — **igazolja, hogy a kapott szám
+helyes**, három egymástól független referenciához mérve.
+
+### Hozzáadva
+
+#### A VQE-mag
+- `vqebd.config` — fagyasztott, hash-elhető konfiguráció stabil SHA-256
+  ujjlenyomattal (`config_hash` a Fázis 4 adatsémájához).
+- `vqebd.seeds` — determinisztikus, BLAKE2b-alapú seed-származtatás egyetlen
+  mester-seedből, öt komponensre (ADR-0005).
+- `vqebd.versions` — környezet-ujjlenyomat: csomagverziók + platform.
+- `vqebd.chemistry` — molekula-definíciók (H2, LiH, BeH2), PySCF-meghajtó típusos
+  burkolata, három fermion→qubit leképezés, L0/L1 referenciaenergiák.
+- `vqebd.vqe` — UCCSD ansatz Hartree–Fock kezdőállapottal, saját SciPy-alapú
+  optimalizáló-hurok konvergencia-naplóval, strukturált `VQEResult`.
+- `vqebd.backends` — backend-független energiakiértékelő interfész
+  (Fázis 1: `statevector`; a Fázis 1b/2 változatlan interfésszel bővíti).
+- `vqebd.cli` + `python -m vqebd` — önállóan futtatható parancssori felület.
+
+#### Függőségek
+- A teljes kvantum-stack bekerült a `requirements.txt`-be, `==` pinnekkel:
+  numpy 1.26.4 · scipy 1.13.1 · qiskit 1.4.6 · qiskit-aer 0.17.2 ·
+  qiskit-nature 0.7.2 · qiskit-ibm-runtime 0.41.1 · pyscf 2.14.0 · ply 3.11.
+- **Új:** `requirements.lock` — a teljes tranzitív fa (53 csomag) a megépült
+  image-ből, `pip freeze --all`-lal.
+- Dockerfile: `libgomp1` (a PySCF OpenMP-futásideje) és `*_NUM_THREADS=1`
+  a lebegőpontos determinizmushoz.
+
+#### Tesztelés
+- **+108 automatikus teszt** (összesen 216): validációs, integrációs és egységszint.
+- `tests/validation/test_h2_vqe.py` — a fizikai helyesség 23 tesztje.
+- `tests/integration/test_cli.py` — a teljes lánc a parancssoron keresztül.
+- `tests/unit/` — konfiguráció, seedek, verziók, optimalizáló (analitikus
+  célfüggvényen, kvantumszimuláció nélkül).
+- `tests/repo/test_requirements.py` — a pin ↔ lock konzisztencia és a GPL-licenc
+  elkülönítés ellenőrzése.
+- A negatív harness **8 → 11** esetre bővült (TC-N9…N11).
+
+#### Dokumentáció
+- `docs/plan/phase_01.md` — a Fázis 1 bővített terve.
+- `docs/01_vqe_core.md` — a VQE-mag használata, architektúrája és korlátai.
+- `docs/testing/TP-F01` + `TR-F01` — tesztterv és mérési jegyzőkönyv.
+
+### Mért eredmények (H2, 0.735 Å, STO-3G)
+
+| Szint | Energia (Ha) | Eltérés |
+|---|---|---|
+| Hartree–Fock | −1.1169989968 | — |
+| **L0 — PySCF Full CI** | **−1.1373060358** | referencia |
+| **L1 — egzakt diagonalizáció** | **−1.1373060358** | +1.33 × 10⁻¹⁵ Ha |
+| **L2 — VQE** | **−1.1373060358** | +9.33 × 10⁻¹⁵ Ha |
+
+Visszanyert korrelációs energia: **100.0000 %**. A hiba a kémiai pontosság
+(1.59 × 10⁻³ Ha) körülbelül 10⁻¹²-szerese.
+
+Mindhárom leképezés (Jordan–Wigner, paritás, Bravyi–Kitaev) ugyanazt az energiát
+adja; a paritás-leképezés kétqubites redukcióval 4 helyett **2 qubitet** és 15
+helyett **5 Pauli-tagot** igényel.
+
+### Szigorítva az alaptervhez képest
+- Az elfogadási tolerancia ±0.01 Ha helyett **±1.6 mHa** (kémiai pontosság),
+  és **két független referenciához** mérve, nem egy irodalmi számhoz.
+- A „többször lefuttatva ugyanaz" elvárásból **automatikus, bitre azonosságot
+  követelő teszt** lett (AC-1.6).
+- A `run_vqe()` `float` helyett strukturált `VQEResult`-ot ad vissza; az
+  alapterv által kért szám ennek az `energy` mezője.
+
+### Javítva
+- A `scipy.optimize` `TNC` metódusa `maxfun`-t vár `maxiter` helyett; a rossz
+  opciókulcsot a SciPy **csendben eldobta**, így az iterációs korlát nem
+  érvényesült. Az ismeretlen opciókulcs mostantól hibát ad, nem figyelmeztetést.
+- A `qiskit-nature` több mezője (`num_particles`, `num_spatial_orbitals`,
+  `nuclear_repulsion_energy`) lehet `None`; ezt explicit ellenőrzés kezeli
+  beszédes hibaüzenettel.
+- A CLI külön modulba (`vqebd.cli`) került, hogy a `runner` ne fusson egyszerre
+  csomagimportként és `__main__`-ként (`runpy` figyelmeztetés).
+
+### Ismert korlát
+- A `qiskit-nature 0.7.2` UCCSD-je a Qiskit 1.4 `NLocal` osztályát használja,
+  ami `PendingDeprecationWarning`-ot ad. Külső csomag, a helyességet nem érinti.
 
 ---
 
@@ -88,5 +176,6 @@ A `requirements.txt` ebben a fázisban **szándékosan üres** — az alapterv e
 szerint a Fázis 0 image nem tartalmazhat kvantumkönyvtárat. A teljes, már feloldott
 stack a Fázis 1-ben kerül be.
 
-[Unreleased]: https://github.com/kormosattila/vqebd/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kormosattila/vqebd/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kormosattila/vqebd/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kormosattila/vqebd/releases/tag/v0.1.0

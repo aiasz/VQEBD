@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -105,9 +106,47 @@ def _break_line_endings(root: Path) -> None:
 
 
 def _break_changelog(root: Path) -> None:
+    """A CHANGELOG legfelső *kiadási* szakaszcímének átírása.
+
+    A rontásnak verziófüggetlennek kell lennie: egy konkrét verziószámra
+    (pl. ``## [0.1.0]``) kódolt csere a következő verzióemelés után csendben
+    hatástalanná válna, és a negatív eset tévesen jelezne hibát. Ezért a
+    *mintát* keressük, nem a konkrét számot.
+    """
     path = root / "CHANGELOG.md"
+    text = path.read_text(encoding="utf-8")
+    pattern = re.compile(r"^##\s*\[(?!Unreleased\b)([^\]]+)\]", re.MULTILINE)
+    match = pattern.search(text)
+    if match is None:
+        raise RuntimeError("a CHANGELOG.md nem tartalmaz kiadási szakaszcímet")
+    broken = text[: match.start()] + "## [9.9.9]" + text[match.end() :]
+    path.write_text(broken, encoding="utf-8", newline="\n")
+
+
+def _break_requirements_pin(root: Path) -> None:
+    path = root / "requirements.txt"
     path.write_text(
-        path.read_text(encoding="utf-8").replace("## [0.1.0]", "## [0.9.9]"),
+        path.read_text(encoding="utf-8").replace("numpy==1.26.4", "numpy==1.26.3"),
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def _break_license_separation(root: Path) -> None:
+    path = root / "requirements.txt"
+    path.write_text(
+        path.read_text(encoding="utf-8") + "\nmitiq==0.47.0\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
+def _break_seed_derivation(root: Path) -> None:
+    path = root / "src" / "vqebd" / "seeds.py"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace(
+            'f"{master}:{label}".encode()', 'f"{master}|{label}".encode()'
+        ),
         encoding="utf-8",
         newline="\n",
     )
@@ -161,6 +200,24 @@ CASES: tuple[NegativeCase, ...] = (
         "A CHANGELOG legfelső kiadásának átírása",
         _break_changelog,
         "test_changelog_top_entry_matches",
+    ),
+    NegativeCase(
+        "TC-N9",
+        "A requirements.txt numpy-pinjének átírása",
+        _break_requirements_pin,
+        "test_required_package_is_pinned",
+    ),
+    NegativeCase(
+        "TC-N10",
+        "A GPL-3.0 licencű mitiq felvétele közvetlen függőségként",
+        _break_license_separation,
+        "test_gpl_package_is_not_a_direct_dependency",
+    ),
+    NegativeCase(
+        "TC-N11",
+        "A seed-származtatás elválasztójának megváltoztatása",
+        _break_seed_derivation,
+        "test_seed_set_matches_golden_values",
     ),
 )
 

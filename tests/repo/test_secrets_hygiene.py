@@ -110,8 +110,28 @@ SKIPPED_DIRS = {
     "node_modules",
     "data",
 }
-# A Docker-image digest szándékosan 64 hexa karakter — ez nem titok.
-ALLOWED_CONTEXTS = ("sha256:", "digest", "Digest")
+# Vannak jogos, 40+ hexa karakteres stringek a repóban, amelyek NEM titkok.
+# Ezeket a soron szereplő *címke* alapján engedjük át — nem magát a mintát
+# lazítjuk, hanem a környezetet ismerjük fel.
+#
+# Mit fed le:
+#   - Docker-image digest      (`sha256:...`, `digest`)
+#   - konfiguráció-ujjlenyomat (`config_hash`) — a futás azonosítója az adatsémában
+#   - környezet-ujjlenyomat    (`fingerprint`, `ujjlenyomat`) — a csomagverziók hash-e
+#   - Git-commit hash          (`commit`)
+#
+# Ezek mind a MI általunk generált, publikus, reprodukálhatóságot szolgáló
+# azonosítók. Egy valódi IBM-token soha nem jelenik meg ilyen címke mellett.
+ALLOWED_CONTEXTS = (
+    "sha256:",
+    "digest",
+    "Digest",
+    "config_hash",
+    "fingerprint",
+    "ujjlenyomat",
+    "Ujjlenyomat",
+    "commit",
+)
 
 
 def test_no_token_like_strings_in_tracked_files(repo_root: Path) -> None:
