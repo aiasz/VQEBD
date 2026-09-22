@@ -25,8 +25,8 @@ LABEL org.opencontainers.image.title="VQEBD" \
       org.opencontainers.image.description="VQE-alapú kvantumkémiai benchmark & dashboard" \
       org.opencontainers.image.authors="Kormos Attila, Claude AI (Anthropic, Claude Opus 5)" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.source="https://github.com/kormosattila/vqebd" \
-      org.opencontainers.image.documentation="https://github.com/kormosattila/vqebd/tree/main/docs"
+      org.opencontainers.image.source="https://github.com/aiasz/VQEBD" \
+      org.opencontainers.image.documentation="https://github.com/aiasz/VQEBD/tree/main/docs"
 
 # --- Rendszerszintű függőségek ----------------------------------------------
 # libgomp1: a PySCF és a NumPy/SciPy OpenMP-futásideje. A csomagok mind
