@@ -33,6 +33,18 @@ qiskit-ibm-runtime==0.41.1  # az utolsó, qiskit>=1.4.1-et engedő verzió.
                             # TR-000, 1. kör / 11. lépés) — a 2025 júliusában
                             # megszűnt `ibm_quantum` csatorna helyett.
 
+# --- Második platform: Google Cirq + qsim (ADR-0006) ------------------------
+cirq-core==1.4.1         # Független szimulátor-implementáció.
+                         # MIÉRT NEM ÚJABB? A cirq-core 1.5.0 már `numpy>=1.25`-öt,
+                         # az 1.7.0 pedig `numpy~=2.1`-et követel — utóbbi ütközik az
+                         # ADR-0001 szerinti `numpy<2.0` kötöttséggel. Az 1.4.1 egyúttal
+                         # a mitiq `cirq-core<1.5.0` pinjével is kompatibilis (Fázis 3).
+qsimcirq==0.22.1         # C++-ban optimalizált állapotvektor-szimulátor.
+                         # FIGYELEM: EGYSZERES pontosságú (`complex64`), ezért ~1e-7 Ha
+                         # hibát ad. Ez mért, dokumentált kompromisszum, nem hiba:
+                         # cserébe 24 qubiten 22x gyorsabb a cirq.Simulator-nál.
+                         # Pontosság-kapcsoló a QSimOptions-ben NINCS.
+
 # --- Kvantumkémia ----------------------------------------------------------
 pyscf==2.14.0            # Hartree–Fock és Full CI referencia (L0 szint)
 

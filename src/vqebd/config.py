@@ -44,10 +44,23 @@ MapperKind = Literal["jordan_wigner", "parity", "bravyi_kitaev"]
 - ``bravyi_kitaev`` — [bravyi2002], [seeley2012]; logaritmikus Pauli-súly.
 """
 
-BackendKind = Literal["statevector"]
-"""A Fázis 1-ben egyetlen backend: zajmentes állapotvektor.
+BackendKind = Literal["qiskit_statevector", "cirq_simulator", "qsim"]
+"""A támogatott platform-backend azonosítók.
 
-A Fázis 1b-ben ``aer_shot`` és ``aer_noisy``, a Fázis 2-ben ``ibm_qpu`` bővíti.
+Az azonosító **platformot és végrehajtási módot együtt** nevez meg. Ez kizárja az
+értelmetlen kombinációkat (pl. „Cirq + IBM QPU"), és egyetlen mezőben tartja a
+benchmark platform-dimenzióját.
+
+- ``qiskit_statevector`` — Qiskit ``StatevectorEstimator``, egzakt, ``complex128``.
+- ``cirq_simulator`` — Google Cirq beépített szimulátora, egzakt, ``complex128``.
+- ``qsim`` — Google qsim, C++-ban optimalizált, egzakt, de **``complex64``**.
+
+A Fázis 1b (``qiskit_aer_shot``, ``qiskit_aer_noisy``, ``qsim_noisy``) és a
+Fázis 2 (``ibm_qpu``) bővíti a listát.
+
+.. note::
+   A ``0.3.0`` verzióban a korábbi ``"statevector"`` azonosító
+   ``"qiskit_statevector"``-ra változott (ADR-0006).
 """
 
 InitialPointKind = Literal["zeros", "random"]
@@ -153,7 +166,7 @@ class VQEConfig:
     two_qubit_reduction: bool = True
     ansatz: AnsatzSpec = field(default_factory=AnsatzSpec)
     optimizer: OptimizerSpec = field(default_factory=OptimizerSpec)
-    backend: BackendKind = "statevector"
+    backend: BackendKind = "qiskit_statevector"
     seed: int = 20260922
 
     def to_dict(self) -> dict[str, Any]:

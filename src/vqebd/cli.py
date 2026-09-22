@@ -7,6 +7,8 @@ legyen (AC-1.9). Használat::
     python -m vqebd --bond-length 1.2                # másik geometria
     python -m vqebd --mapper jordan_wigner           # másik leképezés
     python -m vqebd --optimizer COBYLA               # másik optimalizáló
+    python -m vqebd --backend cirq_simulator         # másik platform (ADR-0006)
+    python -m vqebd --backend qsim                   # C++ szimulátor, complex64
     python -m vqebd --json                           # gépi feldolgozáshoz
 
 A CLI szándékosan **külön modulban** van, nem a :mod:`vqebd.vqe.runner`-ben:
@@ -65,6 +67,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="a kétqubites redukció kikapcsolása (csak parity esetén hat)",
     )
+    parser.add_argument(
+        "--backend",
+        default="qiskit_statevector",
+        choices=["qiskit_statevector", "cirq_simulator", "qsim"],
+        help="platform-backend: melyik szimulátor végezze a kiértékelést (ADR-0006)",
+    )
     parser.add_argument("--optimizer", default="SLSQP", help="SciPy optimalizáló-metódus")
     parser.add_argument("--maxiter", type=int, default=300, help="iterációs felső korlát")
     parser.add_argument("--seed", type=int, default=20260922, help="mester-seed")
@@ -101,6 +109,7 @@ def main(argv: list[str] | None = None) -> int:
         two_qubit_reduction=not args.no_two_qubit_reduction,
         ansatz=AnsatzSpec(initial_point=args.initial_point),
         optimizer=OptimizerSpec(method=args.optimizer, maxiter=args.maxiter),
+        backend=args.backend,
         seed=args.seed,
     )
 

@@ -45,6 +45,9 @@ class VQEResult:
         n_hamiltonian_terms: A Hamilton-operátor Pauli-tagjainak száma.
         mapper: A használt leképezés azonosítója.
         two_qubit_reduction: Alkalmaztunk-e kétqubites redukciót.
+        platform: A kiértékelést végző szoftverplatform (``qiskit``/``cirq``/``qsim``).
+        precision: Az állapotvektor számábrázolása (``complex128``/``complex64``).
+        backend_tolerance_ha: Az adott platformtól elfogadható eltérés (Ha).
         n_iterations: Az optimalizáló iterációinak száma.
         n_function_evaluations: A célfüggvény-kiértékelések száma.
         converged: Konvergált-e az optimalizáló.
@@ -67,6 +70,9 @@ class VQEResult:
     n_hamiltonian_terms: int
     mapper: str
     two_qubit_reduction: bool
+    platform: str
+    precision: str
+    backend_tolerance_ha: float
     n_iterations: int
     n_function_evaluations: int
     converged: bool
@@ -115,6 +121,16 @@ class VQEResult:
         return (self.reference.hartree_fock - self.energy) / (-correlation)
 
     @property
+    def within_backend_tolerance(self) -> bool:
+        """A platform saját, számábrázolásból levezetett toleranciáján belül van-e.
+
+        Ez szigorúbb (vagy lazább) a kémiai pontosságnál, platformtól függően:
+        a ``complex64`` qsimtől 1e-5 Ha-t fogadunk el, a ``complex128``
+        platformoktól 1e-9 Ha-t. Lásd: :mod:`vqebd.platforms`.
+        """
+        return abs(self.error_vs_reference) < self.backend_tolerance_ha
+
+    @property
     def within_chemical_accuracy(self) -> bool:
         """Kémiai pontosságon belül van-e az eredmény (\\|Δ\\| < 1.6 mHa)."""
         return abs(self.error_vs_reference) < CHEMICAL_ACCURACY_HA
@@ -147,6 +163,11 @@ class VQEResult:
             "n_hamiltonian_terms": self.n_hamiltonian_terms,
             "mapper": self.mapper,
             "two_qubit_reduction": self.two_qubit_reduction,
+            "backend": self.config.backend,
+            "platform": self.platform,
+            "precision": self.precision,
+            "backend_tolerance_ha": self.backend_tolerance_ha,
+            "within_backend_tolerance": self.within_backend_tolerance,
             "n_iterations": self.n_iterations,
             "n_function_evaluations": self.n_function_evaluations,
             "converged": self.converged,
@@ -169,7 +190,8 @@ class VQEResult:
             + (" (2-qubit redukcióval)" if self.two_qubit_reduction else ""),
             f"Áramkör ............. {self.n_qubits} qubit, {self.n_parameters} paraméter, "
             f"{self.n_hamiltonian_terms} Pauli-tag",
-            f"Backend ............. {self.config.backend}",
+            f"Backend ............. {self.config.backend} "
+            f"[{self.platform}, {self.precision}]",
             f"Optimalizáló ........ {self.config.optimizer.method} "
             f"({self.n_iterations} iteráció, {self.n_function_evaluations} kiértékelés)",
             "",

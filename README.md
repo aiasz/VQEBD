@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
@@ -201,3 +202,7 @@ konvenciót követik.
 ---
 
 *© 2026 Kormos Attila, Claude AI (Anthropic) — MIT licenc*
+=======
+# VQEBD
+Konténerizált Python keretrendszer VQE-alapú kvantumkémiai szimulációkhoz (H2, LiH, BeH2) — hibaenyhítési stratégiák tesztelése szimulátoron és valódi IBM kvantumhardveren, strukturált eredménytárolással és interaktív dashboard-os összehasonlítással. Reprodukálható, publikálható közösségi benchmark.
+>>>>>>> a723700fbdcd3e9f4b407e2454840020b1c0146e

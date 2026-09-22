@@ -34,6 +34,7 @@ from vqebd.chemistry.mapping import map_to_qubits
 from vqebd.chemistry.problem import build_electronic_structure
 from vqebd.chemistry.reference import collect_references
 from vqebd.config import VQEConfig
+from vqebd.platforms import platform_of
 from vqebd.seeds import SeedSet
 from vqebd.versions import environment_fingerprint, package_versions
 from vqebd.vqe.ansatz import build_ansatz
@@ -61,6 +62,7 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     """
     started = time.perf_counter()
     seeds = SeedSet.derive(config.seed)
+    platform = platform_of(config.backend)
 
     structure = build_electronic_structure(config.molecule)
     hamiltonian = map_to_qubits(
@@ -86,6 +88,9 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
         n_hamiltonian_terms=hamiltonian.num_terms,
         mapper=hamiltonian.kind,
         two_qubit_reduction=hamiltonian.two_qubit_reduction,
+        platform=platform.platform,
+        precision=platform.precision,
+        backend_tolerance_ha=platform.tolerance_ha,
         n_iterations=outcome.n_iterations,
         n_function_evaluations=outcome.n_function_evaluations,
         converged=outcome.converged,

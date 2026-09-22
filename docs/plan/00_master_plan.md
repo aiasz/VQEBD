@@ -4,10 +4,10 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.0.0 |
+| **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-09-22 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
-| **Státusz** | Elfogadott — Fázis 0 végrehajtása engedélyezett |
+| **Státusz** | Elfogadott — Fázis 0 és 1 lezárva, Fázis 1M végrehajtása engedélyezett |
 | **Alapdokumentum** | `quantum-benchmark-projektterv.md` (v0, 2026-09-22) |
 | **Licenc** | MIT |
 
@@ -136,6 +136,44 @@ E_L0 ──(mapping hiba)── E_L1 ──(ansatz hiba)── E_L2 ──(shot 
 `E_L2 = −1.13730604 Ha` (eltérés 7.6 × 10⁻¹⁵). Azaz a mapping és az UCCSD-ansatz
 H2-re **gépi pontossággal egzakt** — minden ennél nagyobb eltérés zajból származik.
 
+### 3.3 A platform mint önálló dimenzió
+
+A referenciaszintek (L0–L3b) függőlegesen bontják a hibaforrásokat. A **platform**
+vízszintesen: ugyanazt a szintet **több, egymástól független implementációval**
+méri. Részletek: [ADR-0006](../adr/ADR-0006-tobbplatformos-architektura.md).
+
+```
+                    │  Qiskit          │  Cirq            │  Cirq / qsim
+────────────────────┼──────────────────┼──────────────────┼──────────────────
+ L2  egzakt         │ qiskit_statevector│ cirq_simulator  │ qsim
+ L3a véges lövés    │ qiskit_aer_shot  │       —          │       —
+ L3b zajos szim.    │ qiskit_aer_noisy │       —          │ qsim_noisy
+ L3b valódi QPU     │ ibm_qpu          │       —          │       —
+```
+
+| Platform | Erőssége | Korlátja | Kvóta |
+|---|---|---|---|
+| **IBM Quantum (Qiskit)** | Valódi 100+ qubites QPU **és** lokális Aer szimulátor; a legnagyobb tananyag- és közösségi bázis | a QPU-hozzáférés kvótás | Open Plan: **10 perc / 28 nap**, 20 perc felhasználás után egyszeri **+180 perc / 12 hónap** |
+| **Google Cirq** | Független implementáció, kétszeres pontosság (`complex128`) | nincs valódi hardver ebben a projektben; ~20 qubitig kényelmes | **nincs kvóta** |
+| **qsim** | C++-ban optimalizált; 24 qubiten **22× gyorsabb** a Cirqnél | **egyszeres pontosság** (`complex64`, ~10⁻⁷ Ha) | **nincs kvóta** |
+
+**Miért éri meg?** Három okból:
+
+1. **Implementációfüggetlenség.** Egy benchmark, amelynek eredménye egyetlen
+   könyvtár sajátossága lehet, nem benchmark. A `qiskit_statevector` és a
+   `cirq_simulator` **2.2 × 10⁻¹⁵ Ha**-ra egyezik — ez a szimulátor-réteg
+   független igazolása.
+2. **Kvótavédelem.** A Fázis 2 hardveres kódja két kvótamentes platformon
+   próbálható ki, mielőtt QPU-időt fogyasztana.
+3. **Skálázás.** A Fázis 5 nagyobb rendszerei (LiH 10–12 qubit, BeH2 12–14 qubit)
+   a qsimen nagyságrendekkel gyorsabban futnak.
+
+**A pontosság mint benchmark-eredmény.** A qsim `complex64` aritmetikája
+~10⁻⁷ Ha hibát ad — ez **négy nagyságrenddel** a kémiai pontosság alatt van,
+tehát kémiailag jelentéktelen, de numerikusan mérhető. Ez nem a qsim hibája,
+hanem tudatos pontosság–sebesség kompromisszum, és a benchmark egyik
+**önálló eredménye**: megmutatja, hol érdemes a gyorsabb szimulátort választani.
+
 ---
 
 ## 4. Technológiai stack — a döntés és a kényszer
@@ -170,6 +208,8 @@ A Mitiq `qiskit` extrája ezt meg is erősíti: `qiskit~=1.4.2`, `qiskit-aer~=0.
 | mitiq | **0.47.0** | Referencia-implementáció a ZNE keresztvalidációhoz. |
 | **ply** | **3.11** | **Rejtett függőség** — a Mitiq qiskit↔cirq konverziója nélküle `ModuleNotFoundError`. |
 | pyscf | **2.14.0** | Elektronszerkezeti driver + FCI referencia (L0). |
+| **cirq-core** | **1.4.1** | A második platform (ADR-0006). Az 1.5.0+ `numpy>=1.25`-öt, az 1.7.0 `numpy~=2.1`-et követel → kizárva. Egyúttal a Mitiq `cirq-core<1.5.0` pinjével is kompatibilis. |
+| **qsimcirq** | **0.22.1** | C++-ban optimalizált szimulátor, `cirq-core~=1.0`. **Egyszeres pontosságú** (`complex64`) — mért, dokumentált kompromisszum. |
 | cirq-core | 1.4.1 | A Mitiq belső áramkör-reprezentációja (tranzitív). |
 
 Ez a metszet **empirikusan feloldva és 13+8+11 lépéses funkcionális próbán átment**
@@ -268,6 +308,7 @@ A részletes indoklás külön fájlokban:
 | [ADR-0003](../adr/ADR-0003-mitigacios-architektura.md) | Pluginalapú hibaenyhítés, saját ISA-biztos ZNE | Elfogadott |
 | [ADR-0004](../adr/ADR-0004-adattarolas.md) | SQLite mint kanonikus tároló, sémaverziózással | Elfogadott |
 | [ADR-0005](../adr/ADR-0005-determinizmus.md) | Determinizmus- és seed-politika | Elfogadott |
+| [ADR-0006](../adr/ADR-0006-tobbplatformos-architektura.md) | Többplatformos architektúra: Qiskit ↔ Cirq ↔ qsim | Elfogadott |
 
 ---
 
@@ -279,11 +320,12 @@ Az alapterv 10 fázisa megmarad. A változások:
 |---|---|---|
 | **0** | Repó + Docker | + verziópolitika, CI-váz, licenc, hivatkozásjegyzék, ADR-keret |
 | **1** | H2-VQE szimulátoron | + **L0/L1/L2 hármas keresztvalidáció** (FCI ↔ egzakt diag ↔ VQE), nem csak a ±0.01 Ha ablak. Szigorítás: **±1.6 mHa** (kémiai pontosság). |
+| **1M** *(új)* | — | **Többplatformos validáció.** Ugyanaz a feladat Qiskiten, Cirqen és qsimen. Egy benchmark nem támaszkodhat egyetlen implementációra; részletek: ADR-0006. |
 | **1b** *(új)* | — | **Zajos szimuláció FakeBackend-en.** Az alaptervben a Fázis 2 az első zajos futás; ez kvótát éget hibakereséssel. Beiktatunk egy kvótamentes zajos fázist. |
 | **2** | Valódi hardver | Változatlan cél, de az 1b után már *validált* kóddal futunk rá. |
 | **3** | Mitiq ZNE | + saját ISA-biztos ZNE, + measurement mitigation (M5), + extrapolátor-összehasonlítás, + Mitiq-keresztvalidáció (M4) |
 | **4** | Adatséma | + sémaverzió, + környezet-ujjlenyomat, + provenance-mezők, + FAIR-elvek |
-| **5** | Batch futtatás | + aktív tér (active space) redukció LiH/BeH2-re (mért indoklás: 4. fejezet táblázata) |
+| **5** | Batch futtatás | + aktív tér (active space) redukció LiH/BeH2-re (mért indoklás: 4. fejezet táblázata), + **platform a kombinációs mátrix dimenziója** |
 | **6** | Automatizálás | + strukturált hibatárolás, + újrapróbálkozási politika |
 | **7** | Dashboard | változatlan, 4 belső lépés |
 | **8** | Konténerizáció | változatlan |
@@ -308,7 +350,8 @@ tartozik tesztterv.
 |---|---|
 | `0.1.0` | Fázis 0 lezárva |
 | `0.2.0` | Fázis 1 lezárva |
-| `0.3.0` | Fázis 1b lezárva |
+| `0.3.0` | Fázis 1M lezárva |
+| `0.4.0` | Fázis 1b lezárva |
 | … | … |
 | `1.0.0` | Fázis 9 lezárva (első publikált release, DOI) |
 
@@ -399,6 +442,10 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | R6 | ZNE nem javít (readout-hiba) | Alacsony | **Bekövetkezett** | Measurement mitigation külön dimenzióként (M5) | Kezelve |
 | R7 | Barren plateau nagyobb molekulánál | Közepes | Közepes | Aktív tér redukció; UCCSD + HF kezdőállapot | Figyelt |
 | R8 | pyscf nem fut Windows-on natívan | Alacsony | **Bekövetkezett** | Minden számítás konténerben (Linux) | Kezelve |
+| R9 | Egyetlen implementációra támaszkodó benchmark | Magas | Közepes | Platform-dimenzió: Qiskit ↔ Cirq ↔ qsim (ADR-0006) | Kezelve |
+| R10 | Qubit-sorrend (endianness) eltérése Qiskit és Cirq között | **Magas** | **Bekövetkezett** | Mátrixszintű konverziós teszt; `reversed(qubits)` rögzítve (ADR-0006) | Kezelve |
+| R11 | A qsim egyszeres pontossága félrevezeti az összehasonlítást | Közepes | **Bekövetkezett** | Platformonkénti tolerancia; a rekord tárolja a pontosságot | Kezelve |
+| R12 | Az IBM Open Plan kvótája (10 perc / 28 nap) kimerül | Magas | Közepes | Fázis 1M + 1b: két kvótamentes platform; `VQEBD_ALLOW_HARDWARE=false` alapértelmezés | Figyelt |
 
 ---
 
@@ -419,6 +466,8 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | mHa | milli-Hartree = 10⁻³ Ha |
 | QPU | Quantum Processing Unit |
 | NISQ | Noisy Intermediate-Scale Quantum |
+| qsim | A Google C++-ban írt, nagy teljesítményű állapotvektor-szimulátora |
+| endianness | A qubitek helyiérték-sorrendje; Qiskit little-endian, Cirq a `qubit_order` elejét tekinti legnagyobb helyiértékűnek |
 
 ---
 
@@ -427,6 +476,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | Verzió | Dátum | Változás |
 |---|---|---|
 | 1.0.0 | 2026-09-22 | Első kiadás. Alapterv bővítése a TR-000 spike mérései alapján. |
+| 1.1.0 | 2026-09-22 | **Platform-dimenzió bevezetése** (3.3. fejezet, ADR-0006): Qiskit ↔ Cirq ↔ qsim. Új Fázis 1M. Stack bővítve `cirq-core 1.4.1` és `qsimcirq 0.22.1` csomagokkal. R9–R12 kockázatok felvéve. |
 
 ---
 

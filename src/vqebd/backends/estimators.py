@@ -78,7 +78,7 @@ class EnergyEvaluator(ABC):
 
 
 class StatevectorEnergyEvaluator(EnergyEvaluator):
-    """Zajmentes, egzakt kiértékelés állapotvektorral.
+    """Qiskit: zajmentes, egzakt kiértékelés állapotvektorral (``complex128``).
 
     Nincs sem lövészaj, sem hardverzaj: a várható érték a gépi pontosság határáig
     egzakt. Ez az **L2 referenciaszint** — az ansatz korlátait mutatja meg, minden
@@ -100,7 +100,7 @@ class StatevectorEnergyEvaluator(EnergyEvaluator):
 
     @property
     def kind(self) -> BackendKind:
-        return "statevector"
+        return "qiskit_statevector"
 
     def evaluate(self, parameters: Sequence[float]) -> float:
         # A V2 primitív „PUB" formátuma: (áramkör, observable, paraméterek).
@@ -112,29 +112,44 @@ def make_energy_evaluator(
     kind: BackendKind,
     circuit: Any,
     observable: Any,
-    seeds: SeedSet,  # noqa: ARG001 — lásd a docstringet
+    seeds: SeedSet,
 ) -> EnergyEvaluator:
-    """Energiakiértékelő létrehozása a kért backendhez.
+    """Energiakiértékelő létrehozása a kért platform-backendhez.
+
+    A VQE-hurok szempontjából mindegy, melyiket kapja: az interfész azonos
+    (ADR-0002). Ez teszi lehetővé, hogy ugyanaz a kód fusson mindhárom platformon.
 
     Args:
-        kind: A backend fajtája.
-        circuit: A paraméterezett ansatz-áramkör.
-        observable: A qubit-Hamilton-operátor (``SparsePauliOp``).
-        seeds: A seed-készlet. A ``statevector`` kiértékelés egzakt és
-            determinisztikus, ezért **ebben a fázisban nincs használatban** —
-            a paraméter mégis kötelező, mert a Fázis 1b (``aer_shot``,
-            ``aer_noisy``) és a Fázis 2 (``ibm_qpu``) backendjei igénylik, és
-            a gyár szignatúrája nem változhat fázisonként.
+        kind: A platform-backend azonosítója.
+        circuit: A paraméterezett ansatz-áramkör (Qiskit).
+        observable: A qubit-Hamilton-operátor (Qiskit ``SparsePauliOp``).
+        seeds: A seed-készlet. A ``qiskit_statevector`` kiértékelés egzakt és
+            determinisztikus, ezért nem használ seedet; a Cirq-alapú backendek
+            viszont **transzpilálnak**, és ahhoz kell a ``seed_transpiler``
+            (ADR-0005: a SABRE-alapú lépések sztochasztikusak).
 
     Returns:
         A kiértékelő.
 
     Raises:
         ValueError: Ismeretlen backend esetén.
-        NotImplementedError: Későbbi fázisban megvalósítandó backend esetén.
     """
-    if kind == "statevector":
+    if kind == "qiskit_statevector":
         return StatevectorEnergyEvaluator(circuit, observable)
+
+    # Késleltetett import: a Cirq-réteg csak akkor töltődik be, ha tényleg kell.
+    if kind == "cirq_simulator":
+        from vqebd.backends.cirq_estimators import CirqEnergyEvaluator
+
+        return CirqEnergyEvaluator(circuit, observable, seed_transpiler=seeds.transpiler)
+
+    if kind == "qsim":
+        from vqebd.backends.cirq_estimators import QsimEnergyEvaluator
+
+        return QsimEnergyEvaluator(circuit, observable, seed_transpiler=seeds.transpiler)
+
     # A típusellenőrző szerint ez elérhetetlen (a BackendKind kimerítő), de
     # futásidőben érkezhet érvénytelen string is — ezért maradjon a védelem.
-    raise ValueError(f"ismeretlen backend: {kind!r}")
+    from vqebd.platforms import PLATFORMS
+
+    raise ValueError(f"ismeretlen backend: {kind!r}. Ismert backendek: {sorted(PLATFORMS)}")
