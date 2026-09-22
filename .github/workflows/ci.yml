@@ -77,11 +77,11 @@ jobs:
       # --- AC-0.9: minőségi kapuk --------------------------------------------
       - name: "AC-0.9 — ruff check"
         run: |
-          docker run --rm -v "$PWD:/repo:ro" -w /repo "$IMAGE" python -m ruff check .
+          docker run --rm -v "$PWD:/repo:ro" -w /repo "$IMAGE" python -m ruff check --no-cache .
 
       - name: "AC-0.9 — ruff format ellenőrzése"
         run: |
-          docker run --rm -v "$PWD:/repo:ro" -w /repo "$IMAGE" python -m ruff format --check .
+          docker run --rm -v "$PWD:/repo:ro" -w /repo "$IMAGE" python -m ruff format --no-cache --check .
 
       - name: "AC-0.9 — mypy (strict)"
         run: |
