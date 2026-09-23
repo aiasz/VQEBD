@@ -32,7 +32,7 @@ import sys
 
 from vqebd import __version__
 from vqebd.chemistry.molecule import H2_REFERENCE_BOND_LENGTH, h2
-from vqebd.config import AnsatzSpec, OptimizerSpec, VQEConfig
+from vqebd.config import AnsatzSpec, MitigationSpec, OptimizerSpec, VQEConfig
 from vqebd.vqe.runner import run_vqe
 
 __all__ = ["build_parser", "main"]
@@ -90,6 +90,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="a variációs paraméterek kezdőértéke",
     )
     parser.add_argument(
+        "--mitigation",
+        default="none",
+        choices=["none", "zne_local", "zne_mitiq"],
+        help="hibaenyhítési stratégia (ADR-0003)",
+    )
+    parser.add_argument(
+        "--extrapolator",
+        default="richardson",
+        choices=["richardson", "linear", "quadratic", "exponential"],
+        help="ZNE extrapolációs modell",
+    )
+    parser.add_argument(
         "--no-fci",
         action="store_true",
         help="a Full CI referencia (L0) kihagyása — nagy rendszereknél drága",
@@ -118,6 +130,10 @@ def main(argv: list[str] | None = None) -> int:
         optimizer=OptimizerSpec(method=args.optimizer, maxiter=args.maxiter),
         backend=args.backend,
         seed=args.seed,
+        mitigation=MitigationSpec(
+            strategy=args.mitigation,
+            extrapolator=args.extrapolator,
+        ),
     )
 
     try:

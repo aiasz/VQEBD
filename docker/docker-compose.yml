@@ -23,7 +23,7 @@ services:
       args:
         APP_UID: "1000"
         APP_GID: "1000"
-    image: vqebd:0.5.0
+    image: vqebd:0.6.0
     container_name: vqebd-app
     init: true                    # helyes jelkezelés (Ctrl+C), zombie-folyamatok elkerülése
     working_dir: /app

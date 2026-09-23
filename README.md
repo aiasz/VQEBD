@@ -135,6 +135,19 @@ Az első fizikai hardveres mérés az IBM legfejlettebb, 156-qubites Heron
 processzorán (`ibm_kingston`, 2q hiba: 0.0020). A mért nyers fizikai hiba mindössze
 ~4 mHa a Full CI elméleti alapállapothoz képest. Részletek: [`docs/02_hardware_run.md`](docs/02_hardware_run.md).
 
+### Fázis 3 — hibaenyhítés Zero-Noise Extrapolation-nel (ZNE)
+
+| Szint | Módszer | Extrapolátor | E (Ha) | Hiba az L1-hez (mHa) | Kémiai pontosság |
+|---|---|---|---|---|---|
+| **L3b** | Nyers (FakeManilaV2) | — | −1.121556 | +15.75 | ❌ |
+| **L4** | **`zne_local` ($\lambda \in \{1, 3, 5\}$)** | **Richardson** | **−1.136959** | **+0.35** | **✅ IGEN** |
+| **L4** | `zne_local` ($\lambda \in \{1, 3, 5\}$) | Exponenciális | −1.136965 | +0.34 | **✅ IGEN** |
+| **L4** | `zne_mitiq` ($\lambda \in \{1, 3, 5\}$) | Richardson | −1.137885 | −0.58 | **✅ IGEN** |
+
+A saját, ISA-biztos unitáris hajtogatási algoritmus (`zne_local`) sikeresen visszahozza a
+zajos szimulációt a kémiai pontossági küszöb ($1.59\ \text{mHa}$) alá.
+Részletek: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
+
 
 ### Gyors indítás
 
@@ -142,20 +155,20 @@ processzorán (`ibm_kingston`, 2q hiba: 0.0020). A mért nyers fizikai hiba mind
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (378 teszt)
+make test       # teljes tesztkészlet (396 teszt)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.5.0 python -m vqebd
+docker run --rm vqebd:0.6.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.5.0 .
-docker run --rm vqebd:0.5.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.6.0 .
+docker run --rm vqebd:0.6.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -170,9 +183,11 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_01m.md`](docs/plan/phase_01m.md) | A Fázis 1M részletes terve |
 | [`docs/plan/phase_01b.md`](docs/plan/phase_01b.md) | A Fázis 1b részletes terve |
 | [`docs/plan/phase_02.md`](docs/plan/phase_02.md) | A Fázis 2 részletes terve |
+| [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | A Fázis 3 részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
+| [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Hibaenyhítés és Zero-Noise Extrapolation (L4)** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
@@ -362,6 +377,19 @@ processor (`ibm_kingston`, median 2q error: 0.0020). The raw unmitigated physica
 error is only ~4 mHa from the Full CI theoretical ground state.
 Details: [`docs/02_hardware_run.md`](docs/02_hardware_run.md).
 
+### Phase 3 — Error Mitigation with Zero-Noise Extrapolation (ZNE)
+
+| Level | Method | Extrapolator | E (Ha) | Error vs L1 (mHa) | Chemical Accuracy |
+|---|---|---|---|---|---|
+| **L3b** | Raw (FakeManilaV2) | — | −1.121556 | +15.75 | ❌ |
+| **L4** | **`zne_local` ($\lambda \in \{1, 3, 5\}$)** | **Richardson** | **−1.136959** | **+0.35** | **✅ YES** |
+| **L4** | `zne_local` ($\lambda \in \{1, 3, 5\}$) | Exponential | −1.136965 | +0.34 | **✅ YES** |
+| **L4** | `zne_mitiq` ($\lambda \in \{1, 3, 5\}$) | Richardson | −1.137885 | −0.58 | **✅ YES** |
+
+Custom ISA-safe unitary folding (`zne_local`) successfully brings the error below
+the chemical accuracy threshold ($1.59\ \text{mHa}$).
+Details: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
+
 
 ### Quick Start
 
@@ -369,20 +397,20 @@ Details: [`docs/02_hardware_run.md`](docs/02_hardware_run.md).
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (378 tests)
+make test       # full test suite (396 tests)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.5.0 python -m vqebd
+docker run --rm vqebd:0.6.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.5.0 .
-docker run --rm vqebd:0.5.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.6.0 .
+docker run --rm vqebd:0.6.0 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -397,9 +425,11 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_01m.md`](docs/plan/phase_01m.md) | Detailed Phase 1M plan |
 | [`docs/plan/phase_01b.md`](docs/plan/phase_01b.md) | Detailed Phase 1b plan |
 | [`docs/plan/phase_02.md`](docs/plan/phase_02.md) | Detailed Phase 2 plan |
+| [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | Detailed Phase 3 plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
+| [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Error mitigation and Zero-Noise Extrapolation (L4)** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |

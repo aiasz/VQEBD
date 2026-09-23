@@ -29,8 +29,11 @@ from typing import Any, Literal
 __all__ = [
     "AnsatzSpec",
     "BackendKind",
+    "ExtrapolatorKind",
     "InitialPointKind",
     "MapperKind",
+    "MitigationSpec",
+    "MitigationStrategyKind",
     "MoleculeSpec",
     "OptimizerSpec",
     "VQEConfig",
@@ -151,6 +154,35 @@ class OptimizerSpec:
             raise ValueError(f"a tol legyen pozitív: {self.tol}")
 
 
+MitigationStrategyKind = Literal["none", "zne_local", "zne_mitiq"]
+"""A támogatott hibaenyhítési stratégiák azonosítói (ADR-0003)."""
+
+ExtrapolatorKind = Literal["richardson", "linear", "quadratic", "exponential"]
+"""A ZNE extrapolációs modelljeinek azonosítói."""
+
+
+@dataclass(frozen=True, slots=True)
+class MitigationSpec:
+    """A hibaenyhítés beállításai (ADR-0003).
+
+    Attributes:
+        strategy: A módszer (``"none"``, ``"zne_local"``, ``"zne_mitiq"``).
+        scale_factors: A zajszorzók (λ) ZNE esetén (pl. (1, 3, 5)).
+        extrapolator: Az extrapolációs modell (``"richardson"``, ``"linear"``, stb.).
+    """
+
+    strategy: MitigationStrategyKind = "none"
+    scale_factors: tuple[int, ...] = (1, 3, 5)
+    extrapolator: ExtrapolatorKind = "richardson"
+
+    def __post_init__(self) -> None:
+        for s in self.scale_factors:
+            if s < 1 or s % 2 != 1:
+                raise ValueError(
+                    f"a ZNE skálafaktoroknak páratlan pozitív egésznek kell lenniük, kapott: {s}"
+                )
+
+
 @dataclass(frozen=True, slots=True)
 class VQEConfig:
     """Egyetlen VQE-futtatás teljes, önmagában elegendő leírása.
@@ -168,6 +200,7 @@ class VQEConfig:
         optimizer: A klasszikus optimalizáló.
         backend: A kiértékelés módja.
         seed: A **mester**-seed; ebből származik az összes többi (:mod:`vqebd.seeds`).
+        mitigation: A hibaenyhítés beállításai (ADR-0003).
     """
 
     molecule: MoleculeSpec
@@ -177,10 +210,14 @@ class VQEConfig:
     optimizer: OptimizerSpec = field(default_factory=OptimizerSpec)
     backend: BackendKind = "qiskit_statevector"
     seed: int = 20260922
+    mitigation: MitigationSpec = field(default_factory=MitigationSpec)
 
     def to_dict(self) -> dict[str, Any]:
         """Beágyazott szótár-alak — naplózáshoz és az adatsémához."""
-        return dataclasses.asdict(self)
+        d = dataclasses.asdict(self)
+        if "mitigation" in d and "scale_factors" in d["mitigation"]:
+            d["mitigation"]["scale_factors"] = list(d["mitigation"]["scale_factors"])
+        return d
 
     def canonical_json(self) -> str:
         """Kanonikus JSON-alak: rendezett kulcsok, fix elválasztók.

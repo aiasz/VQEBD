@@ -81,8 +81,27 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     evaluator = make_energy_evaluator(config.backend, ansatz.circuit, hamiltonian.operator, seeds)
     outcome = minimize_energy(evaluator, ansatz.initial_point, config.optimizer)
 
-    electronic = outcome.value
-    total = electronic + hamiltonian.nuclear_repulsion_energy
+    mitigation_res = None
+    if config.mitigation.strategy != "none":
+        from vqebd.mitigation import get_mitigation_strategy
+
+        strategy = get_mitigation_strategy(
+            config.mitigation.strategy,
+            scale_factors=config.mitigation.scale_factors,
+            extrapolator=config.mitigation.extrapolator,
+        )
+        mitigation_res = strategy.execute(
+            ansatz.circuit,
+            hamiltonian.operator,
+            evaluator,
+            outcome.parameters,
+            seeds,
+        )
+        electronic = mitigation_res.mitigated_energy
+        total = electronic + hamiltonian.nuclear_repulsion_energy
+    else:
+        electronic = outcome.value
+        total = electronic + hamiltonian.nuclear_repulsion_energy
 
     return VQEResult(
         energy=total,
@@ -108,4 +127,5 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
         seeds=seeds,
         versions=package_versions(),
         environment_fingerprint=environment_fingerprint(),
+        mitigation=mitigation_res,
     )

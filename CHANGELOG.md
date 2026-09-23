@@ -12,8 +12,43 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 3** — hibacsökkentés (Mitiq ZNE, Richardson / exponenciális illesztés, saját ISA-biztos ZNE).
-- **Fázis 4** — strukturált SQLite és JSON adattárolási réteg.
+- **Fázis 4** — strukturált SQLite és JSON adattárolási réteg (`v0.7.0`).
+- **Fázis 5** — batch futtatás és molekuláris skálázás (LiH, BeH2).
+
+---
+
+## [0.6.0] — 2026-09-23
+
+**Fázis 3 lezárva — Hibaenyhítési stratégiák (ZNE & Mitiq) (L4).**
+
+A VQEBD pluginalapú hibaenyhítési réteggel bővült (ADR-0003), amely Zero-Noise
+Extrapolation (ZNE) segítségével sikeresen csökkenti a zajt és helyreállítja a
+kémiai pontosságot:
+
+### Hozzáadva
+
+#### Hibaenyhítési réteg (`vqebd.mitigation`)
+- `MitigationStrategy` protokoll és `MitigationResult` rekord.
+- `ZneLocalMitigation` — saját, **ISA- és layout-biztos** globális unitáris áramkör-hajtogatás (`fold_global_unitary`, $\lambda \in \{1, 3, 5\}$).
+- Extrapolációs modellek (`extrapolation.py`): Richardson (Lagrange $\lambda \to 0$), lineáris, másodfokú/polinomiális és exponenciális.
+- `MitiqZneMitigation` — opcionális Mitiq ZNE referencia (GPL-3.0 izolált).
+- `NoMitigation` — nyers referencia.
+- CLI és konfiguráció: `--mitigation none | zne_local | zne_mitiq`, `--extrapolator richardson | linear | quadratic | exponential`.
+- L4 szintű jelentés és szerializáció a `VQEResult` rekordokban.
+
+#### Dokumentáció és tesztek
+- `docs/03_mitigation_test.md`, `docs/plan/phase_03.md`, `TP-F03` és `TR-F03`.
+- Új egység- és validációs tesztek: `test_folding.py`, `test_extrapolation.py`, `test_mitigation_strategies.py`, `test_mitigation_validation.py`.
+
+### Mért eredmények (H2, STO-3G, FakeManilaV2)
+
+| Módszer | Extrapolátor | Energia (Ha) | Hiba az L1-hez (mHa) | Kémiai pontosság |
+|---|---|---|---|---|
+| Referencia (L0/L1/L2) | — | −1.137306 | 0.00 | ✅ |
+| **Nyers (L3b)** | — | −1.121556 | +15.75 | ❌ |
+| **`zne_local` (L4)** | **Richardson** | **−1.136959** | **+0.35** | **✅ IGEN** |
+| **`zne_local` (L4)** | **Exponenciális** | **−1.136965** | **+0.34** | **✅ IGEN** |
+| **`zne_mitiq` (L4)** | **Richardson** | **−1.137885** | **−0.58** | **✅ IGEN** |
 
 ---
 

@@ -83,6 +83,7 @@ class VQEResult:
     seeds: SeedSet
     versions: Mapping[str, str]
     environment_fingerprint: str
+    mitigation: Any = None
 
     # ---------------------------------------------------------------- hibák
 
@@ -178,6 +179,7 @@ class VQEResult:
             "seeds": self.seeds.to_dict(),
             "versions": dict(self.versions),
             "environment_fingerprint": self.environment_fingerprint,
+            "mitigation": self.mitigation.to_dict() if self.mitigation is not None else None,
         }
 
     def report(self) -> str:
@@ -202,14 +204,26 @@ class VQEResult:
         if ref.exact_diagonalization is not None:
             lines.append(f"  L1  egzakt diag. .. {ref.exact_diagonalization:+.10f}")
 
+        raw_total = (
+            self.mitigation.raw_energy + self.nuclear_repulsion_energy
+            if self.mitigation is not None and self.mitigation.strategy_name != "none"
+            else self.energy
+        )
+
         if self.config.backend == "qiskit_aer_shot":
-            lines.append(f"  L3a VQE (shot) .... {self.energy:+.10f}")
+            lines.append(f"  L3a VQE (shot) .... {raw_total:+.10f}")
         elif self.config.backend == "qiskit_aer_noisy":
-            lines.append(f"  L3b VQE (noisy) ... {self.energy:+.10f}")
+            lines.append(f"  L3b VQE (noisy) ... {raw_total:+.10f}")
         elif self.config.backend == "ibm_qpu":
-            lines.append(f"  L5  VQE (hardware)  {self.energy:+.10f}")
+            lines.append(f"  L5  VQE (hardware)  {raw_total:+.10f}")
         else:
-            lines.append(f"  L2  VQE ........... {self.energy:+.10f}")
+            lines.append(f"  L2  VQE ........... {raw_total:+.10f}")
+
+        if self.mitigation is not None and self.mitigation.strategy_name != "none":
+            lines.append(
+                f"  L4  VQE (mitigated) {self.energy:+.10f} "
+                f"[{self.mitigation.strategy_name}, {self.mitigation.extrapolator_name}]"
+            )
 
         lines.append("")
         lines.append("Hibák:")
