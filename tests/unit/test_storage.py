@@ -78,7 +78,9 @@ def test_tc_402_insert_result_with_mitigation(tmp_path: Path) -> None:
     cfg = VQEConfig(
         molecule=h2(H2_REFERENCE_BOND_LENGTH),
         backend="qiskit_statevector",
-        mitigation=MitigationSpec(strategy="zne_local", scale_factors=(1, 3, 5), extrapolator="richardson"),
+        mitigation=MitigationSpec(
+            strategy="zne_local", scale_factors=(1, 3, 5), extrapolator="richardson"
+        ),
     )
     result = run_vqe(cfg)
 
@@ -98,7 +100,11 @@ def test_tc_403_query_results_filters(tmp_path: Path) -> None:
     cfg_exact = VQEConfig(molecule=h2(0.735), backend="qiskit_statevector")
     res_exact = run_vqe(cfg_exact)
 
-    cfg_noisy = VQEConfig(molecule=h2(0.735), backend="qiskit_aer_noisy", optimizer=OptimizerSpec(method="COBYLA", maxiter=5))
+    cfg_noisy = VQEConfig(
+        molecule=h2(0.735),
+        backend="qiskit_aer_noisy",
+        optimizer=OptimizerSpec(method="COBYLA", maxiter=5),
+    )
     res_noisy = run_vqe(cfg_noisy)
 
     save_result(res_exact, db_file)

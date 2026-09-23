@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS results (
     run_id TEXT UNIQUE NOT NULL,
     timestamp TEXT NOT NULL,
     schema_version INTEGER NOT NULL DEFAULT 1,
-    
+
     -- Molekula és fizikai feladat
     molecule_name TEXT NOT NULL,
     geometry TEXT NOT NULL,
@@ -30,13 +30,13 @@ CREATE TABLE IF NOT EXISTS results (
     basis TEXT NOT NULL,
     charge INTEGER NOT NULL DEFAULT 0,
     spin INTEGER NOT NULL DEFAULT 0,
-    
+
     -- Leképezés és ansatz
     mapper TEXT NOT NULL,
     two_qubit_reduction INTEGER NOT NULL,
     ansatz_kind TEXT NOT NULL,
     initial_point TEXT NOT NULL,
-    
+
     -- Optimalizáló és konvergencia
     optimizer_method TEXT NOT NULL,
     optimizer_maxiter INTEGER NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS results (
     n_function_evaluations INTEGER NOT NULL,
     converged INTEGER NOT NULL,
     optimizer_message TEXT NOT NULL,
-    
+
     -- Platform és backend
     backend TEXT NOT NULL,
     platform TEXT NOT NULL,
@@ -53,13 +53,13 @@ CREATE TABLE IF NOT EXISTS results (
     optimization_level INTEGER,
     hardware_backend_name TEXT,
     hardware_job_id TEXT,
-    
+
     -- Hibaenyhítés (ZNE)
     mitigation_strategy TEXT NOT NULL DEFAULT 'none',
     mitigation_extrapolator TEXT,
     scale_factors_json TEXT,
     scaled_energies_json TEXT,
-    
+
     -- Energiák és hibák (Hartree)
     energy_ha REAL NOT NULL,
     electronic_energy_ha REAL NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS results (
     correlation_recovered REAL,
     within_chemical_accuracy INTEGER NOT NULL,
     satisfies_variational_principle INTEGER NOT NULL,
-    
+
     -- Reprodukálhatóság és Provenance (FAIR)
     master_seed INTEGER NOT NULL,
     seeds_json TEXT NOT NULL,

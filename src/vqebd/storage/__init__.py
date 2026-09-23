@@ -53,4 +53,3 @@ def load_results(
             within_chemical_accuracy=within_chemical_accuracy,
             limit=limit,
         )
-

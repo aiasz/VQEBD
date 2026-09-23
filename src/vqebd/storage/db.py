@@ -35,7 +35,10 @@ class Database:
         if isinstance(self.path, Path) and not self.read_only and self.path != Path(":memory:"):
             self.path.parent.mkdir(parents=True, exist_ok=True)
 
-        conn_str = f"file:{self.path}?mode=ro" if (read_only and self.path != ":memory:") else str(self.path)
+        if read_only and self.path != ":memory:":
+            conn_str = f"file:{self.path}?mode=ro"
+        else:
+            conn_str = str(self.path)
         uri = bool(read_only and self.path != ":memory:")
 
         self._conn = sqlite3.connect(conn_str, uri=uri)
@@ -112,8 +115,16 @@ class Database:
             "backend": cfg.backend,
             "platform": result.platform,
             "precision": result.precision,
-            "shots": 8192 if "shot" in cfg.backend or "noisy" in cfg.backend or cfg.backend == "ibm_qpu" else None,
-            "optimization_level": 3 if cfg.backend in ("qiskit_aer_noisy", "ibm_qpu") else (1 if cfg.backend == "qiskit_aer_shot" else None),
+            "shots": (
+                8192
+                if "shot" in cfg.backend or "noisy" in cfg.backend or cfg.backend == "ibm_qpu"
+                else None
+            ),
+            "optimization_level": (
+                3
+                if cfg.backend in ("qiskit_aer_noisy", "ibm_qpu")
+                else (1 if cfg.backend == "qiskit_aer_shot" else None)
+            ),
             "hardware_backend_name": "ibm_kingston" if cfg.backend == "ibm_qpu" else None,
             "hardware_job_id": None,
             "mitigation_strategy": mit.strategy_name if mit else "none",
@@ -123,12 +134,18 @@ class Database:
             "energy_ha": result.energy,
             "electronic_energy_ha": result.electronic_energy,
             "nuclear_repulsion_ha": result.nuclear_repulsion_energy,
-            "raw_energy_ha": (mit.raw_energy + result.nuclear_repulsion_energy) if mit else result.energy,
+            "raw_energy_ha": (
+                (mit.raw_energy + result.nuclear_repulsion_energy) if mit else result.energy
+            ),
             "hartree_fock_ha": ref.hartree_fock,
             "full_ci_ha": ref.full_ci,
             "exact_diag_ha": ref.exact_diagonalization,
-            "error_vs_fci_ha": (result.energy - ref.full_ci) if ref.full_ci is not None else None,
-            "error_vs_exact_diag_ha": (result.energy - ref.exact_diagonalization) if ref.exact_diagonalization is not None else None,
+            "error_vs_fci_ha": ((result.energy - ref.full_ci) if ref.full_ci is not None else None),
+            "error_vs_exact_diag_ha": (
+                (result.energy - ref.exact_diagonalization)
+                if ref.exact_diagonalization is not None
+                else None
+            ),
             "correlation_recovered": result.correlation_energy_recovered,
             "within_chemical_accuracy": 1 if result.within_chemical_accuracy else 0,
             "satisfies_variational_principle": 1 if result.satisfies_variational_principle else 0,
