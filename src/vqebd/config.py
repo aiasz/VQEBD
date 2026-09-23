@@ -44,7 +44,13 @@ MapperKind = Literal["jordan_wigner", "parity", "bravyi_kitaev"]
 - ``bravyi_kitaev`` — [bravyi2002], [seeley2012]; logaritmikus Pauli-súly.
 """
 
-BackendKind = Literal["qiskit_statevector", "cirq_simulator", "qsim"]
+BackendKind = Literal[
+    "qiskit_statevector",
+    "cirq_simulator",
+    "qsim",
+    "qiskit_aer_shot",
+    "qiskit_aer_noisy",
+]
 """A támogatott platform-backend azonosítók.
 
 Az azonosító **platformot és végrehajtási módot együtt** nevez meg. Ez kizárja az
@@ -54,9 +60,10 @@ benchmark platform-dimenzióját.
 - ``qiskit_statevector`` — Qiskit ``StatevectorEstimator``, egzakt, ``complex128``.
 - ``cirq_simulator`` — Google Cirq beépített szimulátora, egzakt, ``complex128``.
 - ``qsim`` — Google qsim, C++-ban optimalizált, egzakt, de **``complex64``**.
+- ``qiskit_aer_shot`` — Qiskit Aer, véges lövésszám, zaj nélkül (L3a).
+- ``qiskit_aer_noisy`` — Qiskit Aer, FakeManilaV2 kalibrációs zajjal (L3b).
 
-A Fázis 1b (``qiskit_aer_shot``, ``qiskit_aer_noisy``, ``qsim_noisy``) és a
-Fázis 2 (``ibm_qpu``) bővíti a listát.
+A Fázis 2 (``ibm_qpu``) bővíti a listát.
 
 .. note::
    A ``0.3.0`` verzióban a korábbi ``"statevector"`` azonosító

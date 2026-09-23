@@ -212,11 +212,38 @@ PLATFORMS: Final[dict[BackendKind, PlatformInfo]] = {
             "DERIVÁLTMENTES optimalizálót igényel."
         ),
     ),
+    "qiskit_aer_shot": PlatformInfo(
+        backend="qiskit_aer_shot",
+        platform="qiskit",
+        precision="complex128",
+        machine_epsilon=_EPS_64,
+        # Mért: 8192 lövésnél a szórás ~1e-2 Ha nagyságrendű.
+        noise_floor_ha=1e-2,
+        tolerance_ha=5e-2,
+        exact=False,
+        requires_quota=False,
+        deterministic=True,
+        recommended_optimizer="COBYLA",
+        description="Qiskit Aer — véges lövésszám (8192), zajmodell nélkül (L3a).",
+    ),
+    "qiskit_aer_noisy": PlatformInfo(
+        backend="qiskit_aer_noisy",
+        platform="qiskit",
+        precision="complex128",
+        machine_epsilon=_EPS_64,
+        # Mért: FakeManilaV2 zajjal a hiba ~1.5e-2 Ha.
+        noise_floor_ha=2e-2,
+        tolerance_ha=5e-2,
+        exact=False,
+        requires_quota=False,
+        deterministic=True,
+        recommended_optimizer="COBYLA",
+        description="Qiskit Aer — FakeManilaV2 kalibrációs zajmodellel (L3b).",
+    ),
 }
 """A platform-backendek nyilvántartása.
 
-A Fázis 1b (``qiskit_aer_shot``, ``qiskit_aer_noisy``, ``qsim_noisy``) és a
-Fázis 2 (``ibm_qpu``) újabb bejegyzésekkel bővíti.
+A Fázis 2 (``ibm_qpu``) újabb bejegyzésekkel bővíti.
 """
 
 

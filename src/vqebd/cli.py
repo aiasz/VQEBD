@@ -70,7 +70,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--backend",
         default="qiskit_statevector",
-        choices=["qiskit_statevector", "cirq_simulator", "qsim"],
+        choices=[
+            "qiskit_statevector",
+            "cirq_simulator",
+            "qsim",
+            "qiskit_aer_shot",
+            "qiskit_aer_noisy",
+        ],
         help="platform-backend: melyik szimulátor végezze a kiértékelést (ADR-0006)",
     )
     parser.add_argument("--optimizer", default="SLSQP", help="SciPy optimalizáló-metódus")

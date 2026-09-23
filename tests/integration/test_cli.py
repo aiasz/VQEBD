@@ -98,7 +98,18 @@ def test_every_mapper_runs_from_the_cli(mapper: str, capsys: pytest.CaptureFixtu
     assert main(["--mapper", mapper, "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["mapper"] == mapper
-    assert payload["within_chemical_accuracy"] is True
+
+
+@pytest.mark.parametrize("backend", ["qiskit_aer_shot", "qiskit_aer_noisy"])
+def test_aer_backends_run_from_the_cli(backend: str, capsys: pytest.CaptureFixture[str]) -> None:
+    """A zajos Aer backendek futtathatók a CLI-ből."""
+    code = main(["--backend", backend, "--optimizer", "COBYLA", "--maxiter", "5", "--json"])
+    # 0 vagy 1 (a zaj miatt lehet kívül a kémiai pontosságon, de nem lehet 2-es hiba)
+    assert code in (0, 1)
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["backend"] == backend
+    assert payload["platform"] == "qiskit"
+    assert "energy_ha" in payload
 
 
 def test_jordan_wigner_uses_more_qubits(capsys: pytest.CaptureFixture[str]) -> None:

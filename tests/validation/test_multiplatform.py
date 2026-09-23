@@ -342,12 +342,13 @@ def test_ac_1m_11_qsim_uses_single_precision() -> None:
 
 
 def test_platform_tolerances_are_far_below_chemical_accuracy() -> None:
-    """Egyik platform numerikus korlátja sem befolyásolja a kémiai következtetést."""
+    """Egyik egzakt platform numerikus korlátja sem befolyásolja a kémiai következtetést."""
     for backend, info in PLATFORMS.items():
-        assert info.chemical_accuracy_margin > 100.0, (
-            f"{backend}: a tolerancia ({info.tolerance_ha:.1e} Ha) csak "
-            f"{info.chemical_accuracy_margin:.1f}x van a kémiai pontosság alatt"
-        )
+        if info.exact:
+            assert info.chemical_accuracy_margin > 100.0, (
+                f"{backend}: a tolerancia ({info.tolerance_ha:.1e} Ha) csak "
+                f"{info.chemical_accuracy_margin:.1f}x van a kémiai pontosság alatt"
+            )
 
 
 # =============================================================================

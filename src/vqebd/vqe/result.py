@@ -201,13 +201,23 @@ class VQEResult:
             lines.append(f"  L0  Full CI ....... {ref.full_ci:+.10f}")
         if ref.exact_diagonalization is not None:
             lines.append(f"  L1  egzakt diag. .. {ref.exact_diagonalization:+.10f}")
-        lines.append(f"  L2  VQE ........... {self.energy:+.10f}")
+
+        if self.config.backend == "qiskit_aer_shot":
+            lines.append(f"  L3a VQE (shot) .... {self.energy:+.10f}")
+        elif self.config.backend == "qiskit_aer_noisy":
+            lines.append(f"  L3b VQE (noisy) ... {self.energy:+.10f}")
+        else:
+            lines.append(f"  L2  VQE ........... {self.energy:+.10f}")
+
         lines.append("")
         lines.append("Hibák:")
         if ref.mapping_error is not None:
             lines.append(f"  leképezés (L1−L0) . {ref.mapping_error:+.3e} Ha")
         if self.error_vs_exact_diagonalization is not None:
-            lines.append(f"  ansatz (L2−L1) .... {self.error_vs_exact_diagonalization:+.3e} Ha")
+            if self.config.backend in ("qiskit_aer_shot", "qiskit_aer_noisy"):
+                lines.append(f"  ansatz+zaj (L3−L1)  {self.error_vs_exact_diagonalization:+.3e} Ha")
+            else:
+                lines.append(f"  ansatz (L2−L1) .... {self.error_vs_exact_diagonalization:+.3e} Ha")
         lines.append(f"  referenciához ..... {self.error_vs_reference:+.3e} Ha")
         recovered = self.correlation_energy_recovered
         if recovered is not None:

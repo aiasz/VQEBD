@@ -125,6 +125,128 @@ class StatevectorEnergyEvaluator(EnergyEvaluator):
         return float(job.result()[0].data.evs)
 
 
+class AerShotEnergyEvaluator(EnergyEvaluator):
+    """Qiskit Aer: véges lövésszámú, zajmentes kiértékelés (L3a)."""
+
+    def __init__(self, circuit: Any, observable: Any, seeds: SeedSet) -> None:
+        import numpy as np
+        from qiskit import transpile
+        from qiskit_aer import AerSimulator
+        from qiskit_aer.primitives import EstimatorV2 as AerEstimator
+
+        super().__init__(num_qubits=int(circuit.num_qubits))
+        if int(observable.num_qubits) != self.num_qubits:
+            raise ValueError(
+                f"az áramkör ({self.num_qubits} qubit) és az observable "
+                f"({observable.num_qubits} qubit) qubit-száma eltér"
+            )
+
+        self._shots = 8192
+        self._precision = 1.0 / np.sqrt(self._shots)
+        self._seeds = seeds
+
+        simulator = AerSimulator(seed_simulator=seeds.simulator)
+        self._isa_circuit = transpile(
+            circuit, simulator, optimization_level=1, seed_transpiler=seeds.transpiler
+        )
+        self._isa_observable = (
+            observable.apply_layout(self._isa_circuit.layout)
+            if self._isa_circuit.layout is not None
+            else observable
+        )
+
+        self._estimator = AerEstimator(
+            options={
+                "default_precision": self._precision,
+                "run_options": {"seed_simulator": seeds.simulator},
+            }
+        )
+
+    @property
+    def kind(self) -> BackendKind:
+        return "qiskit_aer_shot"
+
+    def describe(self) -> dict[str, Any]:
+        desc = super().describe()
+        desc.update(
+            {
+                "shots": self._shots,
+                "precision": self._precision,
+                "optimization_level": 1,
+            }
+        )
+        return desc
+
+    def evaluate(self, parameters: Sequence[float]) -> float:
+        job = self._estimator.run([(self._isa_circuit, self._isa_observable, list(parameters))])
+        return float(job.result()[0].data.evs)
+
+
+class AerNoisyEnergyEvaluator(EnergyEvaluator):
+    """Qiskit Aer: zajos kiértékelés FakeBackend kalibrációval (L3b)."""
+
+    def __init__(self, circuit: Any, observable: Any, seeds: SeedSet) -> None:
+        import numpy as np
+        from qiskit import transpile
+        from qiskit_aer import AerSimulator
+        from qiskit_aer.primitives import EstimatorV2 as AerEstimator
+        from qiskit_ibm_runtime.fake_provider import FakeManilaV2
+
+        super().__init__(num_qubits=int(circuit.num_qubits))
+        if int(observable.num_qubits) != self.num_qubits:
+            raise ValueError(
+                f"az áramkör ({self.num_qubits} qubit) és az observable "
+                f"({observable.num_qubits} qubit) qubit-száma eltér"
+            )
+
+        self._shots = 8192
+        self._precision = 1.0 / np.sqrt(self._shots)
+        self._seeds = seeds
+        self._backend_name = "FakeManilaV2"
+
+        backend = FakeManilaV2()
+        simulator = AerSimulator.from_backend(backend, seed_simulator=seeds.simulator)
+        self._isa_circuit = transpile(
+            circuit, simulator, optimization_level=3, seed_transpiler=seeds.transpiler
+        )
+        self._isa_observable = (
+            observable.apply_layout(self._isa_circuit.layout)
+            if self._isa_circuit.layout is not None
+            else observable
+        )
+
+        self._estimator = AerEstimator(
+            options={
+                "default_precision": self._precision,
+                "backend_options": {
+                    "noise_model": simulator.options.noise_model,
+                    "seed_simulator": seeds.simulator,
+                },
+                "run_options": {"seed_simulator": seeds.simulator},
+            }
+        )
+
+    @property
+    def kind(self) -> BackendKind:
+        return "qiskit_aer_noisy"
+
+    def describe(self) -> dict[str, Any]:
+        desc = super().describe()
+        desc.update(
+            {
+                "shots": self._shots,
+                "precision": self._precision,
+                "optimization_level": 3,
+                "fake_backend": self._backend_name,
+            }
+        )
+        return desc
+
+    def evaluate(self, parameters: Sequence[float]) -> float:
+        job = self._estimator.run([(self._isa_circuit, self._isa_observable, list(parameters))])
+        return float(job.result()[0].data.evs)
+
+
 def make_energy_evaluator(
     kind: BackendKind,
     circuit: Any,
@@ -153,6 +275,12 @@ def make_energy_evaluator(
     """
     if kind == "qiskit_statevector":
         return StatevectorEnergyEvaluator(circuit, observable)
+
+    if kind == "qiskit_aer_shot":
+        return AerShotEnergyEvaluator(circuit, observable, seeds)
+
+    if kind == "qiskit_aer_noisy":
+        return AerNoisyEnergyEvaluator(circuit, observable, seeds)
 
     # Késleltetett import: a Cirq-réteg csak akkor töltődik be, ha tényleg kell.
     if kind == "cirq_simulator":

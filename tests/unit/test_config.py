@@ -101,6 +101,8 @@ def test_fingerprint_is_a_sha256_hex_digest() -> None:
         {"seed": 1},
         {"ansatz": AnsatzSpec(initial_point="random")},
         {"optimizer": OptimizerSpec(method="COBYLA")},
+        {"backend": "qiskit_aer_shot"},
+        {"backend": "qiskit_aer_noisy"},
     ],
 )
 def test_fingerprint_changes_with_configuration(change: dict[str, object]) -> None:
