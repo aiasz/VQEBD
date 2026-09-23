@@ -148,6 +148,8 @@ A saját, ISA-biztos unitáris hajtogatási algoritmus (`zne_local`) sikeresen v
 zajos szimulációt a kémiai pontossági küszöb ($1.59\ \text{mHa}$) alá.
 Részletek: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 
+![Hibaenyhítés és ZNE extrapolációs görbe](docs/figures/fig06_mitigacio.png)
+
 
 ### Gyors indítás
 
@@ -389,6 +391,8 @@ Details: [`docs/02_hardware_run.md`](docs/02_hardware_run.md).
 Custom ISA-safe unitary folding (`zne_local`) successfully brings the error below
 the chemical accuracy threshold ($1.59\ \text{mHa}$).
 Details: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
+
+![Error mitigation and ZNE extrapolation curve](docs/figures/fig06_mitigacio.png)
 
 
 ### Quick Start

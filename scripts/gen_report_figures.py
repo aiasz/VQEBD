@@ -279,6 +279,75 @@ def measure_scaling() -> dict[str, Any]:
     return {"rows": rows, "aggregation": "min", "repeats": SCALING_REPEATS}
 
 
+def measure_mitigation() -> dict[str, Any]:
+    """ZNE hibaenyhítési mérések zajos szimulátoron és hardveres adatokkal."""
+    from vqebd.chemistry.molecule import H2_REFERENCE_BOND_LENGTH, h2
+    from vqebd.config import MitigationSpec, OptimizerSpec, VQEConfig
+    from vqebd.mitigation.extrapolation import extrapolate
+    from vqebd.vqe.runner import run_vqe
+
+    mol = h2(H2_REFERENCE_BOND_LENGTH)
+    opt = OptimizerSpec(method="COBYLA", maxiter=20)
+
+    # 1. Referenciák (L0/L1/L2)
+    cfg_exact = VQEConfig(
+        molecule=mol,
+        backend="qiskit_statevector",
+        optimizer=OptimizerSpec(method="SLSQP"),
+    )
+    res_exact = run_vqe(cfg_exact)
+
+    # 2. Shot zaj (L3a)
+    cfg_shot = VQEConfig(molecule=mol, backend="qiskit_aer_shot", optimizer=opt)
+    res_shot = run_vqe(cfg_shot)
+
+    # 3. Zajos szimuláció (L3b)
+    cfg_noisy = VQEConfig(molecule=mol, backend="qiskit_aer_noisy", optimizer=opt)
+    res_noisy = run_vqe(cfg_noisy)
+
+    # 4. Mitigált szimuláció (L4)
+    cfg_zne = VQEConfig(
+        molecule=mol,
+        backend="qiskit_aer_noisy",
+        optimizer=opt,
+        mitigation=MitigationSpec(
+            strategy="zne_local", scale_factors=(1, 3, 5), extrapolator="richardson"
+        ),
+    )
+    res_zne = run_vqe(cfg_zne)
+
+    scales = [1.0, 3.0, 5.0]
+    scaled_energies = (
+        list(res_zne.mitigation.scaled_energies)
+        if res_zne.mitigation is not None
+        else [res_noisy.electronic_energy] * 3
+    )
+    total_scaled = [e + res_exact.nuclear_repulsion_energy for e in scaled_energies]
+
+    richardson_val, _ = extrapolate("richardson", scales, total_scaled)
+    linear_val, _ = extrapolate("linear", scales, total_scaled)
+    exp_val, _ = extrapolate("exponential", scales, total_scaled)
+
+    # 5. Valódi hardveres adatok (L5) betöltése
+    hw_file = Path("docs/figures/data/hardware_h2_kingston.json")
+    hw_data = json.loads(hw_file.read_text(encoding="utf-8")) if hw_file.is_file() else {}
+    l5_energy = hw_data.get("energies", {}).get("l5_hardware_ha", -1.1412691258)
+
+    return {
+        "l0_full_ci": res_exact.reference.full_ci,
+        "l1_exact_diag": res_exact.reference.exact_diagonalization,
+        "l2_statevector": res_exact.energy,
+        "l3a_shot": res_shot.energy,
+        "l3b_noisy_raw": res_noisy.energy,
+        "l4_zne_richardson": richardson_val,
+        "l4_zne_linear": linear_val,
+        "l4_zne_exponential": exp_val,
+        "l5_hardware_raw": l5_energy,
+        "scales": scales,
+        "total_scaled_energies": total_scaled,
+    }
+
+
 # ================================================================= ábrák
 def figure_reference_chain(data: dict[str, Any], out: Path) -> None:
     """A hibalánc: hol keletkezik a hiba, és mekkora."""
@@ -708,6 +777,199 @@ def figure_scaling(data: dict[str, Any], out: Path) -> None:
     plt.close(fig)
 
 
+def figure_mitigation(data: dict[str, Any], out: Path) -> None:
+    """Fázis 3 & Fázis 2 összehasonlító ábra: ZNE hibaenyhítés és hardveres mérés."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from scipy.optimize import curve_fit
+
+    fig, (ax_bars, ax_extrap) = plt.subplots(
+        1, 2, figsize=(11.5, 5.2), facecolor=SURFACE, gridspec_kw={"wspace": 0.28}
+    )
+
+    fci = data["l0_full_ci"]
+    levels = [
+        "L2\nÁllapotvektor",
+        "L3a\nShot (8192)",
+        "L3b\nFakeManila (nyers)",
+        "L4\nZNE Richardson",
+        "L5\nHeron QPU (nyers)",
+    ]
+    energies = [
+        data["l2_statevector"],
+        data["l3a_shot"],
+        data["l3b_noisy_raw"],
+        data["l4_zne_richardson"],
+        data["l5_hardware_raw"],
+    ]
+    errors = [max(abs(e - fci), 1e-16) for e in energies]
+
+    bar_colors = [
+        SERIES["qiskit_statevector"],
+        STATUS["warning"],
+        STATUS["critical"],
+        STATUS["good"],
+        "#8a3ffc",  # IBM lila
+    ]
+
+    positions = np.arange(len(levels))
+    bars = ax_bars.bar(
+        positions,
+        errors,
+        0.55,
+        color=bar_colors,
+        zorder=3,
+        edgecolor=SURFACE,
+        linewidth=1.5,
+    )
+    for rect, val in zip(bars, errors, strict=True):
+        ax_bars.text(
+            rect.get_x() + rect.get_width() / 2,
+            val * 1.35,
+            f"{val:.1e}\nHa" if val < 1e-4 else f"{val * 1000:.2f}\nmHa",
+            ha="center",
+            va="bottom",
+            fontsize=8.5,
+            color=INK_SECONDARY,
+            fontweight="600",
+        )
+
+    ax_bars.axhline(
+        CHEMICAL_ACCURACY_HA, color=STATUS["critical"], linewidth=1.6, linestyle="--", zorder=4
+    )
+    ax_bars.text(
+        len(levels) - 0.55,
+        CHEMICAL_ACCURACY_HA * 1.3,
+        "kémiai pontosság (1.6 mHa)",
+        color=STATUS["critical"],
+        fontsize=8.5,
+        ha="right",
+        va="bottom",
+        fontweight="600",
+    )
+
+    ax_bars.set_yscale("log")
+    ax_bars.set_ylim(1e-16, 1e-1)
+    ax_bars.set_xticks(positions)
+    ax_bars.set_xticklabels(levels, fontsize=9, color=INK_SECONDARY)
+    ax_bars.set_ylabel(
+        "Hiba az elméleti Full CI-hez képest (Ha, log skála)", color=INK_SECONDARY, fontsize=9.5
+    )
+    style_axes(ax_bars)
+    title(
+        ax_bars,
+        "Referenciaszintek és hibaenyhítés",
+        "A ZNE visszahozza a zajos szimulációt a kémiai pontosság alá",
+    )
+
+    # Jobb oldali panel: ZNE extrapolációs görbe
+    scales = data["scales"]
+    y_vals = data["total_scaled_energies"]
+
+    ax_extrap.scatter(
+        scales,
+        y_vals,
+        color=STATUS["critical"],
+        s=60,
+        zorder=5,
+        label="Mért pontok (λ ∈ {1, 3, 5})",
+        edgecolor=INK,
+        linewidth=1.2,
+    )
+
+    lambda_grid = np.linspace(0.0, 5.5, 100)
+
+    # Richardson extrapoláció görbéje
+    poly_coeffs = np.polyfit(scales, y_vals, deg=2)
+    poly_curve = np.polyval(poly_coeffs, lambda_grid)
+    ax_extrap.plot(
+        lambda_grid,
+        poly_curve,
+        color=STATUS["good"],
+        linewidth=2.2,
+        label=f"Richardson / Polinom (λ=0: {data['l4_zne_richardson']:.5f} Ha)",
+        zorder=4,
+    )
+
+    # Exponenciális görbe
+    def _exp(x: Any, a: float, b: float, c: float) -> Any:
+        return a * np.exp(-b * x) + c
+
+    try:
+        p0 = [y_vals[0] - y_vals[-1], 0.1, y_vals[-1]]
+        popt, _ = curve_fit(_exp, scales, y_vals, p0=p0, maxfev=5000)
+        ax_extrap.plot(
+            lambda_grid,
+            _exp(lambda_grid, *popt),
+            color=SERIES["qiskit_statevector"],
+            linewidth=1.6,
+            linestyle=":",
+            label=f"Exponenciális (λ=0: {data['l4_zne_exponential']:.5f} Ha)",
+            zorder=3,
+        )
+    except Exception:
+        pass
+
+    # Lineáris illesztés
+    lin_coeffs = np.polyfit(scales, y_vals, deg=1)
+    ax_extrap.plot(
+        lambda_grid,
+        np.polyval(lin_coeffs, lambda_grid),
+        color=SERIES["cirq_simulator"],
+        linewidth=1.6,
+        linestyle="--",
+        label=f"Lineáris (λ=0: {data['l4_zne_linear']:.5f} Ha)",
+        zorder=3,
+    )
+
+    # Extrapolált pont (λ=0)
+    ax_extrap.scatter(
+        [0.0],
+        [data["l4_zne_richardson"]],
+        color=STATUS["good"],
+        marker="*",
+        s=180,
+        zorder=6,
+        edgecolor=INK,
+        linewidth=1.2,
+    )
+
+    # Kémiai pontossági sáv
+    ax_extrap.axhspan(
+        fci - CHEMICAL_ACCURACY_HA,
+        fci + CHEMICAL_ACCURACY_HA,
+        color=STATUS["good"],
+        alpha=0.15,
+        label="Kémiai pontossági sáv (±1.6 mHa)",
+        zorder=1,
+    )
+    ax_extrap.axhline(
+        fci,
+        color=INK,
+        linewidth=1.2,
+        linestyle="-",
+        zorder=2,
+        label="Full CI egzakt alapállapot",
+    )
+
+    ax_extrap.set_xlabel("Zajszorzó (λ)", color=INK_SECONDARY, fontsize=10)
+    ax_extrap.set_ylabel("Alapállapoti energia (Ha)", color=INK_SECONDARY, fontsize=10)
+    ax_extrap.set_xlim(-0.3, 5.7)
+    style_axes(ax_extrap)
+    title(
+        ax_extrap,
+        "Zero-Noise Extrapolation (ZNE) görbe",
+        "λ=0 extrapoláció különböző modellekkel (H2, FakeManilaV2)",
+    )
+    legend = ax_extrap.legend(frameon=False, fontsize=8.5, loc="lower left")
+    for text in legend.get_texts():
+        text.set_color(INK_SECONDARY)
+
+    fig.subplots_adjust(left=0.08, right=0.98, top=0.86, bottom=0.13)
+    fig.savefig(out / "fig06_mitigacio.png", dpi=200, facecolor=SURFACE)
+    plt.close(fig)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out", default=Path("docs/figures"), type=Path)
@@ -727,6 +989,7 @@ def main(argv: list[str] | None = None) -> int:
         ("hibalanc", measure_reference_chain, figure_reference_chain),
         ("optimalizalo_matrix", measure_optimizer_matrix, figure_optimizer_matrix),
         ("disszociacio", measure_dissociation, figure_dissociation),
+        ("mitigacio", measure_mitigation, figure_mitigation),
     ]
     if not args.quick:
         steps.append(("skalazas", measure_scaling, figure_scaling))

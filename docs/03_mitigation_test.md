@@ -46,6 +46,8 @@ L3b VQE (FakeManilaV2, nyers) .... -1.121556 Ha (Δ = +15.75 mHa ❌)
 L4  VQE + ZNE (Richardson) ....... -1.136959 Ha (Δ = +0.35 mHa ✅ Kémiai pontosság!)
 ```
 
+![Hibaenyhítés és ZNE extrapolációs görbe](figures/fig06_mitigacio.png)
+
 ---
 
 ## 3. Támogatott stratégiák és modellek

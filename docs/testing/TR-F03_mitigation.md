@@ -42,6 +42,8 @@ visszanyeri a kémiai pontosságot a zajos szimulációkon és hardveres mérés
 | `zne_local` ($\lambda \in \{1, 3, 5\}$) | **Lineáris** | -1.136357 | +0.95 | **✅ IGEN** |
 | `zne_mitiq` ($\lambda \in \{1, 3, 5\}$) | **Richardson** | -1.137885 | -0.58 | **✅ IGEN** |
 
+![Hibaenyhítés és ZNE extrapolációs görbe](../figures/fig06_mitigacio.png)
+
 ---
 
 ## 3. Keresztvalidáció a Mitiq referenciával (M4)
