@@ -50,6 +50,7 @@ BackendKind = Literal[
     "qsim",
     "qiskit_aer_shot",
     "qiskit_aer_noisy",
+    "ibm_qpu",
 ]
 """A támogatott platform-backend azonosítók.
 
@@ -62,8 +63,9 @@ benchmark platform-dimenzióját.
 - ``qsim`` — Google qsim, C++-ban optimalizált, egzakt, de **``complex64``**.
 - ``qiskit_aer_shot`` — Qiskit Aer, véges lövésszám, zaj nélkül (L3a).
 - ``qiskit_aer_noisy`` — Qiskit Aer, FakeManilaV2 kalibrációs zajjal (L3b).
+- ``ibm_qpu`` — Valódi IBM Quantum QPU (Heron processzor, pl. ``ibm_kingston``, L5).
 
-A Fázis 2 (``ibm_qpu``) bővíti a listát.
+A Fázis 3 a hibaenyhített futtatásokkal bővíti a rendszert.
 
 .. note::
    A ``0.3.0`` verzióban a korábbi ``"statevector"`` azonosító

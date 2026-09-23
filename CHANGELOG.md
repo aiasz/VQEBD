@@ -12,8 +12,40 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 2** — valódi IBM QPU-futtatás (`ibm_kingston`), teljes dokumentációval (`v0.5.0`).
-- **Fázis 3** — hibacsökkentés (Mitiq ZNE, Richardson / exponenciális illesztés).
+- **Fázis 3** — hibacsökkentés (Mitiq ZNE, Richardson / exponenciális illesztés, saját ISA-biztos ZNE).
+- **Fázis 4** — strukturált SQLite és JSON adattárolási réteg.
+
+---
+
+## [0.5.0] — 2026-09-23
+
+**Fázis 2 lezárva — Valódi hardveres futtatás IBM Heron QPU-n (L5).**
+
+Megtörtént az első éles fizikai kvantumprocesszoros mérés az IBM Quantum felhőben
+üzemelő, 156-qubites `ibm_kingston` Heron QPU-n:
+
+### Hozzáadva
+
+#### Hardveres backend
+- `vqebd.backends.estimators.IBMQpuEnergyEvaluator` — valódi IBM Quantum Heron QPU kiértékelő (L5 szint), 156-qubites ISA transzpilációval és `observable.apply_layout()` illesztéssel.
+- Új backend azonosító: `ibm_qpu` a `vqebd.config.BackendKind` és `vqebd.platforms.PLATFORMS` nyilvántartásban (`requires_quota=True`).
+- `scripts/run_hardware_vqe.py` — automatizált hardveres mérési szkript az L2-n megtalált optimális $\theta^*$ pont kiértékelésére és a nyers adatok mentésére.
+- `tests/unit/test_hardware_evaluator.py` — kvótavédett egység- és mocktesztek (`@pytest.mark.hardware`).
+
+#### Dokumentáció és tesztek
+- `docs/02_hardware_run.md`, `docs/plan/phase_02.md`, `TP-F02` és `TR-F02`.
+- Nyers hardveres mérési adatok: `data/raw/hardware_h2_kingston.json` (Job ID: `dapq25kak42c73cj1hu0`).
+
+### Mért eredmények (H2, 0.735 Å, STO-3G, ibm_kingston Heron QPU)
+
+| Szint | Backend | Mód | Energia (Ha) | Hiba az L0-hoz (Ha) |
+|---|---|---|---|---|
+| **L0** | PySCF Full CI | — | −1.1373060358 | 0.0 |
+| **L1** | Egzakt diag. | — | −1.1373060358 | $+1.33 \times 10^{-15}$ |
+| **L2** | `qiskit_statevector` | SLSQP | −1.1373060358 | $+1.49 \times 10^{-15}$ |
+| **L3a** | `qiskit_aer_shot` | COBYLA (8192 shot) | −1.1213780162 | $+1.59 \times 10^{-2}$ |
+| **L3b** | `qiskit_aer_noisy` | COBYLA (FakeManila) | −1.0938632143 | $+4.34 \times 10^{-2}$ |
+| **L5** | **`ibm_kingston` (Heron QPU)** | **8192 shot (Job: dapq25...)** | **−1.1412691258** | **−3.963 × 10⁻³ (−3.96 mHa)** |
 
 ---
 

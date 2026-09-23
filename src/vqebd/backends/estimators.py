@@ -247,6 +247,98 @@ class AerNoisyEnergyEvaluator(EnergyEvaluator):
         return float(job.result()[0].data.evs)
 
 
+class IBMQpuEnergyEvaluator(EnergyEvaluator):
+    """IBM Quantum: valódi hardveres kiértékelés Heron QPU-n (L5)."""
+
+    def __init__(
+        self,
+        circuit: Any,
+        observable: Any,
+        seeds: SeedSet,
+        *,
+        backend_name: str | None = None,
+        shots: int = 8192,
+    ) -> None:
+        import os
+
+        import numpy as np
+        from qiskit import transpile
+        from qiskit_ibm_runtime import EstimatorV2 as IBMRuntimeEstimator
+        from qiskit_ibm_runtime import QiskitRuntimeService
+
+        from vqebd.credentials import load_ibm_credentials
+
+        super().__init__(num_qubits=int(circuit.num_qubits))
+        if int(observable.num_qubits) != self.num_qubits:
+            raise ValueError(
+                f"az áramkör ({self.num_qubits} qubit) és az observable "
+                f"({observable.num_qubits} qubit) qubit-száma eltér"
+            )
+
+        self._shots = shots
+        self._precision = 1.0 / np.sqrt(self._shots)
+        self._seeds = seeds
+        self._credentials = load_ibm_credentials()
+        self._last_job_id: str | None = None
+
+        service_kwargs: dict[str, Any] = {
+            "channel": self._credentials.channel,
+            "token": self._credentials.reveal(),
+        }
+        if self._credentials.instance:
+            service_kwargs["instance"] = self._credentials.instance
+
+        service = QiskitRuntimeService(**service_kwargs)
+        target_name = backend_name or os.environ.get("VQEBD_IBM_BACKEND", "ibm_kingston")
+        self._backend = service.backend(target_name)
+        self._backend_name = self._backend.name
+
+        self._isa_circuit = transpile(
+            circuit,
+            backend=self._backend,
+            optimization_level=3,
+            seed_transpiler=seeds.transpiler,
+        )
+        self._isa_observable = (
+            observable.apply_layout(self._isa_circuit.layout)
+            if self._isa_circuit.layout is not None
+            else observable
+        )
+
+        self._estimator = IBMRuntimeEstimator(
+            mode=self._backend,
+            options={"default_precision": self._precision},
+        )
+
+    @property
+    def kind(self) -> BackendKind:
+        return "ibm_qpu"
+
+    @property
+    def last_job_id(self) -> str | None:
+        return self._last_job_id
+
+    def describe(self) -> dict[str, Any]:
+        desc = super().describe()
+        desc.update(
+            {
+                "shots": self._shots,
+                "precision": self._precision,
+                "optimization_level": 3,
+                "ibm_backend": self._backend_name,
+                "isa_qubits": self._isa_circuit.num_qubits,
+                "last_job_id": self._last_job_id,
+            }
+        )
+        return desc
+
+    def evaluate(self, parameters: Sequence[float]) -> float:
+        job = self._estimator.run([(self._isa_circuit, self._isa_observable, list(parameters))])
+        self._last_job_id = job.job_id()
+        result = job.result()
+        return float(result[0].data.evs)
+
+
 def make_energy_evaluator(
     kind: BackendKind,
     circuit: Any,
@@ -281,6 +373,9 @@ def make_energy_evaluator(
 
     if kind == "qiskit_aer_noisy":
         return AerNoisyEnergyEvaluator(circuit, observable, seeds)
+
+    if kind == "ibm_qpu":
+        return IBMQpuEnergyEvaluator(circuit, observable, seeds)
 
     # Késleltetett import: a Cirq-réteg csak akkor töltődik be, ha tényleg kell.
     if kind == "cirq_simulator":

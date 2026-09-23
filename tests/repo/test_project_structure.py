@@ -60,6 +60,7 @@ REQUIRED_FILES: tuple[str, ...] = (
     "docs/01_vqe_core.md",
     "docs/01m_multiplatform.md",
     "docs/01b_noisy_simulation.md",
+    "docs/02_hardware_run.md",
     "docs/references.md",
     "docs/plan/00_master_plan.md",
     "docs/plan/phase_00.md",
@@ -82,9 +83,12 @@ REQUIRED_FILES: tuple[str, ...] = (
     "docs/testing/TR-F01M_tobbplatform.md",
     "docs/testing/TP-F01B_noisy_simulation.md",
     "docs/testing/TR-F01B_noisy_simulation.md",
+    "docs/testing/TP-F02_hardware_run.md",
+    "docs/testing/TR-F02_hardware_run.md",
     "scripts/gen_references.py",
     "scripts/negative_test_harness.py",
     "scripts/check_ibm_access.py",
+    "scripts/run_hardware_vqe.py",
     "scripts/gen_report_figures.py",
     "src/vqebd/__init__.py",
     "src/vqebd/__main__.py",
@@ -99,6 +103,7 @@ REQUIRED_FILES: tuple[str, ...] = (
     "src/vqebd/py.typed",
     "tests/conftest.py",
     "tests/repo/test_line_endings.py",
+    "tests/unit/test_hardware_evaluator.py",
 )
 
 # Minden `src/vqebd` alkönyvtárnak valódi Python-csomagnak kell lennie.

@@ -240,10 +240,24 @@ PLATFORMS: Final[dict[BackendKind, PlatformInfo]] = {
         recommended_optimizer="COBYLA",
         description="Qiskit Aer — FakeManilaV2 kalibrációs zajmodellel (L3b).",
     ),
+    "ibm_qpu": PlatformInfo(
+        backend="ibm_qpu",
+        platform="qiskit",
+        precision="complex128",
+        machine_epsilon=_EPS_64,
+        # Heron QPU tipikus mérési hiba ~1-3e-2 Ha.
+        noise_floor_ha=2e-2,
+        tolerance_ha=1e-1,
+        exact=False,
+        requires_quota=True,
+        deterministic=False,
+        recommended_optimizer="COBYLA",
+        description="IBM Quantum — valódi szupravezető QPU (Heron processzor, L5).",
+    ),
 }
 """A platform-backendek nyilvántartása.
 
-A Fázis 2 (``ibm_qpu``) újabb bejegyzésekkel bővíti.
+A Fázis 3 (hibaenyhített backendek) újabb bejegyzésekkel bővíti.
 """
 
 

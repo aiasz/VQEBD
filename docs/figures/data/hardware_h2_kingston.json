@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-09-23T09:52:06Z",
+  "backend": "ibm_qpu",
+  "ibm_backend_name": "ibm_kingston",
+  "job_id": "dapq25kak42c73cj1hu0",
+  "shots": 8192,
+  "duration_s": 48.92562340100994,
+  "optimal_parameters": [
+    -5.372838337302328e-08,
+    -6.366672412516411e-08,
+    -0.11176849880087102
+  ],
+  "energies": {
+    "hartree_fock_ha": -1.116998996754004,
+    "l0_full_ci_ha": -1.1373060357534004,
+    "l1_exact_diag_ha": -1.137306035753399,
+    "l2_statevector_ha": -1.137306035753391,
+    "l5_hardware_ha": -1.1412691257513674
+  },
+  "errors_ha": {
+    "error_vs_l0_ha": -0.0039630899979670176,
+    "error_vs_l1_ha": -0.00396308999796835
+  },
+  "nuclear_repulsion_ha": 0.7199689944489797,
+  "electronic_energy_ha": -1.8612381202003472
+}

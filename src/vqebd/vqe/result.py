@@ -206,6 +206,8 @@ class VQEResult:
             lines.append(f"  L3a VQE (shot) .... {self.energy:+.10f}")
         elif self.config.backend == "qiskit_aer_noisy":
             lines.append(f"  L3b VQE (noisy) ... {self.energy:+.10f}")
+        elif self.config.backend == "ibm_qpu":
+            lines.append(f"  L5  VQE (hardware)  {self.energy:+.10f}")
         else:
             lines.append(f"  L2  VQE ........... {self.energy:+.10f}")
 
@@ -216,6 +218,8 @@ class VQEResult:
         if self.error_vs_exact_diagonalization is not None:
             if self.config.backend in ("qiskit_aer_shot", "qiskit_aer_noisy"):
                 lines.append(f"  ansatz+zaj (L3−L1)  {self.error_vs_exact_diagonalization:+.3e} Ha")
+            elif self.config.backend == "ibm_qpu":
+                lines.append(f"  ansatz+zaj (L5−L1)  {self.error_vs_exact_diagonalization:+.3e} Ha")
             else:
                 lines.append(f"  ansatz (L2−L1) .... {self.error_vs_exact_diagonalization:+.3e} Ha")
         lines.append(f"  referenciához ..... {self.error_vs_reference:+.3e} Ha")

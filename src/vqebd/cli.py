@@ -76,6 +76,7 @@ def build_parser() -> argparse.ArgumentParser:
             "qsim",
             "qiskit_aer_shot",
             "qiskit_aer_noisy",
+            "ibm_qpu",
         ],
         help="platform-backend: melyik szimulátor végezze a kiértékelést (ADR-0006)",
     )
