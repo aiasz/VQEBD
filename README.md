@@ -2,10 +2,10 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.3.0-orange.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-1M%2F10%20lezárva-yellow.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-332%20zöld-brightgreen.svg)](docs/testing/TR-F01M_tobbplatform.md)
-[![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim-blueviolet.svg)](docs/01m_multiplatform.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.6.0-orange.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-3%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-424%20zöld-brightgreen.svg)](docs/testing/TR-F03_mitigation.md)
+[![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
@@ -22,20 +22,22 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 1M lezárva (`v0.3.0`)** — a VQE-mag működik, és
-**három platformon** (Qiskit, Cirq, qsim) validált. Az IBM Quantum hozzáférés
-ellenőrizve: 3 db 156 qubites Heron QPU elérhető.
+Jelenlegi állapot: **Fázis 3 lezárva (`v0.6.0`)** — a VQE-mag működik három
+platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
+zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
+(`ibm_kingston`, L5), és Zero-Noise Extrapolation (ZNE) hibaenyhítéssel (L4)
+igazoltan visszanyeri a kémiai pontosságot.
 
 | Fázis | Tartalom | Állapot |
 |---|---|---|
 | 0 | Repó + Docker alapinfrastruktúra | ✅ **Lezárva** (`v0.1.0`) |
 | 1 | H2-VQE szimulátoron | ✅ **Lezárva** (`v0.2.0`) |
-| **1M** | **Többplatformos validáció (Qiskit ↔ Cirq ↔ qsim)** *(új, ADR-0006)* | ✅ **Lezárva** (`v0.3.0`) |
-| 1b | Zajos szimuláció FakeBackend-en *(új, a TR-000 alapján)* | ⏳ Következő |
-| 2 | Egyszeri futás valódi IBM-hardveren | 🔓 **Feloldva** (hozzáférés kész) |
-| 3 | Hibaenyhítés (ZNE + mérési hibaenyhítés) | ⬜ Tervezett |
-| 4 | Adatséma és perzisztens tárolás | ⬜ Tervezett |
-| 5 | Batch futtatás, több molekula | ⬜ Tervezett |
+| **1M** | **Többplatformos validáció (Qiskit ↔ Cirq ↔ qsim)** *(ADR-0006)* | ✅ **Lezárva** (`v0.3.0`) |
+| **1b** | **Zajos szimuláció FakeBackend-en (L3a / L3b)** | ✅ **Lezárva** (`v0.4.0`) |
+| **2** | **Egyszeri futás valódi IBM-hardveren (`ibm_kingston` Heron QPU, L5)** | ✅ **Lezárva** (`v0.5.0`) |
+| **3** | **Hibaenyhítés (ISA ZNE + Mitiq keresztvalidáció, L4)** | ✅ **Lezárva** (`v0.6.0`) |
+| 4 | Adatséma és perzisztens tárolás (SQLite / JSON) | ⏳ **Következő** (`v0.7.0`) |
+| 5 | Batch futtatás, több molekula (LiH, BeH2) | ⬜ Tervezett |
 | 6 | Automatizálás és ütemezés | ⬜ Tervezett |
 | 7 | Streamlit dashboard | ⬜ Tervezett |
 | 8 | Teljes konténerizáció | ⬜ Tervezett |
@@ -264,20 +266,22 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 1M completed (`v0.3.0`)** — the VQE core works and is
-validated on **three platforms** (Qiskit, Cirq, qsim). IBM Quantum access has
-been verified: 3 × 156-qubit Heron QPUs available.
+Current status: **Phase 3 completed (`v0.6.0`)** — the VQE core works across
+three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a), calibration
+device noise (L3b), physical hardware measurement on IBM's 156-qubit Heron QPU
+(`ibm_kingston`, L5), and Zero-Noise Extrapolation (ZNE) error mitigation (L4)
+proven to restore chemical accuracy.
 
 | Phase | Content | Status |
 |---|---|---|
 | 0 | Repo + Docker base infrastructure | ✅ **Completed** (`v0.1.0`) |
 | 1 | H2-VQE on simulator | ✅ **Completed** (`v0.2.0`) |
-| **1M** | **Multi-platform validation (Qiskit ↔ Cirq ↔ qsim)** *(new, ADR-0006)* | ✅ **Completed** (`v0.3.0`) |
-| 1b | Noisy simulation on FakeBackend *(new, based on TR-000)* | ⏳ Next |
-| 2 | Single run on real IBM hardware | 🔓 **Unblocked** (access verified) |
-| 3 | Error mitigation (ZNE + measurement error mitigation) | ⬜ Planned |
-| 4 | Data schema and persistent storage | ⬜ Planned |
-| 5 | Batch runs, multiple molecules | ⬜ Planned |
+| **1M** | **Multi-platform validation (Qiskit ↔ Cirq ↔ qsim)** *(ADR-0006)* | ✅ **Completed** (`v0.3.0`) |
+| **1b** | **Noisy simulation on FakeBackend (L3a / L3b)** | ✅ **Completed** (`v0.4.0`) |
+| **2** | **Single run on real IBM hardware (`ibm_kingston` Heron QPU, L5)** | ✅ **Completed** (`v0.5.0`) |
+| **3** | **Error mitigation (ISA ZNE + Mitiq cross-validation, L4)** | ✅ **Completed** (`v0.6.0`) |
+| 4 | Data schema and persistent storage (SQLite / JSON) | ⏳ **Next** (`v0.7.0`) |
+| 5 | Batch runs, multiple molecules (LiH, BeH2) | ⬜ Planned |
 | 6 | Automation and scheduling | ⬜ Planned |
 | 7 | Streamlit dashboard | ⬜ Planned |
 | 8 | Full containerization | ⬜ Planned |
