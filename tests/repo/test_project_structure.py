@@ -66,6 +66,7 @@ REQUIRED_FILES: tuple[str, ...] = (
     "docs/plan/phase_01.md",
     "docs/plan/phase_01m.md",
     "docs/plan/phase_01b.md",
+    "docs/plan/phase_02.md",
     "docs/adr/ADR-0001-technologiai-stack.md",
     "docs/adr/ADR-0002-sajat-vqe-hurok.md",
     "docs/adr/ADR-0003-mitigacios-architektura.md",
