@@ -114,6 +114,17 @@ nagyságrenddel** téved. Az `SLSQP` a qsimen `1.5 × 10⁻²` Ha hibát ad
 nyolc optimalizáló hibátlan. Részletek és az ábrák:
 [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md).
 
+### Fázis 1b — véges lövésszám és hardver-zajszimuláció
+
+| Szint | Backend | Optimalizáló | E (Ha) | Hiba az L1-hez (Ha) |
+|---|---|---|---|---|
+| **L3a** | `qiskit_aer_shot` (8192 shot) | COBYLA | −1.1213780162 | $+1.59 \times 10^{-2}$ |
+| **L3b** | `qiskit_aer_noisy` (FakeManilaV2) | COBYLA | −1.0938632143 | $+4.34 \times 10^{-2}$ |
+
+A Fázis 1b szétválasztja a véges mintavételi (shot) zajt és az eszköz kalibrációs
+zaját (kapuhiba, T1/T2 dekoherencia, kiolvasási hiba) kvótamentes szimulációban.
+Részletek: [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md).
+
 
 ### Gyors indítás
 
@@ -121,20 +132,20 @@ nyolc optimalizáló hibátlan. Részletek és az ábrák:
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (332 teszt)
+make test       # teljes tesztkészlet (371 teszt)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.3.0 python -m vqebd
+docker run --rm vqebd:0.4.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.3.0 .
-docker run --rm vqebd:0.3.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.4.0 .
+docker run --rm vqebd:0.4.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -147,7 +158,9 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_00.md`](docs/plan/phase_00.md) | A Fázis 0 részletes terve |
 | [`docs/plan/phase_01.md`](docs/plan/phase_01.md) | A Fázis 1 részletes terve |
 | [`docs/plan/phase_01m.md`](docs/plan/phase_01m.md) | A Fázis 1M részletes terve |
+| [`docs/plan/phase_01b.md`](docs/plan/phase_01b.md) | A Fázis 1b részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
+| [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
@@ -315,6 +328,17 @@ reporting successful convergence; `Powell` yields `2.9 × 10⁻⁸`.
 all eight optimizers work flawlessly. Details and figures:
 [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md).
 
+### Phase 1b — Finite-Shot and Device Noise Simulation
+
+| Level | Backend | Optimizer | E (Ha) | Error vs L1 (Ha) |
+|---|---|---|---|---|
+| **L3a** | `qiskit_aer_shot` (8192 shots) | COBYLA | −1.1213780162 | $+1.59 \times 10^{-2}$ |
+| **L3b** | `qiskit_aer_noisy` (FakeManilaV2) | COBYLA | −1.0938632143 | $+4.34 \times 10^{-2}$ |
+
+Phase 1b isolates finite sampling (shot) noise and device calibration noise
+(gate error, T1/T2 decoherence, readout error) in quota-free simulation.
+Details: [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md).
+
 
 ### Quick Start
 
@@ -322,20 +346,20 @@ all eight optimizers work flawlessly. Details and figures:
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (332 tests)
+make test       # full test suite (371 tests)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.3.0 python -m vqebd
+docker run --rm vqebd:0.4.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.3.0 .
-docker run --rm vqebd:0.3.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.4.0 .
+docker run --rm vqebd:0.4.0 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -348,7 +372,9 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_00.md`](docs/plan/phase_00.md) | Detailed Phase 0 plan |
 | [`docs/plan/phase_01.md`](docs/plan/phase_01.md) | Detailed Phase 1 plan |
 | [`docs/plan/phase_01m.md`](docs/plan/phase_01m.md) | Detailed Phase 1M plan |
+| [`docs/plan/phase_01b.md`](docs/plan/phase_01b.md) | Detailed Phase 1b plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
+| [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |

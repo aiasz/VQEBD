@@ -12,8 +12,45 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 1b** — zajos szimuláció FakeBackend-en, kvótamentesen (`v0.4.0`).
-- **Fázis 2** — valódi IBM QPU-futtatás (`ibm_kingston`), teljes dokumentációval.
+- **Fázis 2** — valódi IBM QPU-futtatás (`ibm_kingston`), teljes dokumentációval (`v0.5.0`).
+- **Fázis 3** — hibacsökkentés (Mitiq ZNE, Richardson / exponenciális illesztés).
+
+---
+
+## [0.4.0] — 2026-09-23
+
+**Fázis 1b lezárva — Véges lövésszámú és zajos szimuláció (L3a / L3b).**
+
+A VQE referencialánc két új szimulációs szinttel bővült, amelyek elkülönítik a
+véges mintavételi (shot) zajt és a valódi eszköz kalibrációs zaját
+kvótamentes szimulációban:
+
+### Hozzáadva
+
+#### Zajos és véges mintavételi szimuláció
+- `vqebd.backends.estimators.AerShotEnergyEvaluator` — L3a szint (Qiskit Aer, 8192 shot).
+- `vqebd.backends.estimators.AerNoisyEnergyEvaluator` — L3b szint (`FakeManilaV2` 5-qubites kalibrációs zajmodell, T1/T2 relaxáció, kapu- és kiolvasási hibák).
+- Automatikus ISA transzpiláció és `observable.apply_layout()` illesztés az 5-qubites eszköztopológiára.
+- CLI: `--backend qiskit_aer_shot | qiskit_aer_noisy`.
+- L3a / L3b címkék és ansatz+zaj hibabontás a `VQEResult.report()` kimenetben.
+
+#### Platform- és optimalizáló-biztonság
+- Új bejegyzések a `vqebd.platforms.PLATFORMS` nyilvántartásban `qiskit_aer_shot` és `qiskit_aer_noisy` backendekre.
+- Gradiens-alapú optimalizálókra (pl. `SLSQP`) futásidejű `RuntimeWarning` figyelmeztetés lép életbe zajos célfüggvény esetén.
+
+#### Dokumentáció és tesztek
+- `docs/01b_noisy_simulation.md`, `docs/plan/phase_01b.md`, `TP-F01B` és `TR-F01B`.
+- `tests/validation/test_noisy_simulation.py` — 19 új automatikus teszteset (TC-1B01–TC-1B09).
+
+### Mért eredmények (H2, 0.735 Å, STO-3G)
+
+| Szint | Backend | Optimalizáló | Energia (Ha) | Hiba az L1-hez (Ha) |
+|---|---|---|---|---|
+| **L0** | PySCF Full CI | — | −1.1373060358 | 0.0 |
+| **L1** | Egzakt diag. | — | −1.1373060358 | $1.33 \times 10^{-15}$ |
+| **L2** | `qiskit_statevector` | SLSQP | −1.1373060358 | $1.49 \times 10^{-15}$ |
+| **L3a** | `qiskit_aer_shot` | COBYLA (8192 shot) | −1.1213780162 | $+1.59 \times 10^{-2}$ |
+| **L3b** | `qiskit_aer_noisy` | COBYLA (FakeManila) | −1.0938632143 | $+4.34 \times 10^{-2}$ |
 
 ---
 

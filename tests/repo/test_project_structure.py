@@ -59,6 +59,7 @@ REQUIRED_FILES: tuple[str, ...] = (
     "docs/00_setup.md",
     "docs/01_vqe_core.md",
     "docs/01m_multiplatform.md",
+    "docs/01b_noisy_simulation.md",
     "docs/references.md",
     "docs/plan/00_master_plan.md",
     "docs/plan/phase_00.md",
