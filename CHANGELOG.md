@@ -12,8 +12,29 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 4** — strukturált SQLite és JSON adattárolási réteg (`v0.7.0`).
-- **Fázis 5** — batch futtatás és molekuláris skálázás (LiH, BeH2).
+- **Fázis 5** — batch futtatás és molekuláris skálázás (LiH, BeH2) (`v0.8.0`).
+- **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
+
+---
+
+## [0.7.0] — 2026-09-23
+
+**Fázis 4 lezárva — Adatséma és perzisztens tárolás (SQLite & FAIR export).**
+
+A korábbi szöveges jegyzőkönyvek és adatszigetek helyett strukturált, FAIR-megfelelő
+adattárolási réteg jött létre (ADR-0004):
+
+### Hozzáadva
+
+#### Adattárolási réteg (`vqebd.storage`)
+- `Database` — SQLite adatbáziskezelő WAL móddal, típusos `CHECK` megszorításokkal, indexeléssel és sémaverziózással (`schema_version = 1`).
+- `export_to_csv`, `export_to_json` — determinisztikusan rendezett CSV és JSON exportáló modul.
+- `scripts/export_results.py` — történeti adatok automatikus migrációja és betöltése (8 reprezentatív futtatás: L0, L1, L2 Qiskit/Cirq/qsim, L3a, L3b, L4 ZNE Richardson/Exp, L5 IBM Heron QPU).
+- `tests/unit/test_storage.py` — 8 új egység- és integrációs teszt (séma, WAL, beszúrás, szűrés, CSV determinizmus, megszorítások).
+
+#### Dokumentáció
+- `docs/04_data_schema.md`, `docs/plan/phase_04.md`, `TP-F04` és `TR-F04`.
+- Exportált referenciaállományok: `docs/figures/data/results_v1.csv` és `results_v1.json`.
 
 ---
 
