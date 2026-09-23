@@ -2,10 +2,10 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.6.0-orange.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-3%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-424%20zöld-brightgreen.svg)](docs/testing/TR-F03_mitigation.md)
-[![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron-blueviolet.svg)](docs/01m_multiplatform.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.7.0-orange.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-4%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-432%20zöld-brightgreen.svg)](docs/testing/TR-F04_storage.md)
+[![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
@@ -22,11 +22,12 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 3 lezárva (`v0.6.0`)** — a VQE-mag működik három
+Jelenlegi állapot: **Fázis 4 lezárva (`v0.7.0`)** — a VQE-mag működik három
 platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
-(`ibm_kingston`, L5), és Zero-Noise Extrapolation (ZNE) hibaenyhítéssel (L4)
-igazoltan visszanyeri a kémiai pontosságot.
+(`ibm_kingston`, L5), Zero-Noise Extrapolation (ZNE) hibaenyhítéssel (L4)
+igazoltan visszanyeri a kémiai pontosságot, és a strukturált, FAIR-megfelelő
+SQLite adattárolási réteg (`vqebd.storage`) perzisztálja az eredményeket.
 
 | Fázis | Tartalom | Állapot |
 |---|---|---|
@@ -36,8 +37,8 @@ igazoltan visszanyeri a kémiai pontosságot.
 | **1b** | **Zajos szimuláció FakeBackend-en (L3a / L3b)** | ✅ **Lezárva** (`v0.4.0`) |
 | **2** | **Egyszeri futás valódi IBM-hardveren (`ibm_kingston` Heron QPU, L5)** | ✅ **Lezárva** (`v0.5.0`) |
 | **3** | **Hibaenyhítés (ISA ZNE + Mitiq keresztvalidáció, L4)** | ✅ **Lezárva** (`v0.6.0`) |
-| 4 | Adatséma és perzisztens tárolás (SQLite / JSON) | ⏳ **Következő** (`v0.7.0`) |
-| 5 | Batch futtatás, több molekula (LiH, BeH2) | ⬜ Tervezett |
+| **4** | **Adatséma és perzisztens tárolás (SQLite / CSV / JSON)** | ✅ **Lezárva** (`v0.7.0`) |
+| 5 | Batch futtatás, több molekula (LiH, BeH2) | ⏳ **Következő** (`v0.8.0`) |
 | 6 | Automatizálás és ütemezés | ⬜ Tervezett |
 | 7 | Streamlit dashboard | ⬜ Tervezett |
 | 8 | Teljes konténerizáció | ⬜ Tervezett |
@@ -152,6 +153,24 @@ Részletek: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 
 ![Hibaenyhítés és ZNE extrapolációs görbe](docs/figures/fig06_mitigacio.png)
 
+### Fázis 4 — adatséma és perzisztens tárolás (SQLite & FAIR export)
+
+A VQEBD a számítási eredményeket közvetlenül típusos, indexelt SQLite adatbázisba
+menti (`data/db/vqebd.sqlite`), amelyből determinisztikusan reprodukálható CSV és
+JSON exportok készülnek (`data/exports/results_v1.csv`).
+
+| Tárolt futás típusa | Backend | Mitigáció | Mért energia (Ha) | Hiba az L1-hez |
+|---|---|---|---|---|
+| **L2 Állapotvektor** | `qiskit_statevector` | none | −1.1373060358 | $+1.33 \times 10^{-15}$ Ha ✅ |
+| **L2 Állapotvektor** | `cirq_simulator` | none | −1.1373060358 | $+4.44 \times 10^{-16}$ Ha ✅ |
+| **L2 Állapotvektor** | `qsim` | none | −1.1373060068 | $+2.90 \times 10^{-8}$ Ha ✅ |
+| **L3a Véges lövésszám** | `qiskit_aer_shot` | none | −1.1208540086 | $+1.65 \times 10^{-2}$ Ha |
+| **L3b Zajos szimuláció** | `qiskit_aer_noisy` | none | −1.0927745684 | $+4.45 \times 10^{-2}$ Ha |
+| **L4 ZNE Hibaenyhítés** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1130006901 | $+2.43 \times 10^{-2}$ Ha |
+| **L5 Valódi IBM QPU** | `ibm_kingston` (Heron) | none | −1.1412691258 | $−3.96 \times 10^{-3}$ Ha |
+
+Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md).
+
 
 ### Gyors indítás
 
@@ -159,20 +178,20 @@ Részletek: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (396 teszt)
+make test       # teljes tesztkészlet (432 teszt)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.6.0 python -m vqebd
+docker run --rm vqebd:0.7.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.6.0 .
-docker run --rm vqebd:0.6.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.0 .
+docker run --rm vqebd:0.7.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -188,10 +207,12 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_01b.md`](docs/plan/phase_01b.md) | A Fázis 1b részletes terve |
 | [`docs/plan/phase_02.md`](docs/plan/phase_02.md) | A Fázis 2 részletes terve |
 | [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | A Fázis 3 részletes terve |
+| [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | A Fázis 4 részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
 | [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Hibaenyhítés és Zero-Noise Extrapolation (L4)** |
+| [`docs/04_data_schema.md`](docs/04_data_schema.md) | **Adatséma, SQLite adattárolás és FAIR exportálás** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
@@ -398,6 +419,23 @@ Details: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 
 ![Error mitigation and ZNE extrapolation curve](docs/figures/fig06_mitigacio.png)
 
+### Phase 4 — Data Schema and Persistent Storage (SQLite & FAIR Export)
+
+VQEBD persists all quantum computation records into a canonical, typed SQLite database
+(`data/db/vqebd.sqlite`), with deterministic CSV and JSON exports (`data/exports/results_v1.csv`).
+
+| Stored Run Type | Backend | Mitigation | Measured Energy (Ha) | Error vs L1 |
+|---|---|---|---|---|
+| **L2 Statevector** | `qiskit_statevector` | none | −1.1373060358 | $+1.33 \times 10^{-15}$ Ha ✅ |
+| **L2 Statevector** | `cirq_simulator` | none | −1.1373060358 | $+4.44 \times 10^{-16}$ Ha ✅ |
+| **L2 Statevector** | `qsim` | none | −1.1373060068 | $+2.90 \times 10^{-8}$ Ha ✅ |
+| **L3a Finite Shots** | `qiskit_aer_shot` | none | −1.1208540086 | $+1.65 \times 10^{-2}$ Ha |
+| **L3b Noisy Sim** | `qiskit_aer_noisy` | none | −1.0927745684 | $+4.45 \times 10^{-2}$ Ha |
+| **L4 ZNE Mitigated** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1130006901 | $+2.43 \times 10^{-2}$ Ha |
+| **L5 Real IBM QPU** | `ibm_kingston` (Heron) | none | −1.1412691258 | $−3.96 \times 10^{-3}$ Ha |
+
+Details: [`docs/04_data_schema.md`](docs/04_data_schema.md).
+
 
 ### Quick Start
 
@@ -405,20 +443,20 @@ Details: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (396 tests)
+make test       # full test suite (432 tests)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.6.0 python -m vqebd
+docker run --rm vqebd:0.7.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.6.0 .
-docker run --rm vqebd:0.6.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.0 .
+docker run --rm vqebd:0.7.0 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -434,10 +472,12 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_01b.md`](docs/plan/phase_01b.md) | Detailed Phase 1b plan |
 | [`docs/plan/phase_02.md`](docs/plan/phase_02.md) | Detailed Phase 2 plan |
 | [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | Detailed Phase 3 plan |
+| [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | Detailed Phase 4 plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
 | [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Error mitigation and Zero-Noise Extrapolation (L4)** |
+| [`docs/04_data_schema.md`](docs/04_data_schema.md) | **Data schema, SQLite database and FAIR exports** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |

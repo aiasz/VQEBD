@@ -81,3 +81,4 @@ ply==3.11                # A mitiq qiskit<->cirq konverziója ezt igényli
 #            tests/unit/test_package.py::test_no_qiskit_algorithms_import_in_source
 #            Lásd: docs/adr/ADR-0002-sajat-vqe-hurok.md
 # =============================================================================
+
