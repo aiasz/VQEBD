@@ -326,6 +326,12 @@ Mért ZNE-eredmény ezen (H2, UCCSD, Richardson λ∈{1,3,5}):
 | ZNE / lineáris | −1.136357 | +0.95 mHa |
 | ZNE / exponenciális | −1.136965 | +0.34 mHa |
 
+> **Javítás (v0.7.1, TR-F03 v1.1.0):** a fenti táblázat a TR-000 spike *egyszeri,
+> alacsony precizitású* mérése. A leszállított kóddal mérve a ZNE **torzítása**
+> Richardsonnal +0.23 mHa ✅ (egzakt zajos várható érték). Egyetlen, 8192 lövéses
+> futás **szórása** viszont 26 mHa, így egy futás önmagában nem ad kémiai
+> pontosságot. Az Aer Estimator a readout-hibát nem modellezi (ADR-0003, 1. kieg.).
+
 **Következmény:** a Fázis 2–3–5–6 teljes egészében kvótamentesen fejleszthető és
 tesztelhető, a valódi QPU-t csak a végső validálásra tartjuk fenn. Ez az alapterv
 "kvótavédelem" alapelvének a legerősebb megvalósítása.

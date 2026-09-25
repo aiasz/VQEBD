@@ -4,8 +4,8 @@
 |---|---|
 | **Azonosító** | TR-F04 |
 | **Típus** | Test Report (mérési jegyzőkönyv) |
-| **Dokumentum-verzió** | 1.0.0 |
-| **Dátum** | 2026-09-23 |
+| **Dokumentum-verzió** | 1.1.0 (2.1 javítási jegyzet) |
+| **Dátum** | 2026-09-23 · 2026-09-25 (v0.7.1) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 4 — Adatséma és tárolás |
 | **Tesztterv** | [`TP-F04`](TP-F04_storage.md) |
@@ -32,16 +32,37 @@ lett a rendszerbe.
 
 ## 2. Tárolt benchmark adatok összefoglalója ($H_2$, $0.735\ \text{Å}$)
 
-| Run ID | Backend | Platform | Mitigáció | Energia (Hartree) | Hiba (Ha) | Kémiai pontosság |
-|---|---|---|---|---|---|---|
-| `bench-l2-qiskit_statevector` | `qiskit_statevector` | Qiskit | none | -1.1373060358 | $+1.33 \times 10^{-15}$ | ✅ IGEN |
-| `bench-l2-cirq_simulator` | `cirq_simulator` | Cirq | none | -1.1373060358 | $+4.44 \times 10^{-16}$ | ✅ IGEN |
-| `bench-l2-qsim` | `qsim` | qsim | none | -1.1373060068 | $+2.90 \times 10^{-8}$ | ✅ IGEN |
-| `bench-l3a-qiskit_aer_shot` | `qiskit_aer_shot` | Qiskit | none | -1.1208540086 | $+1.65 \times 10^{-2}$ | ❌ NEM |
-| `bench-l3b-qiskit_aer_noisy` | `qiskit_aer_noisy` | Qiskit | none | -1.0927745684 | $+4.45 \times 10^{-2}$ | ❌ NEM |
-| `bench-l4-zne-richardson` | `qiskit_aer_noisy` | Qiskit | zne_local (Rich.) | -1.1130006901 | $+2.43 \times 10^{-2}$ | ❌ NEM |
-| `bench-l4-zne-exponential` | `qiskit_aer_noisy` | Qiskit | zne_local (Exp.) | -1.1130367673 | $+2.43 \times 10^{-2}$ | ❌ NEM |
-| `bench-l5-ibm_kingston` | `ibm_qpu` | Qiskit | none | -1.1412691258 | $-3.96 \times 10^{-3}$ | ❌ NEM |
+| Run ID | Backend | Platform | Mitigáció | Energia (Hartree) | Hiba az L0-hoz (Ha) | Kémiai pontosság | Variációs elv |
+|---|---|---|---|---|---|---|---|
+| `bench-l2-qiskit_statevector` | `qiskit_statevector` | Qiskit | none | −1.1373060358 | $+9.33 \times 10^{-15}$ | ✅ | ✅ |
+| `bench-l2-cirq_simulator` | `cirq_simulator` | Cirq | none | −1.1373060358 | $+8.88 \times 10^{-15}$ | ✅ | ✅ |
+| `bench-l2-qsim` | `qsim` | qsim | none | −1.1373060068 | $+2.90 \times 10^{-8}$ | ✅ | ✅ |
+| `bench-l3a-qiskit_aer_shot` | `qiskit_aer_shot` | Qiskit | none | −1.1421267225 | $-4.82 \times 10^{-3}$ | ❌ | ❌ ¹ |
+| `bench-l3b-qiskit_aer_noisy` | `qiskit_aer_noisy` | Qiskit | none | −1.1145306932 | $+2.28 \times 10^{-2}$ | ❌ | ✅ |
+| `bench-l4-zne-richardson` | `qiskit_aer_noisy` | Qiskit | zne_local (Rich.) | −1.1075860081 | $+2.97 \times 10^{-2}$ | ❌ | ✅ |
+| `bench-l4-zne-exponential` | `qiskit_aer_noisy` | Qiskit | zne_local (Exp.) | −1.1202858217 | $+1.70 \times 10^{-2}$ | ❌ | ✅ |
+| `bench-l5-ibm_kingston` | `ibm_qpu` | Qiskit | **ibm_resilience_1** (TREX) | −1.1412691258 | $-3.96 \times 10^{-3}$ | ❌ | ❌ ² |
+
+*A táblázat a v0.7.1 kóddal újragenerált [`docs/figures/data/results_v1.json`](../figures/data/results_v1.json)
+tartalma (friss adatbázisból, 2026-09-25). A rekordok `versions_json` mezője
+v0.7.1 óta a `vqebd` saját verzióját is tartalmazza.*
+
+¹ Kiválasztási torzítás: a COBYLA (maxiter = 50) a zajos célfüggvény kedvező
+húzásait választja ki (TR-F01B 6.3). ² 1σ-n belüli statisztikus ingadozás
+(TR-F02 v1.1.0, 2.1). A „❌” itt nem kódhiba, hanem a rekord **helyes**, számított
+jelzője; a v0.7.0 ezt kézzel `1`-re írta.
+
+### 2.1 Javítási jegyzet (v0.7.1)
+
+Az 1.0.0 táblázat L3a/L3b/L4 sorai a v0.7.0 kóddal készültek, amelyben (1) az
+Aer-mintavétel minden kiértékelésnél ugyanazt az eltolást adta, (2) a
+`zne_local` hajtogatását a transzpiler részben kiejtette (TR-F03 v1.1.0, J3–J4).
+Az L5 rekordban a `mitigation_strategy` `none` volt (valójában TREX), a
+`satisfies_variational_principle` és a `correlation_recovered` pedig kézzel beírt
+érték volt (1, ill. 1.20). Mindhárom most számított. **Egy helyi, v0.7.0-val
+feltöltött `data/db/vqebd.sqlite` a régi rekordokat tartalmazza**: a betöltő a
+meglévő `run_id`-kat nem írja felül. Ilyenkor friss adatbázisba kell exportálni
+(`--db`).
 
 ---
 

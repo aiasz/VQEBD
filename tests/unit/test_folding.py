@@ -44,7 +44,7 @@ def test_fold_global_unitary_scales_two_qubit_gates(scale: int) -> None:
 def test_fold_global_preserves_layout() -> None:
     """A layout attribútum megmarad a hajtogatás után."""
     qc = _sample_circuit()
-    qc._layout = "dummy_layout"  # type: ignore[attr-defined]
+    qc._layout = "dummy_layout"
     folded = fold_global_unitary(qc, 3)
     assert folded.layout == "dummy_layout"
 

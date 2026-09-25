@@ -176,3 +176,26 @@ def test_tracked_packages_cover_the_direct_dependencies(
         f"nem követett közvetlen függőségek: {untracked}. "
         "Vedd fel őket a vqebd.versions.TRACKED_PACKAGES listába."
     )
+
+
+# --- Opcionális Mitiq-kiegészítés (v0.7.1) -----------------------------------
+
+
+def test_mitiq_requirements_file_pins_mitiq(repo_root: Path) -> None:
+    """A GPL-es mitiq külön, rögzített fájlban telepíthető (ADR-0003)."""
+    path = repo_root / "requirements-mitiq.txt"
+    assert path.is_file(), "a requirements-mitiq.txt hiányzik (ADR-0003 hivatkozik rá)"
+    pins = _parse_pins(path)
+    assert pins.get("mitiq") == "0.47.0"
+
+
+def test_mitiq_requirements_do_not_override_lock(repo_root: Path) -> None:
+    """A mitiq-kiegészítés nem írhat felül egyetlen zárolt verziót sem."""
+    optional = _parse_pins(repo_root / "requirements-mitiq.txt")
+    locked = _parse_pins(repo_root / "requirements.lock")
+    conflicts = {
+        name: (ver, locked[name])
+        for name, ver in optional.items()
+        if name in locked and locked[name] != ver
+    }
+    assert not conflicts, f"verzióütközés a lock-fájllal: {conflicts}"

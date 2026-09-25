@@ -106,6 +106,13 @@ def populate_benchmark_runs(db: Database) -> int:
     if hw_json is not None:
         hw_raw = json.loads(hw_json.read_text(encoding="utf-8"))
         run_id_hw = "bench-l5-ibm_kingston"
+        hw_energy = hw_raw.get("energies", {}).get("l5_hardware_ha", -1.1412691258)
+        ref = res_exact.reference
+        assert ref.full_ci is not None and ref.exact_diagonalization is not None
+        hw_error = hw_energy - ref.full_ci
+        # A mitigációs szintet a tárolt job metaadatai rögzítik (TR-F02 v1.1.0):
+        # a resilience_level nem volt megadva → szerver-alapértelmezés (1, TREX).
+        hw_resilience = hw_raw.get("resilience_level") or 1
         if db.get_result(run_id_hw) is None:
             cfg_hw = VQEConfig(
                 molecule=mol,
@@ -140,24 +147,24 @@ def populate_benchmark_runs(db: Database) -> int:
                 "optimization_level": 3,
                 "hardware_backend_name": "ibm_kingston",
                 "hardware_job_id": hw_raw.get("job_id", "dapq25kak42c73cj1hu0"),
-                "mitigation_strategy": "none",
+                "mitigation_strategy": f"ibm_resilience_{hw_resilience}",
                 "mitigation_extrapolator": None,
                 "scale_factors_json": None,
                 "scaled_energies_json": None,
-                "energy_ha": hw_raw.get("energies", {}).get("l5_hardware_ha", -1.1412691258),
+                "energy_ha": hw_energy,
                 "electronic_energy_ha": hw_raw.get("electronic_energy_ha", -1.8612381202),
                 "nuclear_repulsion_ha": hw_raw.get("nuclear_repulsion_ha", 0.7199689944),
-                "raw_energy_ha": hw_raw.get("energies", {}).get("l5_hardware_ha", -1.1412691258),
+                "raw_energy_ha": hw_energy,
                 "hartree_fock_ha": res_exact.reference.hartree_fock,
                 "full_ci_ha": res_exact.reference.full_ci,
                 "exact_diag_ha": res_exact.reference.exact_diagonalization,
-                "error_vs_fci_ha": hw_raw.get("errors_ha", {}).get("error_vs_l0_ha", -0.003963),
-                "error_vs_exact_diag_ha": (
-                    hw_raw.get("errors_ha", {}).get("error_vs_l1_ha", -0.003963)
-                ),
-                "correlation_recovered": 1.20,
-                "within_chemical_accuracy": 0,
-                "satisfies_variational_principle": 1,
+                "error_vs_fci_ha": hw_error,
+                "error_vs_exact_diag_ha": hw_energy - ref.exact_diagonalization,
+                # SZÁMÍTOTT, nem beírt érték (a v0.7.0 1.20-at és 1-et rögzített kézzel).
+                "correlation_recovered": (ref.hartree_fock - hw_energy)
+                / (ref.hartree_fock - ref.full_ci),
+                "within_chemical_accuracy": int(abs(hw_error) < 1.5936e-3),
+                "satisfies_variational_principle": int(hw_error > -1e-9),
                 "master_seed": 20260922,
                 "seeds_json": json.dumps(res_exact.seeds.to_dict()),
                 "config_hash": cfg_hw.fingerprint(),
@@ -165,7 +172,17 @@ def populate_benchmark_runs(db: Database) -> int:
                 "versions_json": json.dumps(dict(res_exact.versions)),
                 "wall_time_s": hw_raw.get("duration_s", 48.93),
                 "optimal_parameters_json": json.dumps(hw_raw.get("optimal_parameters", [])),
-                "metadata_json": json.dumps({"source": "IBM Quantum Cloud"}),
+                "metadata_json": json.dumps(
+                    {
+                        "source": "IBM Quantum Cloud",
+                        "evaluation": "egyetlen kiértékelés θ*-nál (nem hardveres VQE)",
+                        "uncertainty_ha": hw_raw.get("uncertainty_ha"),
+                        "quantum_seconds": hw_raw.get("quantum_seconds"),
+                        "note": "a variációs határ alatti érték 1σ-n belüli statisztikus "
+                        "ingadozás (TR-F02 v1.1.0, 2.1)",
+                    },
+                    ensure_ascii=False,
+                ),
             }
             db.insert_record(hw_record)
             seeded_count += 1

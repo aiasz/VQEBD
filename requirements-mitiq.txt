@@ -1,0 +1,22 @@
+# =============================================================================
+# VQEBD — OPCIONÁLIS Mitiq-kiegészítés (a `zne_mitiq` stratégiához)
+# =============================================================================
+# A mitiq GPL-3.0 licencű, a VQEBD MIT. Ezért NEM a requirements.txt része:
+# külön, tudatos lépésben telepíthető, és a rendszer nélküle is teljes értékű
+# (ADR-0003; a hiányát teszt őrzi: tests/unit/test_mitigation_strategies.py).
+#
+# Telepítés (a requirements.txt UTÁN):
+#     pip install -r requirements-mitiq.txt
+#
+# Mért hatás a rögzített készletre (vqebd:0.7.0 image, 2026-09-25):
+#   új csomagok: mitiq==0.47.0, tabulate==0.10.0 — semmi más nem változik,
+#   `pip check`: "No broken requirements found."
+#
+# Kompatibilitás: mitiq 0.47.0 -> numpy<2.0 és cirq-core<1.5.0; mindkettőt a
+# requirements.txt pinjei (numpy 1.26.4, cirq-core 1.4.1) kielégítik. A mitiq
+# qiskit<->cirq konverziójához szükséges `ply` a requirements.txt-ben van.
+# =============================================================================
+
+mitiq==0.47.0            # GPL-3.0 — csak a src/vqebd/mitigation/mitiq_zne.py importálja,
+                         # függvényen belül
+tabulate==0.10.0         # a mitiq tranzitív függősége; a reprodukálhatóság miatt rögzítve

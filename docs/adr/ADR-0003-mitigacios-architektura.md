@@ -5,7 +5,7 @@
 | **Azonosító** | ADR-0003 |
 | **Cím** | Pluginalapú hibaenyhítési architektúra, saját ISA-biztos ZNE-implementációval |
 | **Státusz** | **Elfogadott** |
-| **Dátum** | 2026-09-22 |
+| **Dátum** | 2026-09-22 · **1. kiegészítés: 2026-09-25 (v0.7.1)** |
 | **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Érinti** | Fázis 3, 5, 6, 7 |
 | **Függ** | [ADR-0001](ADR-0001-technologiai-stack.md), [ADR-0002](ADR-0002-sajat-vqe-hurok.md) |
@@ -195,6 +195,40 @@ tényező**, és önálló benchmark-dimenzióként kerül a sémába (`optimiza
 - Ha a Mitiq megoldja a qubit-vesztést (M3), a `zne_mitiq` ISA-szinten is futtatható lesz.
 - Ha a `zne_local` és a `zne_mitiq` bármikor statisztikailag szignifikánsan eltér,
   a projekt **leáll**, és a hiba felderítése elsőbbséget élvez.
+
+## 1. kiegészítés (2026-09-25, v0.7.1) — megvalósítás a döntéshez igazítva
+
+A v0.7.0 megvalósítása két ponton **eltért** ettől az ADR-től. Mindkettőt a
+TR-F03 1. javítási köre mérte ki:
+
+1. **A `zne_local` nem volt ISA-biztos.** A döntés az ISA-áramkör hajtogatását
+   írta elő (TR-000, N1–N2), a kód azonban a *logikai* áramkört hajtogatta, majd
+   `optimization_level=3`-mal fordított. A transzpiler az U·U† párok egy részét
+   kiejtette: 4/10/16 CX a várt 4/12/20 helyett. **Javítás:** új
+   `IsaEnergyEvaluator` alaposztály; a hajtogatás az ISA-áramkörön történik, a
+   bázisra fordítás `optimization_level=0`-val. Minden futás rögzíti az
+   `effective_scale_factors` értékét.
+2. **A `zne_mitiq` sosem futott le** (hiányzó `requirements-mitiq.txt`, kötetlen
+   paraméterek, annotációs típusfelismerés). **Javítás:** TR-F03 J5–J8; a
+   keresztvalidáció (TC-302) CI-ben fut.
+
+A „Felülvizsgálati feltétel” második pontja így először **ténylegesen**
+ellenőrizhető: a két implementáció torzítása +0.23 és +0.37 mHa, az eltérés
+0.13 mHa, azaz nem szignifikáns. A projekt folytatható.
+
+### Két új, mért modellezési korlát
+
+- **Az Aer `EstimatorV2` a zajmodell readout-hibáját NEM alkalmazza** (mérés
+  nélkül, `save_expval`-lal számol). Mérve: csak readout-hibát (20%) tartalmazó
+  zajmodellel ⟨Z⟩ = 1.000; kontrollként ugyanaz a modell a `SamplerV2`-ben 20.3%
+  bitflipet ad. **Következmény:** az L3b szint *readout-hiba nélküli*, ebben a
+  tekintetben optimistább a hardvernél. Az M5 megállapítás (a ZNE readout-maradékot
+  hagy) valódi hardveren érvényes, és ott a TREX (`resilience_level=1`) kezeli.
+  A szimulált readout-hiba (Sampler-alapú becslő) a Fázis 5 nyitott tétele.
+- **A mintavételi zaj statisztikája:** egyetlen ZNE-futás szórása a
+  Lagrange-súlyok normájával nő (Richardson (1,3,5): 2.28×). 8192 lövés/pont
+  mellett ez 26 mHa, így az **extrapolátor választása a lövésszám függvénye**
+  (mért RMSE: lineáris 12.3, Richardson 26.5, nyers 28.6 mHa).
 
 ## Hivatkozások
 

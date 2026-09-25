@@ -26,6 +26,9 @@ A fázis célkitűzései:
 4. **Kémiai pontosság helyreállítása:** Zajos szimuláción (`FakeManilaV2`) és
    valódi hardveres mérésen igazolni, hogy a ZNE szignifikánsan csökkenti a hibát
    (TR-000 előzetes mérés: nyers $+15.75\ \text{mHa} \to$ mitigált $+0.35\ \text{mHa}$ ✅).
+   **Mért eredmény (TR-F03 v1.1.0, v0.7.1):** a ZNE torzítása +0.23 mHa ✅, de egyetlen
+   8192 lövéses futás szórása 26 mHa — a kémiai pontosság a módszer *torzítására*
+   igazolt, egyetlen futásra nem.
 
 ## 2. Architektúra (`src/vqebd/mitigation/`)
 
@@ -47,7 +50,7 @@ src/vqebd/mitigation/
 | **AC-3.1** | `fold_global_unitary` $\lambda \in \{1, 3, 5\}$ esetén pontosan $1 + 2n$-szeresére növeli a kétqubites kapuk számát és megőrzi az ISA layoutot | egységteszt |
 | **AC-3.2** | A saját `fold_global_unitary` és a Mitiq `fold_global` kapuszámai és unitárisai megegyeznek | keresztvalidációs teszt |
 | **AC-3.3** | Richardson, lineáris, polinomiális és exponenciális extrapolátorok egzaktul visszaadják az analitikus $\lambda=0$ határértéket | egységteszt |
-| **AC-3.4** | `qiskit_aer_noisy` + `FakeManilaV2` esetén a `zne_local` a nyers $+15\ \text{mHa}$ hibát $< 1.6\ \text{mHa}$ kémiai pontosságra javítja | validációs teszt |
+| **AC-3.4** | `qiskit_aer_noisy` + `FakeManilaV2`, egzakt zajos várható érték mellett a `zne_local` (Richardson, exp) **torzítása** $< 1.6\ \text{mHa}$, a nyers hiba $> 15.9\ \text{mHa}$ *(v0.7.1: újrafogalmazva, TR-F03 v1.1.0)* | validációs teszt |
 | **AC-3.5** | A Mitiq opcionális függőségként működik; hiányában a `zne_local` önállóan, hibamentesen fut | izolációs teszt |
 | **AC-3.6** | A `MitigationResult` tartalmazza a skálafaktorokat, a nyers és mitigált energiákat és az illesztési maradékokat | egységteszt |
 | **AC-3.7** | A CLI és a `run_vqe` támogatja a `--mitigation` és `--extrapolator` kapcsolókat | integrációs teszt |

@@ -29,7 +29,7 @@ kémiai pontosságot ($|\Delta| < 1.6\ \text{mHa}$).
 | **TC-301** | AC-3.1 | `fold_global_unitary` a kétqubites kapukat pontosan $\lambda$-szorosára skálázza és megőrzi az ISA layoutot. |
 | **TC-302** | AC-3.2 | Keresztvalidáció: a saját `fold_global_unitary` és a Mitiq `fold_global` kapuszámai és mátrixai megegyeznek. |
 | **TC-303** | AC-3.3 | Richardson, lineáris, polinom és exponenciális extrapolátorok szintetikus görbéken egzakt $\lambda=0$ értéket adnak. |
-| **TC-304** | AC-3.4 | `FakeManilaV2` zajos szimuláción a `zne_local` (Richardson) a kémiai pontossági küszöb ($1.6\ \text{mHa}$) alá csökkenti a hibát. |
+| **TC-304** | AC-3.4 | `FakeManilaV2` zajmodell szerinti **egzakt** várható értékkel (`precision=0`) a `zne_local` Richardson- és exponenciális extrapolációjának **torzítása** < 1.6 mHa; a lineárisé nagyobb; a nyers hiba > 15.9 mHa. *(v0.7.1-ben újrafogalmazva: egyetlen 8192 lövéses futás szórása 26 mHa, ezért egyfutásos kémiai pontosság nem követelhető meg — TR-F03 v1.1.0, 5. szakasz.)* |
 | **TC-305** | AC-3.5 | A `mitiq` hiánya nem akadályozza a `zne_local` működését (izoláció). |
 | **TC-306** | AC-3.6 | A `MitigationResult` szerializálható és teljes diagnosztikát nyújt. |
 | **TC-307** | AC-3.7 | A CLI kezeli a `--mitigation` és `--extrapolator` opciókat. |

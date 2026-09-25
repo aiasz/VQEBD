@@ -552,13 +552,15 @@ def test_derivative_free_optimizer_rescues_qsim_accuracy() -> None:
     nagyságrendet javul.
     """
     molecule = h2(0.735)
-    gradient_based = run_vqe(
-        VQEConfig(
-            molecule=molecule,
-            backend="qsim",
-            optimizer=OptimizerSpec(method="SLSQP", maxiter=2000),
+    # A figyelmeztetés itt SZÁNDÉKOS (a hibás párosítást mérjük): elvárjuk, nem szivárog.
+    with pytest.warns(RuntimeWarning, match="MEGBÍZHATATLAN"):
+        gradient_based = run_vqe(
+            VQEConfig(
+                molecule=molecule,
+                backend="qsim",
+                optimizer=OptimizerSpec(method="SLSQP", maxiter=2000),
+            )
         )
-    )
     derivative_free = run_vqe(
         VQEConfig(
             molecule=molecule,

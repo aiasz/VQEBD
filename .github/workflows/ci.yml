@@ -98,6 +98,20 @@ jobs:
             -w /repo "$IMAGE" \
             python -m pytest tests -ra -m "not hardware" -p no:cacheprovider
 
+      # A GPL-es mitiq nincs az image-ben (ADR-0003), ezért a keresztvalidáció
+      # (TC-302) a fő futásban kihagyódik. Itt külön, a rögzített opcionális
+      # készlettel TÉNYLEGESEN lefut — v0.7.1 óta (TR-F03, 1. javítási kör).
+      - name: "AC-3.2 — Mitiq-keresztvalidáció (opcionális komponenssel)"
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" \
+            -e VQEBD_REPO_ROOT=/repo \
+            -e PYTHONPATH=/repo/src \
+            -e VQEBD_IN_CONTAINER=1 \
+            -w /repo "$IMAGE" \
+            sh -c "pip install --quiet --no-cache-dir -r requirements-mitiq.txt \
+              && python -m pytest tests/validation/test_mitigation_validation.py \
+                 -ra -m requires_mitiq -p no:cacheprovider"
+
       - name: "AC-0.3 — a szállított image beépített tesztjei (mount nélkül)"
         run: |
           docker run --rm -e VQEBD_IN_CONTAINER=1 "$IMAGE" \

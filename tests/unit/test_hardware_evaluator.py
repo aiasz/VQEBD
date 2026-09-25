@@ -79,7 +79,13 @@ def test_ibm_qpu_mock_evaluation(
     mock_job.job_id.return_value = "job_test_123"
     mock_pub_result = MagicMock()
     mock_pub_result.data.evs = -1.821039
-    mock_job.result.return_value = [mock_pub_result]
+    mock_pub_result.data.stds = 0.0532
+    mock_pub_result.data.ensemble_standard_error = 0.0125
+    mock_pub_result.metadata = {"shots": 8192, "num_randomizations": 32}
+    mock_result = MagicMock()
+    mock_result.__getitem__.return_value = mock_pub_result
+    mock_result.metadata = {"resilience": {"measure_mitigation": True}}
+    mock_job.result.return_value = mock_result
 
     mock_estimator = MagicMock()
     mock_estimator.run.return_value = mock_job
@@ -105,9 +111,31 @@ def test_ibm_qpu_mock_evaluation(
         assert desc["ibm_backend"] == "ibm_kingston"
         assert desc["shots"] == 8192
 
+        assert desc["resilience_level"] == 1
+        assert evaluator.last_std is None
+
         val = evaluator.evaluate([0.0])
         assert val == pytest.approx(-1.821039)
         assert evaluator.last_job_id == "job_test_123"
+        # A bizonytalanság és a szerveroldali mitigáció nem veszhet el (TR-F02 javítás).
+        assert evaluator.last_std == pytest.approx(0.0532)
+        assert evaluator.last_ensemble_standard_error == pytest.approx(0.0125)
+        assert evaluator.last_metadata["result"]["resilience"]["measure_mitigation"] is True
+        assert evaluator.last_metadata["pub"]["num_randomizations"] == 32
+
+    # A resilience_level EXPLICIT kerül az opciók közé — nem a szerver alapértelmezése.
+    _, kwargs = mock_estimator_cls.call_args
+    assert kwargs["options"]["resilience_level"] == 1
+    assert kwargs["options"]["default_precision"] == pytest.approx(1 / 8192**0.5)
+
+
+@pytest.mark.parametrize("level", [-1, 3])
+def test_ibm_qpu_rejects_invalid_resilience_level(level: int) -> None:
+    """Érvénytelen mitigációs szintet a konstruktor QPU-kapcsolat előtt elutasít."""
+    qc = QuantumCircuit(2)
+    op = SparsePauliOp(["II"])
+    with pytest.raises(ValueError, match="resilience_level"):
+        IBMQpuEnergyEvaluator(qc, op, SeedSet.derive(42), resilience_level=level)
 
 
 @pytest.mark.hardware

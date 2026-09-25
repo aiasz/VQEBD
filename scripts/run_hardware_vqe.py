@@ -10,7 +10,10 @@ Biztonsági és kvótavédelmi alapelvek
 - Egyetlen PUB feladatot küld be a runtime EstimatorV2-vel, az L2-n megtalált
   optimális paramétervektorral (\\theta^*), minimalizálva a sorbanállást és
   a kvótafogyasztást.
-- Az eredményt és a job metaadatait elmenti a ``data/raw/`` könyvtárba.
+- Az eredményt, a bizonytalanságot (``stds``, ``ensemble_standard_error``) és a
+  szerveroldali mitigációs metaadatokat a ``--out`` fájlba menti (alapértelmezés:
+  ``docs/figures/data/hardware_h2_kingston.json``).
+- A ``resilience_level`` mindig explicit (TR-F02, 1. javítási kör).
 
 Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
 """
@@ -47,6 +50,16 @@ def main() -> int:
         type=int,
         default=8192,
         help="Mintavételi lövésszám (alapértelmezés: 8192)",
+    )
+    parser.add_argument(
+        "--resilience-level",
+        type=int,
+        default=1,
+        choices=(0, 1, 2),
+        help=(
+            "IBM Runtime mitigációs szint, MINDIG explicit (0 = nyers, "
+            "1 = TREX mérésmitigáció [alapértelmezés], 2 = +ZNE)"
+        ),
     )
     parser.add_argument(
         "--out",
@@ -104,11 +117,13 @@ def main() -> int:
         seeds=seeds,
         backend_name=args.backend,
         shots=args.shots,
+        resilience_level=args.resilience_level,
     )
     desc = evaluator.describe()
     print(f"  Eszköz fizikai qubitszáma ... {desc['isa_qubits']}")
     print(f"  Lövésszám (shots) ........... {desc['shots']}")
     print(f"  Optimális szint ............. {desc['optimization_level']}")
+    print(f"  Mitigációs szint ............ {desc['resilience_level']}")
 
     print("\n[3/4] Mérés futtatása az IBM Heron QPU-n (várás a feladatra)...")
     start_time = time.perf_counter()
@@ -121,6 +136,10 @@ def main() -> int:
     print(f"  Végrehajtási idő ............ {duration:.2f} s")
     print(f"  Mért elektronos energia ..... {electronic_energy:+.10f} Ha")
     print(f"  Mért teljes energia (L5) .... {total_energy:+.10f} Ha")
+    std = evaluator.last_std
+    ens = evaluator.last_ensemble_standard_error
+    print(f"  Szórás (stds) ............... {std if std is not None else float('nan'):.3e} Ha")
+    print(f"  Ensemble standard hiba ...... {ens if ens is not None else float('nan'):.3e} Ha")
 
     err_vs_l0 = total_energy - references.full_ci if references.full_ci is not None else 0.0
     err_vs_l1 = (
@@ -140,6 +159,7 @@ def main() -> int:
         "ibm_backend_name": args.backend,
         "job_id": job_id,
         "shots": args.shots,
+        "resilience_level": args.resilience_level,
         "duration_s": duration,
         "optimal_parameters": opt_params,
         "energies": {
@@ -155,9 +175,14 @@ def main() -> int:
         },
         "nuclear_repulsion_ha": hamiltonian.nuclear_repulsion_energy,
         "electronic_energy_ha": electronic_energy,
+        "uncertainty_ha": {
+            "stds": std,
+            "ensemble_standard_error": ens,
+        },
+        "runtime_metadata": evaluator.last_metadata,
     }
     with args.out.open("w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2, ensure_ascii=False)
+        json.dump(payload, f, indent=2, ensure_ascii=False, default=str)
 
     print("Mérés sikeresen befejeződött és dokumentálva lett.")
     return 0

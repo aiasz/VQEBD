@@ -2,9 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.7.0-orange.svg)](CHANGELOG.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.7.1-orange.svg)](CHANGELOG.md)
 [![Fázis](https://img.shields.io/badge/fázis-4%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-432%20zöld-brightgreen.svg)](docs/testing/TR-F04_storage.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-455%20zöld-brightgreen.svg)](docs/testing/TR-F03_mitigation.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -22,12 +22,20 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 4 lezárva (`v0.7.0`)** — a VQE-mag működik három
-platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
+Jelenlegi állapot: **Fázis 4 lezárva, javítókör (`v0.7.1`)** — a VQE-mag működik
+három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
-(`ibm_kingston`, L5), Zero-Noise Extrapolation (ZNE) hibaenyhítéssel (L4)
-igazoltan visszanyeri a kémiai pontosságot, és a strukturált, FAIR-megfelelő
-SQLite adattárolási réteg (`vqebd.storage`) perzisztálja az eredményeket.
+(`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
+Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.storage`).
+
+> **v0.7.1 — javítókör (2026-09-25).** A Fázis 5 előtti átvizsgálás három mérési
+> hibát tárt fel és javított: (1) az Aer-mintavétel minden kiértékelésnél ugyanazt
+> az eltolást adta, vagyis a „lövészaj” állandó torzítás volt; (2) a ZNE
+> hajtogatását a transzpiler részben kiejtette; (3) a hardveres mérés
+> bizonytalansága és mitigációs szintje (TREX) nem volt rögzítve. A korábban
+> közölt „ZNE → +0.35 mHa ✅” a TR-000 spike száma volt, nem a leszállított
+> kódé. **Az alábbi értékek már a javított kóddal mértek.** Részletek:
+> [`CHANGELOG.md`](CHANGELOG.md), [TR-F03 v1.1.0](docs/testing/TR-F03_mitigation.md).
 
 | Fázis | Tartalom | Állapot |
 |---|---|---|
@@ -68,18 +76,20 @@ hibaforrásokat külön-külön számszerűsíti:
  E_mitigated
 ```
 
-Mért példa (H2, 0.735 Å, STO-3G, `FakeManilaV2` zajmodell — részletek:
-[`TR-000`](docs/testing/TR-000_spike.md)):
+Mért példa (H2, 0.735 Å, STO-3G, `FakeManilaV2` zajmodell, a zajmentes optimumban,
+`v0.7.1` — részletek: [TR-F03](docs/testing/TR-F03_mitigation.md)):
 
-| Szint | Energia (Ha) | Eltérés az L2-től |
+| Szint | Hiba a Full CI-hez | Mit mutat |
 |---|---|---|
-| L0 — PySCF FCI | −1.13730604 | — |
-| L1 — egzakt diagonalizáció | −1.13730604 | 1.3 × 10⁻¹⁵ |
-| L2 — VQE (állapotvektor) | −1.13730604 | 7.6 × 10⁻¹⁵ |
-| L3b — zajos, nyers | −1.121556 | **+15.75 mHa** |
-| L3b + ZNE (Richardson) | −1.136959 | **+0.35 mHa** ✅ |
+| L1 — egzakt diagonalizáció | 1.3 × 10⁻¹⁵ Ha | leképezési hiba |
+| L2 — VQE (állapotvektor) | ~10⁻¹⁴ Ha | ansatz-hiba |
+| L3b — zajos, nyers (egzakt várható érték) | +27.5 mHa ❌ | kapuzaj |
+| L4 — ZNE Richardson, **torzítás** | **+0.23 mHa ✅** | a módszer rendszeres hibája |
+| L4 — ZNE Richardson, **1 futás, 8192 lövés** | −5.7 **± 26.2** mHa | a lövészajt 2.28× felerősíti |
+| L5 — `ibm_kingston`, 1 mérés, TREX | −4.0 **± 12.5** mHa | FCI-vel összeférhető, de a felbontás ≫ kémiai pontosság |
 
-*(✅ = kémiai pontosságon belül, |Δ| < 1.6 mHa)*
+*(✅ = kémiai pontosságon belül, |Δ| < 1.6 mHa; ± = 50 seed szórása, ill. a
+hardveres ensemble standard hiba)*
 
 #### Fázis 1 — mért eredmény (H2, 0.735 Å, STO-3G, zajmentes)
 
@@ -119,57 +129,73 @@ nyolc optimalizáló hibátlan. Részletek és az ábrák:
 
 ### Fázis 1b — véges lövésszám és hardver-zajszimuláció
 
-| Szint | Backend | Optimalizáló | E (Ha) | Hiba az L1-hez (Ha) |
+| Szint | Backend | Optimalizáló | E (Ha) | Hiba az L1-hez |
 |---|---|---|---|---|
-| **L3a** | `qiskit_aer_shot` (8192 shot) | COBYLA | −1.1213780162 | $+1.59 \times 10^{-2}$ |
-| **L3b** | `qiskit_aer_noisy` (FakeManilaV2) | COBYLA | −1.0938632143 | $+4.34 \times 10^{-2}$ |
+| **L3a** | `qiskit_aer_shot` (8192 shot) | COBYLA | −1.1105387727 | +26.8 mHa |
+| **L3b** | `qiskit_aer_noisy` (FakeManilaV2) | COBYLA | −1.0954609696 | +41.9 mHa |
+
+*`v0.7.1` értékek (`python -m vqebd --backend <b> --optimizer COBYLA`). A `v0.7.0`
+L3a-értéke (+15.9 mHa) egy állandó mintavételi eltolás volt — TR-F01B 6. szakasz.*
 
 A Fázis 1b szétválasztja a véges mintavételi (shot) zajt és az eszköz kalibrációs
-zaját (kapuhiba, T1/T2 dekoherencia, kiolvasási hiba) kvótamentes szimulációban.
+zaját (kapuhiba, T1/T2 dekoherencia). **A kiolvasási hibát az Aer Estimator nem
+modellezi** (mérve, ADR-0003 1. kiegészítés). **Fontos korlát:** a H₂ teljes
+korrelációs energiája (20.3 mHa) csak ~1.8σ egyetlen 8192 lövéses kiértékelés
+zajához képest, ezért egyetlen zajos VQE-futás ezt nem tudja megbízhatóan
+feloldani. Ez a Fázis 5 több-seedes módszertanának oka.
 Részletek: [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md).
 
 ### Fázis 2 — valódi hardveres mérés (IBM Heron QPU)
 
-| Szint | Backend | Mód | E (Ha) | Hiba az L0-hoz (Ha) |
+| Szint | Backend | Mód | E (Ha) | Hiba az L0-hoz |
 |---|---|---|---|---|
-| **L5** | `ibm_kingston` (156 qubit Heron QPU) | 8192 shot (Job: `dapq25...`) | **−1.1412691258** | **−3.963 × 10⁻³ (−3.96 mHa)** |
+| **L5** | `ibm_kingston` (156 qubit Heron r2) | 1 kiértékelés θ*-nál, 8192 shot, **TREX** | **−1.1413** | **−3.96 ± 12.5 mHa** (ensemble SE) |
 
-Az első fizikai hardveres mérés az IBM legfejlettebb, 156-qubites Heron
-processzorán (`ibm_kingston`, 2q hiba: 0.0020). A mért nyers fizikai hiba mindössze
-~4 mHa a Full CI elméleti alapállapothoz képest. Részletek: [`docs/02_hardware_run.md`](docs/02_hardware_run.md).
+Job `dapq25kak42c73cj1hu0`, **15 QPU-másodperc**. A mérés **nem nyers**: a szerver
+alapértelmezett mitigációja (`resilience_level=1`, TREX mérésmitigáció +
+mérés-twirling) futott. A v0.7.1 óta ez explicit paraméter. A variációs határ
+alatti érték 0.3σ-s statisztikus ingadozás. A mérés FCI-vel összeférhető, de
+kémiai pontosságot sem igazolni, sem cáfolni nem tud (≈ 62× több lövés kellene).
+Részletek: [`TR-F02 v1.1.0`](docs/testing/TR-F02_hardware_run.md).
 
 ### Fázis 3 — hibaenyhítés Zero-Noise Extrapolation-nel (ZNE)
 
-| Szint | Módszer | Extrapolátor | E (Ha) | Hiba az L1-hez (mHa) | Kémiai pontosság |
-|---|---|---|---|---|---|
-| **L3b** | Nyers (FakeManilaV2) | — | −1.121556 | +15.75 | ❌ |
-| **L4** | **`zne_local` ($\lambda \in \{1, 3, 5\}$)** | **Richardson** | **−1.136959** | **+0.35** | **✅ IGEN** |
-| **L4** | `zne_local` ($\lambda \in \{1, 3, 5\}$) | Exponenciális | −1.136965 | +0.34 | **✅ IGEN** |
-| **L4** | `zne_mitiq` ($\lambda \in \{1, 3, 5\}$) | Richardson | −1.137885 | −0.58 | **✅ IGEN** |
+| Mérés | Nyers | Richardson | Exponenciális | Lineáris |
+|---|---|---|---|---|
+| **Torzítás** — `zne_local` (ISA-hajtogatás) | +27.52 | **+0.23 ✅** | **+0.15 ✅** | +3.15 |
+| **Torzítás** — `zne_mitiq` (logikai hajtogatás) | +37.57 | **+0.37 ✅** | **+0.17 ✅** | +5.43 |
+| **1 futás RMSE** (50 seed, 8192 lövés/pont) | 28.6 | 26.5 | 77.7 | **12.3** |
 
-A saját, ISA-biztos unitáris hajtogatási algoritmus (`zne_local`) sikeresen visszahozza a
-zajos szimulációt a kémiai pontossági küszöb ($1.59\ \text{mHa}$) alá.
+*(mHa, a Full CI-hez; torzítás = egzakt zajos várható érték, `precision=0`)*
+
+A ZNE **módszere helyes**: a torzítás a kémiai pontosságon belül van, és két
+független implementáció 0.13 mHa-en belül ugyanoda jut. Egyetlen futás
+szórását viszont az extrapoláció felnagyítja, ezért **8192 lövésnél a lineáris
+extrapoláció adja a legkisebb teljes hibát**. Az extrapolátor választása tehát a
+lövésszám függvénye.
 Részletek: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 
-![Hibaenyhítés és ZNE extrapolációs görbe](docs/figures/fig06_mitigacio.png)
+![Hibaenyhítés: ZNE torzítás és szórás](docs/figures/fig06_mitigacio.png)
 
 ### Fázis 4 — adatséma és perzisztens tárolás (SQLite & FAIR export)
 
 A VQEBD a számítási eredményeket közvetlenül típusos, indexelt SQLite adatbázisba
 menti (`data/db/vqebd.sqlite`), amelyből determinisztikusan reprodukálható CSV és
-JSON exportok készülnek (`data/exports/results_v1.csv`).
+JSON exportok készülnek. A verziózott referencia-export:
+[`docs/figures/data/results_v1.json`](docs/figures/data/results_v1.json) (`v0.7.1`).
 
-| Tárolt futás típusa | Backend | Mitigáció | Mért energia (Ha) | Hiba az L1-hez |
+| Tárolt futás | Backend | Mitigáció | E (Ha) | Hiba az L0-hoz |
 |---|---|---|---|---|
-| **L2 Állapotvektor** | `qiskit_statevector` | none | −1.1373060358 | $+1.33 \times 10^{-15}$ Ha ✅ |
-| **L2 Állapotvektor** | `cirq_simulator` | none | −1.1373060358 | $+4.44 \times 10^{-16}$ Ha ✅ |
-| **L2 Állapotvektor** | `qsim` | none | −1.1373060068 | $+2.90 \times 10^{-8}$ Ha ✅ |
-| **L3a Véges lövésszám** | `qiskit_aer_shot` | none | −1.1208540086 | $+1.65 \times 10^{-2}$ Ha |
-| **L3b Zajos szimuláció** | `qiskit_aer_noisy` | none | −1.0927745684 | $+4.45 \times 10^{-2}$ Ha |
-| **L4 ZNE Hibaenyhítés** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1130006901 | $+2.43 \times 10^{-2}$ Ha |
-| **L5 Valódi IBM QPU** | `ibm_kingston` (Heron) | none | −1.1412691258 | $−3.96 \times 10^{-3}$ Ha |
+| **L2** | `qiskit_statevector` / `cirq_simulator` | none | −1.1373060358 | < 10⁻¹⁴ Ha ✅ |
+| **L2** | `qsim` (Powell) | none | −1.1373060068 | 2.9 × 10⁻⁸ Ha ✅ |
+| **L3a** | `qiskit_aer_shot` (COBYLA, 50 it.) | none | −1.1421267225 | −4.8 mHa ¹ |
+| **L3b** | `qiskit_aer_noisy` (COBYLA, 50 it.) | none | −1.1145306932 | +22.8 mHa |
+| **L4** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1075860081 | +29.7 mHa |
+| **L5** | `ibm_kingston` | ibm_resilience_1 (TREX) | −1.1412691258 | −4.0 mHa ² |
 
-Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md).
+¹ a zajos minimum kiválasztási torzítása (TR-F01B 6.3) · ² 1σ-n belül (TR-F02)
+
+Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](docs/testing/TR-F04_storage.md).
 
 
 ### Gyors indítás
@@ -178,20 +204,20 @@ Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md).
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (432 teszt)
+make test       # teljes tesztkészlet (455 teszt)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.7.0 python -m vqebd
+docker run --rm vqebd:0.7.1 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.0 .
-docker run --rm vqebd:0.7.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.1 .
+docker run --rm vqebd:0.7.1 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -246,7 +272,8 @@ A VQEBD **MIT** licencű — lásd [`LICENSE`](LICENSE).
 > és nem terjeszti újra**: opcionális, futásidőben betöltött komponensként
 > használja, egyetlen modulba zárva (`src/vqebd/mitigation/mitiq_zne.py`).
 > **Mitiq nélkül a rendszer teljes funkcionalitással működik.** Részletek:
-> [ADR-0003](docs/adr/ADR-0003-mitigacios-architektura.md).
+> [ADR-0003](docs/adr/ADR-0003-mitigacios-architektura.md). Opcionális telepítés
+> (a `zne_mitiq` keresztvalidációhoz): `pip install -r requirements-mitiq.txt`.
 
 A felhasznált szoftverek teljes listája licencekkel és hivatkozásokkal:
 [`docs/references.md`](docs/references.md).
@@ -287,11 +314,21 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 3 completed (`v0.6.0`)** — the VQE core works across
-three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a), calibration
-device noise (L3b), physical hardware measurement on IBM's 156-qubit Heron QPU
-(`ibm_kingston`, L5), and Zero-Noise Extrapolation (ZNE) error mitigation (L4)
-proven to restore chemical accuracy.
+Current status: **Phase 4 completed, correction round (`v0.7.1`)** — the VQE core
+works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
+calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
+Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
+mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
+(`vqebd.storage`).
+
+> **v0.7.1 — correction round (2026-09-25).** The review before Phase 5 found and
+> fixed three measurement defects: (1) Aer sampling applied the same offset to
+> every evaluation, so the "shot noise" was a constant bias; (2) the transpiler
+> partially cancelled the ZNE folding; (3) the hardware measurement's uncertainty
+> and mitigation level (TREX) were not recorded. The previously published
+> "ZNE → +0.35 mHa ✅" was a TR-000 spike number, not a result of the shipped
+> code. **The values below are measured with the corrected code.** Details:
+> [`CHANGELOG.md`](CHANGELOG.md), [TR-F03 v1.1.0](docs/testing/TR-F03_mitigation.md).
 
 | Phase | Content | Status |
 |---|---|---|
@@ -301,8 +338,8 @@ proven to restore chemical accuracy.
 | **1b** | **Noisy simulation on FakeBackend (L3a / L3b)** | ✅ **Completed** (`v0.4.0`) |
 | **2** | **Single run on real IBM hardware (`ibm_kingston` Heron QPU, L5)** | ✅ **Completed** (`v0.5.0`) |
 | **3** | **Error mitigation (ISA ZNE + Mitiq cross-validation, L4)** | ✅ **Completed** (`v0.6.0`) |
-| 4 | Data schema and persistent storage (SQLite / JSON) | ⏳ **Next** (`v0.7.0`) |
-| 5 | Batch runs, multiple molecules (LiH, BeH2) | ⬜ Planned |
+| **4** | **Data schema and persistent storage (SQLite / CSV / JSON)** | ✅ **Completed** (`v0.7.0`) |
+| 5 | Batch runs, multiple molecules (LiH, BeH2) | ⏳ **Next** (`v0.8.0`) |
 | 6 | Automation and scheduling | ⬜ Planned |
 | 7 | Streamlit dashboard | ⬜ Planned |
 | 8 | Full containerization | ⬜ Planned |
@@ -333,18 +370,20 @@ quantifying each source of error separately:
  E_mitigated
 ```
 
-Measured example (H2, 0.735 Å, STO-3G, `FakeManilaV2` noise model — details:
-[`TR-000`](docs/testing/TR-000_spike.md)):
+Measured example (H2, 0.735 Å, STO-3G, `FakeManilaV2` noise model, at the noiseless
+optimum, `v0.7.1` — details: [TR-F03](docs/testing/TR-F03_mitigation.md)):
 
-| Level | Energy (Ha) | Deviation from L2 |
+| Level | Error vs Full CI | What it shows |
 |---|---|---|
-| L0 — PySCF FCI | −1.13730604 | — |
-| L1 — exact diagonalization | −1.13730604 | 1.3 × 10⁻¹⁵ |
-| L2 — VQE (statevector) | −1.13730604 | 7.6 × 10⁻¹⁵ |
-| L3b — noisy, raw | −1.121556 | **+15.75 mHa** |
-| L3b + ZNE (Richardson) | −1.136959 | **+0.35 mHa** ✅ |
+| L1 — exact diagonalization | 1.3 × 10⁻¹⁵ Ha | mapping error |
+| L2 — VQE (statevector) | ~10⁻¹⁴ Ha | ansatz error |
+| L3b — noisy, raw (exact expectation value) | +27.5 mHa ❌ | gate noise |
+| L4 — ZNE Richardson, **bias** | **+0.23 mHa ✅** | systematic error of the method |
+| L4 — ZNE Richardson, **single run, 8192 shots** | −5.7 **± 26.2** mHa | amplifies shot noise 2.28× |
+| L5 — `ibm_kingston`, single measurement, TREX | −4.0 **± 12.5** mHa | consistent with FCI, but resolution ≫ chemical accuracy |
 
-*(✅ = within chemical accuracy, |Δ| < 1.6 mHa)*
+*(✅ = within chemical accuracy, |Δ| < 1.6 mHa; ± = standard deviation over 50
+seeds, or the hardware ensemble standard error)*
 
 #### Phase 1 — Measured Result (H2, 0.735 Å, STO-3G, noiseless)
 
@@ -384,57 +423,74 @@ all eight optimizers work flawlessly. Details and figures:
 
 ### Phase 1b — Finite-Shot and Device Noise Simulation
 
-| Level | Backend | Optimizer | E (Ha) | Error vs L1 (Ha) |
+| Level | Backend | Optimizer | E (Ha) | Error vs L1 |
 |---|---|---|---|---|
-| **L3a** | `qiskit_aer_shot` (8192 shots) | COBYLA | −1.1213780162 | $+1.59 \times 10^{-2}$ |
-| **L3b** | `qiskit_aer_noisy` (FakeManilaV2) | COBYLA | −1.0938632143 | $+4.34 \times 10^{-2}$ |
+| **L3a** | `qiskit_aer_shot` (8192 shots) | COBYLA | −1.1105387727 | +26.8 mHa |
+| **L3b** | `qiskit_aer_noisy` (FakeManilaV2) | COBYLA | −1.0954609696 | +41.9 mHa |
 
-Phase 1b isolates finite sampling (shot) noise and device calibration noise
-(gate error, T1/T2 decoherence, readout error) in quota-free simulation.
+*`v0.7.1` values (`python -m vqebd --backend <b> --optimizer COBYLA`). The `v0.7.0`
+L3a value (+15.9 mHa) was a constant sampling offset — TR-F01B, section 6.*
+
+Phase 1b isolates finite sampling (shot) noise and device calibration noise (gate
+error, T1/T2 decoherence). **Readout error is not modelled by the Aer Estimator**
+(measured, ADR-0003 addendum 1). **Key limitation:** the full H₂ correlation
+energy (20.3 mHa) is only ~1.8σ of a single 8192-shot evaluation's noise, so a
+single noisy VQE run cannot resolve it reliably. This motivates the multi-seed
+methodology of Phase 5.
 Details: [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md).
 
 ### Phase 2 — Real Physical Hardware Execution (IBM Heron QPU)
 
-| Level | Backend | Mode | E (Ha) | Error vs L0 (Ha) |
+| Level | Backend | Mode | E (Ha) | Error vs L0 |
 |---|---|---|---|---|
-| **L5** | `ibm_kingston` (156-qubit Heron QPU) | 8192 shots (Job: `dapq25...`) | **−1.1412691258** | **−3.963 × 10⁻³ (−3.96 mHa)** |
+| **L5** | `ibm_kingston` (156-qubit Heron r2) | single evaluation at θ*, 8192 shots, **TREX** | **−1.1413** | **−3.96 ± 12.5 mHa** (ensemble SE) |
 
-The first real hardware measurement executed on IBM's state-of-the-art Heron
-processor (`ibm_kingston`, median 2q error: 0.0020). The raw unmitigated physical
-error is only ~4 mHa from the Full CI theoretical ground state.
-Details: [`docs/02_hardware_run.md`](docs/02_hardware_run.md).
+Job `dapq25kak42c73cj1hu0`, **15 QPU seconds**. The measurement is **not raw**: the
+server-default mitigation (`resilience_level=1`, TREX readout mitigation +
+measurement twirling) was applied; since v0.7.1 this is an explicit parameter.
+The value below the variational bound is a 0.3σ statistical fluctuation. The
+measurement is consistent with FCI, but can neither confirm nor refute chemical
+accuracy (≈ 62× more shots would be needed).
+Details: [`TR-F02 v1.1.0`](docs/testing/TR-F02_hardware_run.md).
 
 ### Phase 3 — Error Mitigation with Zero-Noise Extrapolation (ZNE)
 
-| Level | Method | Extrapolator | E (Ha) | Error vs L1 (mHa) | Chemical Accuracy |
-|---|---|---|---|---|---|
-| **L3b** | Raw (FakeManilaV2) | — | −1.121556 | +15.75 | ❌ |
-| **L4** | **`zne_local` ($\lambda \in \{1, 3, 5\}$)** | **Richardson** | **−1.136959** | **+0.35** | **✅ YES** |
-| **L4** | `zne_local` ($\lambda \in \{1, 3, 5\}$) | Exponential | −1.136965 | +0.34 | **✅ YES** |
-| **L4** | `zne_mitiq` ($\lambda \in \{1, 3, 5\}$) | Richardson | −1.137885 | −0.58 | **✅ YES** |
+| Measurement | Raw | Richardson | Exponential | Linear |
+|---|---|---|---|---|
+| **Bias** — `zne_local` (ISA folding) | +27.52 | **+0.23 ✅** | **+0.15 ✅** | +3.15 |
+| **Bias** — `zne_mitiq` (logical folding) | +37.57 | **+0.37 ✅** | **+0.17 ✅** | +5.43 |
+| **Single-run RMSE** (50 seeds, 8192 shots/point) | 28.6 | 26.5 | 77.7 | **12.3** |
 
-Custom ISA-safe unitary folding (`zne_local`) successfully brings the error below
-the chemical accuracy threshold ($1.59\ \text{mHa}$).
+*(mHa vs Full CI; bias = exact noisy expectation value, `precision=0`)*
+
+The ZNE **method is correct**: its bias is within chemical accuracy, and two
+independent implementations agree to within 0.13 mHa. The extrapolation,
+however, amplifies the noise of a single run, so **at 8192 shots the linear
+extrapolator gives the smallest total error**. The choice of extrapolator
+therefore depends on the shot budget.
 Details: [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md).
 
-![Error mitigation and ZNE extrapolation curve](docs/figures/fig06_mitigacio.png)
+![Error mitigation: ZNE bias and variance](docs/figures/fig06_mitigacio.png)
 
 ### Phase 4 — Data Schema and Persistent Storage (SQLite & FAIR Export)
 
-VQEBD persists all quantum computation records into a canonical, typed SQLite database
-(`data/db/vqebd.sqlite`), with deterministic CSV and JSON exports (`data/exports/results_v1.csv`).
+VQEBD persists all quantum computation records into a canonical, typed SQLite
+database (`data/db/vqebd.sqlite`), with deterministic CSV and JSON exports. The
+versioned reference export:
+[`docs/figures/data/results_v1.json`](docs/figures/data/results_v1.json) (`v0.7.1`).
 
-| Stored Run Type | Backend | Mitigation | Measured Energy (Ha) | Error vs L1 |
+| Stored run | Backend | Mitigation | E (Ha) | Error vs L0 |
 |---|---|---|---|---|
-| **L2 Statevector** | `qiskit_statevector` | none | −1.1373060358 | $+1.33 \times 10^{-15}$ Ha ✅ |
-| **L2 Statevector** | `cirq_simulator` | none | −1.1373060358 | $+4.44 \times 10^{-16}$ Ha ✅ |
-| **L2 Statevector** | `qsim` | none | −1.1373060068 | $+2.90 \times 10^{-8}$ Ha ✅ |
-| **L3a Finite Shots** | `qiskit_aer_shot` | none | −1.1208540086 | $+1.65 \times 10^{-2}$ Ha |
-| **L3b Noisy Sim** | `qiskit_aer_noisy` | none | −1.0927745684 | $+4.45 \times 10^{-2}$ Ha |
-| **L4 ZNE Mitigated** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1130006901 | $+2.43 \times 10^{-2}$ Ha |
-| **L5 Real IBM QPU** | `ibm_kingston` (Heron) | none | −1.1412691258 | $−3.96 \times 10^{-3}$ Ha |
+| **L2** | `qiskit_statevector` / `cirq_simulator` | none | −1.1373060358 | < 10⁻¹⁴ Ha ✅ |
+| **L2** | `qsim` (Powell) | none | −1.1373060068 | 2.9 × 10⁻⁸ Ha ✅ |
+| **L3a** | `qiskit_aer_shot` (COBYLA, 50 it.) | none | −1.1421267225 | −4.8 mHa ¹ |
+| **L3b** | `qiskit_aer_noisy` (COBYLA, 50 it.) | none | −1.1145306932 | +22.8 mHa |
+| **L4** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1075860081 | +29.7 mHa |
+| **L5** | `ibm_kingston` | ibm_resilience_1 (TREX) | −1.1412691258 | −4.0 mHa ² |
 
-Details: [`docs/04_data_schema.md`](docs/04_data_schema.md).
+¹ selection bias of the noisy minimum (TR-F01B 6.3) · ² within 1σ (TR-F02)
+
+Details: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](docs/testing/TR-F04_storage.md).
 
 
 ### Quick Start
@@ -443,20 +499,20 @@ Details: [`docs/04_data_schema.md`](docs/04_data_schema.md).
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (432 tests)
+make test       # full test suite (455 tests)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.7.0 python -m vqebd
+docker run --rm vqebd:0.7.1 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.0 .
-docker run --rm vqebd:0.7.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.1 .
+docker run --rm vqebd:0.7.1 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -510,7 +566,8 @@ VQEBD is licensed under **MIT** — see [`LICENSE`](LICENSE).
 > **not link or redistribute** it: it is used as an optional, runtime-loaded
 > component, isolated in a single module (`src/vqebd/mitigation/mitiq_zne.py`).
 > **The system works with full functionality without Mitiq.** Details:
-> [ADR-0003](docs/adr/ADR-0003-mitigacios-architektura.md).
+> [ADR-0003](docs/adr/ADR-0003-mitigacios-architektura.md). Optional install
+> (for the `zne_mitiq` cross-validation): `pip install -r requirements-mitiq.txt`.
 
 Full list of software used, with licenses and references:
 [`docs/references.md`](docs/references.md).

@@ -22,5 +22,51 @@
     "error_vs_l1_ha": -0.00396308999796835
   },
   "nuclear_repulsion_ha": 0.7199689944489797,
-  "electronic_energy_ha": -1.8612381202003472
+  "electronic_energy_ha": -1.8612381202003472,
+  "resilience_level": null,
+  "uncertainty_ha": {
+    "stds": 0.05328166317661878,
+    "ensemble_standard_error": 0.012529041411664804
+  },
+  "runtime_metadata": {
+    "pub": {
+      "shots": 8192,
+      "target_precision": 0.011048543456039804,
+      "circuit_metadata": {},
+      "resilience": {},
+      "num_randomizations": 32
+    },
+    "result": {
+      "dynamical_decoupling": {
+        "enable": false,
+        "sequence_type": "XX",
+        "extra_slack_distribution": "middle",
+        "scheduling_method": "alap"
+      },
+      "twirling": {
+        "enable_gates": false,
+        "enable_measure": true,
+        "num_randomizations": "auto",
+        "shots_per_randomization": "auto",
+        "interleave_randomizations": true,
+        "strategy": "active-accum"
+      },
+      "resilience": {
+        "measure_mitigation": true,
+        "zne_mitigation": false,
+        "pec_mitigation": false
+      },
+      "version": 2
+    },
+    "input_options": {
+      "default_precision": 0.011048543456039804
+    }
+  },
+  "quantum_seconds": 15,
+  "job_timestamps": {
+    "created": "2026-09-23T09:51:18.870812Z",
+    "finished": "2026-09-23T09:52:06.671154Z",
+    "running": "2026-09-23T09:51:45.741402Z"
+  },
+  "provenance_note": "uncertainty_ha, runtime_metadata, quantum_seconds: utólag visszaolvasva a tárolt jobból (2026-09-25T06:08:22Z, scripts/fetch_ibm_job.py, QPU-futtatás nélkül). resilience_level=None: a kliens nem adta meg, a szerver alapértelmezése érvényesült (runtime_metadata.result.resilience)."
 }

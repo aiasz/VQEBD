@@ -2,7 +2,9 @@ r"""Saját, ISA-biztos Zero-Noise Extrapolation (ZNE) stratégia (ADR-0003).
 
 Ez a modul valósítja meg a VQEBD natív ZNE eljárását:
 1. Globális unitáris hajtogatással skálázza a zajt ($U \to U (U^\dagger U)^n$),
-   megőrizve a fizikai qubitkiosztást és az ISA layoutot.
+   **a lefordított ISA-áramkörön**, újraoptimalizálás nélkül. Így a fizikai
+   qubitkiosztás megmarad, és a tényleges zajszorzó pontosan a névleges λ
+   (TR-F03 1. javítási kör; a TR-000 spike N2 lépésének módszere).
 2. Kiértékeli az energiát a megadott skálafaktorokon ($\lambda \in \{1, 3, 5, \dots\}$).
 3. A kiválasztott extrapolációs modellel (Richardson, lineáris, polinom, exponenciális)
    meghatározza a zajmentes határértéket ($\lambda \to 0$).
@@ -59,14 +61,38 @@ class ZneLocalMitigation(MitigationStrategy):
         parameters: Sequence[float],
         seeds: SeedSet,
     ) -> MitigationResult:
+        """ZNE végrehajtása a megadott paramétereknél.
+
+        **Transzpiláló kiértékelőn** (:class:`~vqebd.backends.estimators.IsaEnergyEvaluator`:
+        zajos szimulátor, QPU) a hajtogatás a már lefordított **ISA-áramkörön**
+        történik, és a hajtogatott áramkör ``optimization_level=0``-val kerül a
+        kapukészletre. Így a tényleges zajszorzó **pontosan** a névleges λ (a
+        kétqubites kapuk száma λ-szoros) — ezt a metaadat ``effective_scale_factors``
+        mezője minden futásnál rögzíti.
+
+        **Zajmentes kiértékelőn** (állapotvektor) nincs ISA-áramkör: a logikai
+        áramkör hajtogatódik. Itt a ZNE definíció szerint hatástalan (E(λ) állandó),
+        a futás csak a láncolat működését igazolja.
+        """
+        from vqebd.backends.estimators import IsaEnergyEvaluator
+
         scaled_energies: list[float] = []
         gate_counts: list[int] = []
         two_q_gate_counts: list[int] = []
+        isa_level = isinstance(evaluator, IsaEnergyEvaluator)
 
         for scale in self.scale_factors:
-            if scale == 1:
-                energy = evaluator.evaluate(parameters)
+            if isa_level:
+                base = evaluator.isa_circuit
+                folded_c = (
+                    base
+                    if scale == 1
+                    else evaluator.to_isa_unoptimized(fold_global_unitary(base, scale))
+                )
+                energy = evaluator.evaluate_isa(folded_c, parameters)
+            elif scale == 1:
                 folded_c = circuit
+                energy = evaluator.evaluate(parameters)
             else:
                 folded_c = fold_global_unitary(circuit, scale)
                 folded_evaluator = make_energy_evaluator(
@@ -81,9 +107,13 @@ class ZneLocalMitigation(MitigationStrategy):
         float_scales = [float(s) for s in self.scale_factors]
         mitigated_val, residuals = extrapolate(self.extrapolator, float_scales, scaled_energies)
 
+        base_2q = two_q_gate_counts[0] if self.scale_factors[0] == 1 else None
+        effective = [c / base_2q for c in two_q_gate_counts] if base_2q else None
         metadata = {
+            "folding_level": "isa" if isa_level else "logical",
             "gate_counts": gate_counts,
             "two_qubit_gate_counts": two_q_gate_counts,
+            "effective_scale_factors": effective,
         }
 
         return MitigationResult(

@@ -279,72 +279,142 @@ def measure_scaling() -> dict[str, Any]:
     return {"rows": rows, "aggregation": "min", "repeats": SCALING_REPEATS}
 
 
+MITIGATION_ENSEMBLE = 50
+"""A seed-ensemble mérete a ZNE statisztikus szórásának becsléséhez.
+
+50 minta mellett a szórásbecslés relatív hibája ≈ 1/sqrt(2·49) ≈ 10%.
+"""
+
+
 def measure_mitigation() -> dict[str, Any]:
-    """ZNE hibaenyhítési mérések zajos szimulátoron és hardveres adatokkal."""
+    """ZNE hibaenyhítés: a TORZÍTÁS és a SZÓRÁS külön mérve (TR-F03, 1. javítási kör).
+
+    Módszertan — mind a θ* (zajmentes optimum) pontban, ahol a hardveres L5 is mért:
+
+    1. **Torzítás** — ``precision=0``: az Aer a FakeManilaV2 zajmodell szerinti
+       EGZAKT várható értéket adja; a ZNE rendszeres hibája így determinisztikus.
+       ``zne_local`` (ISA-szintű hajtogatás) és — ha telepítve — ``zne_mitiq``
+       (logikai szintű hajtogatás), mint független keresztvalidáció.
+    2. **Szórás** — ``MITIGATION_ENSEMBLE`` különböző seed, alapértelmezett
+       precision (1/sqrt(8192)), független zajhúzás λ-nként: így látszik, mennyit
+       erősít a zajon az extrapoláció (Richardson (1,3,5): sqrt(Σw²) ≈ 2.28×).
+    3. **L5** — a hardveres mérés a bizonytalanságával együtt (TR-F02 v1.1.0).
+    """
+    import statistics
+
+    from vqebd.backends.estimators import AerNoisyEnergyEvaluator
+    from vqebd.chemistry.mapping import map_to_qubits
     from vqebd.chemistry.molecule import H2_REFERENCE_BOND_LENGTH, h2
-    from vqebd.config import MitigationSpec, OptimizerSpec, VQEConfig
+    from vqebd.chemistry.problem import build_electronic_structure
+    from vqebd.config import AnsatzSpec, OptimizerSpec, VQEConfig
+    from vqebd.mitigation import get_mitigation_strategy
     from vqebd.mitigation.extrapolation import extrapolate
+    from vqebd.seeds import SeedSet
+    from vqebd.vqe.ansatz import build_ansatz
     from vqebd.vqe.runner import run_vqe
 
     mol = h2(H2_REFERENCE_BOND_LENGTH)
-    opt = OptimizerSpec(method="COBYLA", maxiter=20)
-
-    # 1. Referenciák (L0/L1/L2)
-    cfg_exact = VQEConfig(
-        molecule=mol,
-        backend="qiskit_statevector",
-        optimizer=OptimizerSpec(method="SLSQP"),
+    cfg = VQEConfig(
+        molecule=mol, backend="qiskit_statevector", optimizer=OptimizerSpec(method="SLSQP")
     )
-    res_exact = run_vqe(cfg_exact)
+    res = run_vqe(cfg)
+    theta = list(res.optimal_parameters)
+    seeds = SeedSet.derive(cfg.seed)
+    structure = build_electronic_structure(mol)
+    hamiltonian = map_to_qubits(structure, "parity", two_qubit_reduction=True)
+    ansatz = build_ansatz(structure, hamiltonian, AnsatzSpec(kind="uccsd"), seeds)
+    e_nuc = hamiltonian.nuclear_repulsion_energy
+    fci = res.reference.full_ci
+    assert fci is not None
 
-    # 2. Shot zaj (L3a)
-    cfg_shot = VQEConfig(molecule=mol, backend="qiskit_aer_shot", optimizer=opt)
-    res_shot = run_vqe(cfg_shot)
+    def err_mha(electronic: float) -> float:
+        return 1e3 * (electronic + e_nuc - fci)
 
-    # 3. Zajos szimuláció (L3b)
-    cfg_noisy = VQEConfig(molecule=mol, backend="qiskit_aer_noisy", optimizer=opt)
-    res_noisy = run_vqe(cfg_noisy)
+    scales = (1, 3, 5)
+    extrapolators = ("richardson", "linear", "exponential")
 
-    # 4. Mitigált szimuláció (L4)
-    cfg_zne = VQEConfig(
-        molecule=mol,
-        backend="qiskit_aer_noisy",
-        optimizer=opt,
-        mitigation=MitigationSpec(
-            strategy="zne_local", scale_factors=(1, 3, 5), extrapolator="richardson"
-        ),
-    )
-    res_zne = run_vqe(cfg_zne)
+    def bias_block(strategy: str) -> dict[str, Any]:
+        evaluator = AerNoisyEnergyEvaluator(
+            ansatz.circuit, hamiltonian.operator, seeds, precision=0.0
+        )
+        result = get_mitigation_strategy(
+            strategy, scale_factors=scales, extrapolator="richardson"
+        ).execute(ansatz.circuit, hamiltonian.operator, evaluator, theta, seeds)
+        energies = list(result.scaled_energies)
+        return {
+            "scales": list(result.scale_factors),
+            "scaled_errors_mha": [err_mha(e) for e in energies],
+            "extrapolated_errors_mha": {
+                ex: err_mha(extrapolate(ex, list(result.scale_factors), energies)[0])
+                for ex in extrapolators
+            },
+            "two_qubit_gate_counts": result.metadata.get("two_qubit_gate_counts"),
+            "folding_level": result.metadata.get("folding_level"),
+        }
 
-    scales = [1.0, 3.0, 5.0]
-    scaled_energies = (
-        list(res_zne.mitigation.scaled_energies)
-        if res_zne.mitigation is not None
-        else [res_noisy.electronic_energy] * 3
-    )
-    total_scaled = [e + res_exact.nuclear_repulsion_energy for e in scaled_energies]
+    bias_local = bias_block("zne_local")
+    try:
+        import mitiq  # noqa: F401
 
-    richardson_val, _ = extrapolate("richardson", scales, total_scaled)
-    linear_val, _ = extrapolate("linear", scales, total_scaled)
-    exp_val, _ = extrapolate("exponential", scales, total_scaled)
+        bias_mitiq: dict[str, Any] | None = bias_block("zne_mitiq")
+    except ImportError:
+        bias_mitiq = None
 
-    # 5. Valódi hardveres adatok (L5) betöltése
+    ensemble: dict[str, list[float]] = {"raw": [], **{ex: [] for ex in extrapolators}}
+    for k in range(MITIGATION_ENSEMBLE):
+        member_seeds = SeedSet.derive(cfg.seed + 1 + k)
+        evaluator = AerNoisyEnergyEvaluator(ansatz.circuit, hamiltonian.operator, member_seeds)
+        result = get_mitigation_strategy(
+            "zne_local", scale_factors=scales, extrapolator="richardson"
+        ).execute(ansatz.circuit, hamiltonian.operator, evaluator, theta, member_seeds)
+        energies = list(result.scaled_energies)
+        ensemble["raw"].append(err_mha(result.raw_energy))
+        for ex in extrapolators:
+            ensemble[ex].append(err_mha(extrapolate(ex, list(result.scale_factors), energies)[0]))
+
+    def summary(values: list[float]) -> dict[str, float]:
+        q = statistics.quantiles(values, n=4)
+        sd = statistics.stdev(values)
+        return {
+            "mean": statistics.fmean(values),
+            "sd": sd,
+            "sem": sd / len(values) ** 0.5,
+            "median": statistics.median(values),
+            "q1": q[0],
+            "q3": q[2],
+        }
+
     hw_file = Path("docs/figures/data/hardware_h2_kingston.json")
-    hw_data = json.loads(hw_file.read_text(encoding="utf-8")) if hw_file.is_file() else {}
-    l5_energy = hw_data.get("energies", {}).get("l5_hardware_ha", -1.1412691258)
+    hw = json.loads(hw_file.read_text(encoding="utf-8")) if hw_file.is_file() else {}
+    hw_unc = hw.get("uncertainty_ha", {})
 
     return {
-        "l0_full_ci": res_exact.reference.full_ci,
-        "l1_exact_diag": res_exact.reference.exact_diagonalization,
-        "l2_statevector": res_exact.energy,
-        "l3a_shot": res_shot.energy,
-        "l3b_noisy_raw": res_noisy.energy,
-        "l4_zne_richardson": richardson_val,
-        "l4_zne_linear": linear_val,
-        "l4_zne_exponential": exp_val,
-        "l5_hardware_raw": l5_energy,
-        "scales": scales,
-        "total_scaled_energies": total_scaled,
+        "method": "theta_star_single_point",
+        "molecule": "H2",
+        "bond_length_angstrom": H2_REFERENCE_BOND_LENGTH,
+        "noise_model": "FakeManilaV2",
+        "l0_full_ci": fci,
+        "l2_statevector": res.energy,
+        "theta_star": theta,
+        "precision_per_evaluation_ha": 1.0 / 8192**0.5,
+        "bias_zne_local": bias_local,
+        "bias_zne_mitiq": bias_mitiq,
+        "ensemble_size": MITIGATION_ENSEMBLE,
+        "ensemble_seeds": [cfg.seed + 1, cfg.seed + MITIGATION_ENSEMBLE],
+        "ensemble_errors_mha": ensemble,
+        "ensemble_summary_mha": {k: summary(v) for k, v in ensemble.items()},
+        "l5_hardware": {
+            "job_id": hw.get("job_id"),
+            "backend": hw.get("ibm_backend_name"),
+            "error_mha": 1e3 * hw["errors_ha"]["error_vs_l0_ha"] if hw else None,
+            "stds_mha": 1e3 * hw_unc["stds"] if hw_unc.get("stds") is not None else None,
+            "ensemble_standard_error_mha": (
+                1e3 * hw_unc["ensemble_standard_error"]
+                if hw_unc.get("ensemble_standard_error") is not None
+                else None
+            ),
+            "resilience": "TREX (szerver-alapértelmezés, resilience_level=1)",
+        },
     }
 
 
@@ -778,194 +848,280 @@ def figure_scaling(data: dict[str, Any], out: Path) -> None:
 
 
 def figure_mitigation(data: dict[str, Any], out: Path) -> None:
-    """Fázis 3 & Fázis 2 összehasonlító ábra: ZNE hibaenyhítés és hardveres mérés."""
+    """ZNE: torzítás (bal) és szórás (jobb), a hardveres L5-tel együtt.
+
+    Minden érték a θ* pontban, hiba a Full CI-hez képest, mHa-ben. A bal panel
+    a módszer RENDSZERES hibáját mutatja (egzakt zajos várható érték), a jobb a
+    VÉGES MINTAVÉTEL mellett ténylegesen várható eloszlást (seed-ensemble).
+    """
     import matplotlib.pyplot as plt
     import numpy as np
-    from scipy.optimize import curve_fit
 
-    fig, (ax_bars, ax_extrap) = plt.subplots(
-        1, 2, figsize=(11.5, 5.2), facecolor=SURFACE, gridspec_kw={"wspace": 0.28}
+    fig, (ax_bias, ax_dist) = plt.subplots(
+        1,
+        2,
+        figsize=(12.5, 5.6),
+        facecolor=SURFACE,
+        gridspec_kw={"wspace": 0.26, "width_ratios": [1.0, 1.15]},
     )
+    chem = CHEMICAL_ACCURACY_HA * 1e3
 
-    fci = data["l0_full_ci"]
-    levels = [
-        "L2\nÁllapotvektor",
-        "L3a\nShot (8192)",
-        "L3b\nFakeManila (nyers)",
-        "L4\nZNE Richardson",
-        "L5\nHeron QPU (nyers)",
-    ]
-    energies = [
-        data["l2_statevector"],
-        data["l3a_shot"],
-        data["l3b_noisy_raw"],
-        data["l4_zne_richardson"],
-        data["l5_hardware_raw"],
-    ]
-    errors = [max(abs(e - fci), 1e-16) for e in energies]
+    # ---------------------------------------------------------------- bal: torzítás
+    local = data["bias_zne_local"]
+    lam = np.asarray(local["scales"])
+    y = np.asarray(local["scaled_errors_mha"])
+    grid = np.linspace(0.0, 5.3, 200)
 
-    bar_colors = [
-        SERIES["qiskit_statevector"],
-        STATUS["warning"],
-        STATUS["critical"],
-        STATUS["good"],
-        "#8a3ffc",  # IBM lila
-    ]
+    ax_bias.axhspan(-chem, chem, color=STATUS["good"], alpha=0.14, zorder=1)
+    ax_bias.axhline(0.0, color=INK, linewidth=1.0, zorder=2)
 
-    positions = np.arange(len(levels))
-    bars = ax_bars.bar(
-        positions,
-        errors,
-        0.55,
-        color=bar_colors,
+    quad = np.polyfit(lam, y, deg=2)
+    lin = np.polyfit(lam, y, deg=1)
+    ex = local["extrapolated_errors_mha"]
+    ax_bias.plot(
+        grid,
+        np.polyval(quad, grid),
+        color=SERIES["qiskit_statevector"],
+        lw=2.0,
         zorder=3,
-        edgecolor=SURFACE,
-        linewidth=1.5,
+        label=f"Richardson (λ→0: {ex['richardson']:+.2f} mHa)",
     )
-    for rect, val in zip(bars, errors, strict=True):
-        ax_bars.text(
-            rect.get_x() + rect.get_width() / 2,
-            val * 1.35,
-            f"{val:.1e}\nHa" if val < 1e-4 else f"{val * 1000:.2f}\nmHa",
-            ha="center",
-            va="bottom",
-            fontsize=8.5,
-            color=INK_SECONDARY,
-            fontweight="600",
-        )
-
-    ax_bars.axhline(
-        CHEMICAL_ACCURACY_HA, color=STATUS["critical"], linewidth=1.6, linestyle="--", zorder=4
+    ax_bias.plot(
+        grid,
+        np.polyval(lin, grid),
+        color=SERIES["cirq_simulator"],
+        lw=1.6,
+        ls="--",
+        zorder=3,
+        label=f"lineáris (λ→0: {ex['linear']:+.2f} mHa)",
     )
-    ax_bars.text(
-        len(levels) - 0.55,
-        CHEMICAL_ACCURACY_HA * 1.3,
-        "kémiai pontosság (1.6 mHa)",
-        color=STATUS["critical"],
-        fontsize=8.5,
-        ha="right",
-        va="bottom",
-        fontweight="600",
-    )
-
-    ax_bars.set_yscale("log")
-    ax_bars.set_ylim(1e-16, 1e-1)
-    ax_bars.set_xticks(positions)
-    ax_bars.set_xticklabels(levels, fontsize=9, color=INK_SECONDARY)
-    ax_bars.set_ylabel(
-        "Hiba az elméleti Full CI-hez képest (Ha, log skála)", color=INK_SECONDARY, fontsize=9.5
-    )
-    style_axes(ax_bars)
-    title(
-        ax_bars,
-        "Referenciaszintek és hibaenyhítés",
-        "A ZNE visszahozza a zajos szimulációt a kémiai pontosság alá",
-    )
-
-    # Jobb oldali panel: ZNE extrapolációs görbe
-    scales = data["scales"]
-    y_vals = data["total_scaled_energies"]
-
-    ax_extrap.scatter(
-        scales,
-        y_vals,
-        color=STATUS["critical"],
+    ax_bias.scatter(
+        lam,
+        y,
         s=60,
-        zorder=5,
-        label="Mért pontok (λ ∈ {1, 3, 5})",
+        color=SERIES["qiskit_statevector"],
         edgecolor=INK,
-        linewidth=1.2,
+        lw=1.0,
+        zorder=5,
+        label="zne_local — ISA-hajtogatás (mért)",
     )
-
-    lambda_grid = np.linspace(0.0, 5.5, 100)
-
-    # Richardson extrapoláció görbéje
-    poly_coeffs = np.polyfit(scales, y_vals, deg=2)
-    poly_curve = np.polyval(poly_coeffs, lambda_grid)
-    ax_extrap.plot(
-        lambda_grid,
-        poly_curve,
+    ax_bias.scatter(
+        [0.0],
+        [ex["richardson"]],
+        marker="*",
+        s=200,
         color=STATUS["good"],
-        linewidth=2.2,
-        label=f"Richardson / Polinom (λ=0: {data['l4_zne_richardson']:.5f} Ha)",
-        zorder=4,
+        edgecolor=INK,
+        lw=1.0,
+        zorder=6,
     )
 
-    # Exponenciális görbe
-    def _exp(x: Any, a: float, b: float, c: float) -> Any:
-        return a * np.exp(-b * x) + c
+    mitiq_block = data.get("bias_zne_mitiq")
+    if mitiq_block is not None:
+        mx = mitiq_block["extrapolated_errors_mha"]
+        ax_bias.scatter(
+            mitiq_block["scales"],
+            mitiq_block["scaled_errors_mha"],
+            s=55,
+            marker="D",
+            facecolor="none",
+            edgecolor=SERIES["qsim"],
+            lw=1.6,
+            zorder=5,
+            label=f"zne_mitiq — logikai hajtogatás (λ→0: {mx['richardson']:+.2f} mHa)",
+        )
+        mquad = np.polyfit(mitiq_block["scales"], mitiq_block["scaled_errors_mha"], deg=2)
+        ax_bias.plot(grid, np.polyval(mquad, grid), color=SERIES["qsim"], lw=1.0, ls=":", zorder=3)
 
-    try:
-        p0 = [y_vals[0] - y_vals[-1], 0.1, y_vals[-1]]
-        popt, _ = curve_fit(_exp, scales, y_vals, p0=p0, maxfev=5000)
-        ax_extrap.plot(
-            lambda_grid,
-            _exp(lambda_grid, *popt),
-            color=SERIES["qiskit_statevector"],
-            linewidth=1.6,
-            linestyle=":",
-            label=f"Exponenciális (λ=0: {data['l4_zne_exponential']:.5f} Ha)",
+    # Nagyító betét: a λ→0 extrapolált értékek a kémiai pontossági sávhoz mérve.
+    inset = ax_bias.inset_axes((0.68, 0.14, 0.30, 0.26))
+    rows: list[tuple[str, float]] = [
+        (f"local {short}", local["extrapolated_errors_mha"][name])
+        for name, short in (("richardson", "Rich."), ("exponential", "exp."), ("linear", "lin."))
+    ]
+    if mitiq_block is not None:
+        rows += [
+            (f"mitiq {short}", mitiq_block["extrapolated_errors_mha"][name])
+            for name, short in (
+                ("richardson", "Rich."),
+                ("exponential", "exp."),
+                ("linear", "lin."),
+            )
+        ]
+    inset.axvspan(-chem, chem, color=STATUS["good"], alpha=0.18, zorder=1)
+    inset.axvline(0.0, color=INK, lw=0.8, zorder=2)
+    for idx, (_name, val) in enumerate(rows):
+        ok = abs(val) < chem
+        inset.scatter(
+            [val],
+            [idx],
+            s=26,
+            marker="o" if ok else "X",
+            color=STATUS["good"] if ok else STATUS["critical"],
+            edgecolor=INK,
+            lw=0.6,
             zorder=3,
         )
-    except Exception:
-        pass
-
-    # Lineáris illesztés
-    lin_coeffs = np.polyfit(scales, y_vals, deg=1)
-    ax_extrap.plot(
-        lambda_grid,
-        np.polyval(lin_coeffs, lambda_grid),
-        color=SERIES["cirq_simulator"],
-        linewidth=1.6,
-        linestyle="--",
-        label=f"Lineáris (λ=0: {data['l4_zne_linear']:.5f} Ha)",
-        zorder=3,
-    )
-
-    # Extrapolált pont (λ=0)
-    ax_extrap.scatter(
-        [0.0],
-        [data["l4_zne_richardson"]],
+        inset.text(
+            val + 0.25,
+            idx,
+            f"{val:+.2f} {'✓' if ok else '✗'}",
+            fontsize=7,
+            va="center",
+            color=INK_SECONDARY,
+        )
+    inset.set_yticks(range(len(rows)))
+    inset.set_yticklabels([r[0] for r in rows], fontsize=7, color=INK_SECONDARY)
+    inset.invert_yaxis()
+    inset.set_xlim(-2.5, 8.5)
+    inset.set_xlabel("torzítás (mHa)", fontsize=7.5, color=INK_SECONDARY, labelpad=1)
+    inset.set_title(
+        "λ→0 nagyítva · zöld = ±1.6 mHa",
+        fontsize=7.5,
         color=STATUS["good"],
-        marker="*",
-        s=180,
-        zorder=6,
-        edgecolor=INK,
-        linewidth=1.2,
+        loc="left",
+        pad=4,
     )
+    style_axes(inset, grid_axis="x")
+    inset.tick_params(labelsize=7)
 
-    # Kémiai pontossági sáv
-    ax_extrap.axhspan(
-        fci - CHEMICAL_ACCURACY_HA,
-        fci + CHEMICAL_ACCURACY_HA,
-        color=STATUS["good"],
-        alpha=0.15,
-        label="Kémiai pontossági sáv (±1.6 mHa)",
-        zorder=1,
-    )
-    ax_extrap.axhline(
-        fci,
-        color=INK,
-        linewidth=1.2,
-        linestyle="-",
-        zorder=2,
-        label="Full CI egzakt alapállapot",
-    )
+    for xi, yi, cnt in zip(lam, y, local["two_qubit_gate_counts"], strict=True):
+        ax_bias.annotate(
+            f"{cnt} CX",
+            (xi, yi),
+            textcoords="offset points",
+            xytext=(-10, 8),
+            ha="right",
+            fontsize=8,
+            color=INK_MUTED,
+        )
 
-    ax_extrap.set_xlabel("Zajszorzó (λ)", color=INK_SECONDARY, fontsize=10)
-    ax_extrap.set_ylabel("Alapállapoti energia (Ha)", color=INK_SECONDARY, fontsize=10)
-    ax_extrap.set_xlim(-0.3, 5.7)
-    style_axes(ax_extrap)
+    ax_bias.set_xlim(-0.3, 5.4)
+    ax_bias.set_xlabel("Zajszorzó λ (ISA-szinten pontos)", color=INK_SECONDARY, fontsize=10)
+    ax_bias.set_ylabel("Hiba a Full CI-hez (mHa)", color=INK_SECONDARY, fontsize=10)
+    style_axes(ax_bias)
     title(
-        ax_extrap,
-        "Zero-Noise Extrapolation (ZNE) görbe",
-        "λ=0 extrapoláció különböző modellekkel (H2, FakeManilaV2)",
+        ax_bias,
+        "1 · A ZNE torzítása",
+        "egzakt zajos várható érték (precision = 0), H₂ θ*, FakeManilaV2",
     )
-    legend = ax_extrap.legend(frameon=False, fontsize=8.5, loc="lower left")
-    for text in legend.get_texts():
-        text.set_color(INK_SECONDARY)
+    leg = ax_bias.legend(frameon=False, fontsize=8.3, loc="upper left")
+    for t in leg.get_texts():
+        t.set_color(INK_SECONDARY)
 
-    fig.subplots_adjust(left=0.08, right=0.98, top=0.86, bottom=0.13)
+    # ---------------------------------------------------------------- jobb: szórás
+    ens = data["ensemble_errors_mha"]
+    summ = data["ensemble_summary_mha"]
+    cats = [
+        ("raw", "nyers\n(λ=1)"),
+        ("richardson", "ZNE\nRichardson"),
+        ("exponential", "ZNE\nexponenciális"),
+        ("linear", "ZNE\nlineáris"),
+    ]
+    rng = np.random.default_rng(0)  # csak a pontok vízszintes szórásához (jitter)
+
+    y_lo, y_hi = -120.0, 95.0  # a kiugró exponenciális illesztések ne nyomják össze
+    ax_dist.axhspan(-chem, chem, color=STATUS["good"], alpha=0.14, zorder=1)
+    ax_dist.axhline(0.0, color=INK, linewidth=1.0, zorder=2)
+    for i, (key, _) in enumerate(cats):
+        vals = np.asarray(ens[key])
+        inside = (vals >= y_lo) & (vals <= y_hi)
+        ax_dist.scatter(
+            i - 0.08 + rng.uniform(-0.14, 0.14, int(inside.sum())),
+            vals[inside],
+            s=14,
+            color=SERIES["qiskit_statevector"],
+            alpha=0.45,
+            lw=0,
+            zorder=3,
+        )
+        n_out = int((~inside).sum())
+        if n_out:
+            ax_dist.annotate(
+                f"▼ {n_out} pont\n< {y_lo:.0f}",
+                (i - 0.08, y_lo),
+                textcoords="offset points",
+                xytext=(0, 4),
+                ha="center",
+                va="bottom",
+                fontsize=7.5,
+                color=STATUS["critical"],
+            )
+        m, sd = summ[key]["mean"], summ[key]["sd"]
+        ax_dist.errorbar(
+            [i + 0.22],
+            [m],
+            yerr=[sd],
+            fmt="o",
+            color=INK,
+            ms=5,
+            capsize=4,
+            lw=1.4,
+            zorder=5,
+        )
+        rmse = float(np.sqrt(np.mean(vals**2)))
+        ax_dist.text(
+            i,
+            y_hi - 2,
+            f"{m:+.1f} ± {sd:.1f}\nRMSE {rmse:.1f}",
+            fontsize=8,
+            color=INK_SECONDARY,
+            va="top",
+            ha="center",
+        )
+
+    hw = data.get("l5_hardware") or {}
+    labels = [c[1] for c in cats]
+    if hw.get("error_mha") is not None and hw.get("stds_mha") is not None:
+        x_hw = len(cats)
+        labels.append("L5 ibm_kingston\n(TREX, 1 mérés)")
+        ax_dist.errorbar(
+            [x_hw],
+            [hw["error_mha"]],
+            yerr=[hw["stds_mha"]],
+            fmt="none",
+            ecolor="#8a3ffc",
+            elinewidth=1.2,
+            capsize=5,
+            alpha=0.6,
+            zorder=4,
+        )
+        ax_dist.errorbar(
+            [x_hw],
+            [hw["error_mha"]],
+            yerr=[hw["ensemble_standard_error_mha"]],
+            fmt="s",
+            color="#8a3ffc",
+            ms=7,
+            elinewidth=2.4,
+            capsize=0,
+            zorder=5,
+        )
+        ax_dist.text(
+            x_hw,
+            y_hi - 2,
+            f"{hw['error_mha']:+.1f} ± {hw['ensemble_standard_error_mha']:.1f} (ens.)"
+            f"\n± {hw['stds_mha']:.1f} (stds)",
+            fontsize=8,
+            color=INK_SECONDARY,
+            va="top",
+            ha="center",
+        )
+
+    ax_dist.set_xticks(range(len(labels)))
+    ax_dist.set_xticklabels(labels, fontsize=8.8, color=INK_SECONDARY)
+    ax_dist.set_xlim(-0.55, len(labels) - 0.45)
+    ax_dist.set_ylim(y_lo, y_hi + 20)
+    ax_dist.set_ylabel("Hiba a Full CI-hez (mHa)", color=INK_SECONDARY, fontsize=10)
+    style_axes(ax_dist)
+    title(
+        ax_dist,
+        f"2 · A ZNE szórása — {data['ensemble_size']} független seed",
+        f"precision {data['precision_per_evaluation_ha'] * 1e3:.1f} mHa/kiértékelés · "
+        "pont = egy futás · fekete = átlag ± szórás",
+    )
+
+    fig.subplots_adjust(left=0.065, right=0.985, top=0.85, bottom=0.14)
     fig.savefig(out / "fig06_mitigacio.png", dpi=200, facecolor=SURFACE)
     plt.close(fig)
 
@@ -974,6 +1130,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out", default=Path("docs/figures"), type=Path)
     parser.add_argument("--quick", action="store_true", help="a lassú skálázás kihagyása")
+    parser.add_argument(
+        "--only",
+        default=None,
+        help="csak a megnevezett mérés/ábra (pl. mitigacio); a többi adat érintetlen marad",
+    )
     args = parser.parse_args(argv)
 
     import matplotlib
@@ -993,6 +1154,10 @@ def main(argv: list[str] | None = None) -> int:
     ]
     if not args.quick:
         steps.append(("skalazas", measure_scaling, figure_scaling))
+    if args.only is not None:
+        steps = [step for step in steps if step[0] == args.only]
+        if not steps:
+            parser.error(f"ismeretlen mérés: {args.only!r}")
 
     for name, measure, draw in steps:
         print(f"[mérés] {name} …", flush=True)
@@ -1005,8 +1170,9 @@ def main(argv: list[str] | None = None) -> int:
         draw(measured, out)
         print(f"[ábra ] {name} kész ({elapsed:.1f} s)", flush=True)
 
-    print("[ábra ] gradiens_biztonsag …", flush=True)
-    figure_gradient_safety(out)
+    if args.only is None:
+        print("[ábra ] gradiens_biztonsag …", flush=True)
+        figure_gradient_safety(out)
 
     print(f"\nKész. Ábrák: {out}/  —  nyers adatok: {data_dir}/")
     return 0

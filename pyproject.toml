@@ -152,4 +152,14 @@ markers = [
 ]
 filterwarnings = [
     "error::DeprecationWarning:vqebd.*",   # a SAJÁT kódunk elavultsága hiba
+    # --- KÜLSŐ, ismert és rögzített függőségi elavulások (v0.7.1) ---------------
+    # Célzottan, üzenet + kibocsátó modul szerint szűrve: ~600 000 figyelmeztetés
+    # elnyomná a ténylegesen releváns jelzéseket. A forrásuk a numpy<2 miatti
+    # qiskit 1.4 / qiskit-aer 0.17 pin (ADR-0001); Qiskit 2.x-en maguktól eltűnnek.
+    # Más üzenetű vagy más modulból jövő elavulás TOVÁBBRA IS megjelenik.
+    "ignore:The property ``qiskit.circuit.instruction.Instruction.condition`` is deprecated:DeprecationWarning:qiskit_aer",
+    "ignore:The property ``qiskit.dagcircuit.dagcircuit.DAGCircuit.calibrations`` is deprecated:DeprecationWarning:qiskit.transpiler",
+    "ignore:The class ``qiskit.circuit.library.n_local.n_local.NLocal`` is pending deprecation:PendingDeprecationWarning:qiskit.circuit.library",
+    # Az opcionális mitiq 0.47.0 qiskit-konverziója (csak requirements-mitiq.txt mellett):
+    "ignore:Treating CircuitInstruction as an iterable is deprecated:DeprecationWarning:mitiq",
 ]

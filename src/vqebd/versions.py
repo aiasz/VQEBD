@@ -24,6 +24,7 @@ from typing import Final
 __all__ = ["TRACKED_PACKAGES", "environment_fingerprint", "package_versions", "runtime_info"]
 
 TRACKED_PACKAGES: Final[tuple[str, ...]] = (
+    "vqebd",
     "qiskit",
     "qiskit-aer",
     "qiskit-nature",
@@ -37,6 +38,11 @@ TRACKED_PACKAGES: Final[tuple[str, ...]] = (
     "qsimcirq",
 )
 """A nyomon követett csomagok.
+
+A ``vqebd`` SAJÁT verziója is szerepel (v0.7.1 óta): a v0.7.0 és v0.7.1 között a
+zajos kiértékelők mintavételi modellje megváltozott (TR-F03, 1. javítási kör),
+így két, azonos függőségekkel készült rekord csak a kódverzió alapján
+különböztethető meg.
 
 A ``qiskit-algorithms`` azért szerepel, mert tranzitívan települ, és a jelenléte
 befolyásolhatja a viselkedést — noha nem hívjuk (ADR-0002). A ``mitiq`` és a
@@ -55,6 +61,13 @@ def package_versions(packages: tuple[str, ...] = TRACKED_PACKAGES) -> dict[str, 
     """
     result: dict[str, str] = {}
     for name in packages:
+        if name == "vqebd":
+            # src-layoutból (PYTHONPATH) futtatva nincs disztribúciós metaadat;
+            # az igazságforrás a VERSION fájl, amelyet a csomag maga olvas be.
+            from vqebd import __version__
+
+            result[name] = __version__
+            continue
         try:
             result[name] = version(name)
         except PackageNotFoundError:

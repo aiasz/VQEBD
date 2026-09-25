@@ -17,6 +17,82 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ---
 
+## [0.7.1] — 2026-09-25
+
+**Javítókör a Fázis 5 előtt: a Fázis 1b–4 mérési láncának átvizsgálása.**
+
+A v0.3.0 → v0.7.0 haladás átvizsgálása több olyan hibát tárt fel, amely a
+korábban közölt számokat érinti. A **mérések (job, adatfájlok) nem változtak**, csak a
+kiértékelésük és azok a kódrészek, amelyek hibásan mértek. A korábbi
+CHANGELOG-bejegyzések történeti rögzítések, ezeket nem írtuk át. A javított
+számok a TR-F01B 6., a TR-F02 v1.1.0, a TR-F03 v1.1.0 és a TR-F04 v1.1.0
+dokumentumokban vannak.
+
+### Javítva — mérési hibák
+
+- **Aer-mintavétel (L3a/L3b):** az Aer `EstimatorV2` minden `run()`-nál
+  `default_rng(seed_simulator)`-ból húzott, így rögzített seed mellett **minden
+  kiértékelés ugyanazt a z·σ eltolást** kapta (+15.9 mHa). A „lövészaj” állandó
+  torzítás volt, a VQE zajmentes felületet optimalizált. Most egzakt várható
+  érték + saját, hívásonként továbblépő RNG (`_AerIsaEnergyEvaluator`); a futás
+  továbbra is determinisztikus. Regressziós tesztek: TC-1B10 (×6).
+- **ZNE hajtogatás (`zne_local`):** a logikai áramkör hajtogatását az
+  `optimization_level=3` részben kiejtette (4/10/16 CX a 4/12/20 helyett). Most
+  ISA-szintű hajtogatás, `level=0` fordítás, új `IsaEnergyEvaluator` alaposztály;
+  `effective_scale_factors` metaadat. Regressziós teszt: TC-301b.
+- **`zne_mitiq`:** sosem futott le (kötetlen paraméterek, `level=3` executor,
+  annotációs típusfelismerés `from __future__ import annotations` mellett), és a
+  `scaled_energies` mezőbe a nyers értéket ismételte. Mindhárom javítva; a
+  keresztvalidáció (TC-302) most **CI-ben is fut**.
+- **Hardveres kiértékelő (L5):** a `stds` eldobódott, a `resilience_level` implicit
+  volt. Most a `last_std`, `last_ensemble_standard_error` és `last_metadata`
+  rögzített, a `resilience_level` explicit (alapértelmezés 1 = a mért szerver-viselkedés).
+- **Exponenciális extrapoláció:** hiba esetén csendben másodfokúra váltott
+  „exponential” címkével. Most `RuntimeWarning` jelzi.
+- **Export (L5-rekord):** `mitigation_strategy` `none` helyett `ibm_resilience_1`;
+  a `satisfies_variational_principle` és a `correlation_recovered` számított (a
+  v0.7.0 kézzel 1-et és 1.20-at írt).
+
+### Javítva — dokumentáció
+
+- **TR-F03 v1.1.0:** az 1.0.0 számai (+15.75 → +0.35 mHa ✅) a TR-000 spike-ból
+  származtak. Újramérve: ZNE **torzítás** +0.23 mHa ✅ (Mitiq: +0.37 mHa), de egy
+  8192 lövéses futás **szórása** 26 mHa. AC-3.4 indokoltan újrafogalmazva.
+- **TR-F02 v1.1.0:** az L5 nem „nyers” (TREX); bizonytalanság ±12.5 mHa (ensemble
+  SE) / ±53.3 mHa (`stds`); a −3.96 mHa 0.3σ-s ingadozás, nem a hardver
+  hibaszintje. Adatútvonal javítva; kvóta: 15 QPU-s. A kalibráció a mérés
+  időpontjára visszakérve.
+- **TR-F01B, TR-F04, ADR-0003 (1. kiegészítés), `docs/01b`, `docs/02`, `docs/03`,
+  mesterterv, `phase_03`:** javító jegyzetek.
+- **README (HU/EN):** a két nyelvi rész újra szinkronban (az angol még a v0.6.0
+  állapotot mutatta).
+
+### Hozzáadva
+
+- `requirements-mitiq.txt` (mitiq 0.47.0 + tabulate 0.10.0; mért hatás: `pip check` tiszta).
+- `scripts/fetch_ibm_job.py` — tárolt IBM job visszaolvasása **QPU-kvóta nélkül**;
+  konzisztencia-ellenőrzéssel pótolta a Fázis 2 hiányzó bizonytalansági adatait.
+- `scripts/gen_report_figures.py --only <név>`; új `fig06_mitigacio` (torzítás +
+  50 seedes szórás + L5 hibasávval).
+- A `precision` paraméter az Aer-kiértékelőkön (`0.0` = egzakt zajos várható érték).
+- A rekordok `versions_json` mezője a `vqebd` saját verzióját is tartalmazza.
+- `pytest` `filterwarnings`: ~600 000 ismert külső elavulási figyelmeztetés
+  célzott szűrése (üzenet + kibocsátó modul szerint).
+
+### Mért, új modellezési korlátok (dokumentálva, nyitott tétel)
+
+- Az Aer `EstimatorV2` a zajmodell **readout-hibáját nem alkalmazza**: csak
+  readout-hibát tartalmazó modellel ⟨Z⟩ = 1.000, a Sampler-kontroll 20.3%.
+- A zajos VQE végső energiája a zajos minimum **kiválasztási torzítását**
+  hordozza: független újramintavételezés kell (Fázis 5).
+
+### Tesztek
+
+- **455 passed** (mitiq-kel) / **454 passed + 1 skipped** (nélküle), 3 figyelmeztetés;
+  ruff, ruff format, mypy (strict) tiszta.
+
+---
+
 ## [0.7.0] — 2026-09-23
 
 **Fázis 4 lezárva — Adatséma és perzisztens tárolás (SQLite & FAIR export).**

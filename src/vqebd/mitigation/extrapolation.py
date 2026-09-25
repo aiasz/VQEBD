@@ -122,14 +122,32 @@ def exponential_extrapolate(
     def _exp_model(x: Any, a: float, b: float, c: float) -> Any:
         return a * np.exp(-b * x) + c
 
+    import warnings
+
+    from scipy.optimize import OptimizeWarning
+
     p0 = [vals[0] - vals[-1], 0.1, vals[-1]]
     try:
-        popt, _ = curve_fit(_exp_model, scales, vals, p0=p0, maxfev=5000)
+        with warnings.catch_warnings():
+            # 3 pont / 3 paraméter: az illesztés PONTOS, a kovariancia elvileg nem
+            # becsülhető — a SciPy erre OptimizeWarning-ot ad. Ez nem hiba, a
+            # kovarianciát nem is használjuk. Több pontnál a jelzés megmarad.
+            if len(scales) == 3:
+                warnings.simplefilter("ignore", OptimizeWarning)
+            popt, _ = curve_fit(_exp_model, scales, vals, p0=p0, maxfev=5000)
         extrapolated = float(_exp_model(0.0, *popt))
         fitted = _exp_model(scales, *popt)
         residuals = float(np.sum((vals - fitted) ** 2))
         return extrapolated, residuals
-    except Exception:
+    except (RuntimeError, ValueError) as exc:
+        # A tartalék NEM csendes: az eredményrekord „exponential” címkét kap,
+        # ezért jelezni kell, hogy valójában másodfokú illesztés történt.
+        warnings.warn(
+            f"az exponenciális illesztés nem konvergált ({exc}); "
+            f"másodfokú polinomiális tartalék használva",
+            RuntimeWarning,
+            stacklevel=2,
+        )
         return polynomial_extrapolate(scale_factors, values, deg=2)
 
 

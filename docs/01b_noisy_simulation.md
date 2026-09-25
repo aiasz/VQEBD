@@ -74,6 +74,15 @@ Futásidő: 5.315 s
 Konfiguráció-ujjlenyomat: b10bff4dce6b
 ```
 
+> **Javítás (v0.7.1):** a fenti kimenet a v0.3.0–v0.7.0 kóddal készült. Az akkori
+> Aer-mintavétel minden kiértékelésnél ugyanazt a z·σ ≈ +15.9 mHa eltolást adta,
+> ezért a COBYLA egy eltolt, **zajmentes** felületen konvergált (116 kiértékelés,
+> „Optimization terminated successfully”). A v0.7.1 független zajjal ugyanerre a
+> parancsra −1.1105387727 Ha-t (+26.8 mHa, 78 kiértékelés) ad. A H₂ korrelációs
+> energiája (20.3 mHa) ~1.8σ egyetlen kiértékelés zajához képest, így egy
+> zajos futás ezt nem oldja fel megbízhatóan. Részletek:
+> [TR-F01B 6. szakasz](testing/TR-F01B_noisy_simulation.md).
+
 ---
 
 ## 3. Fontos architekturális tanulságok

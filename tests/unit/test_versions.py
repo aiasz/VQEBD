@@ -63,3 +63,10 @@ def test_environment_fingerprint_is_a_sha256_hex_digest() -> None:
 def test_environment_fingerprint_is_stable_within_a_run() -> None:
     """Ugyanabban a környezetben kétszer hívva ugyanazt adja."""
     assert environment_fingerprint() == environment_fingerprint()
+
+
+def test_own_version_is_tracked() -> None:
+    """A kódverzió a rekord része (v0.7.1): mintavételi modell-váltás azonos függőségek mellett."""
+    from vqebd import __version__
+
+    assert package_versions()["vqebd"] == __version__

@@ -258,3 +258,60 @@ def test_mismatched_qubit_count_raises_value_error() -> None:
 
     with pytest.raises(ValueError, match="eltér"):
         AerNoisyEnergyEvaluator(qc, op, seeds)
+
+
+# --- TC-1B10: a mintavételi zaj FÜGGETLEN kiértékelésenként (v0.7.1) ------------
+#
+# Regressziós tesztek a v0.7.0 hibájára: az Aer EstimatorV2 minden run()-nál
+# ugyanabból a seedből húzott, így minden kiértékelés ugyanazt a z·σ eltolást
+# kapta (a „lövészaj" valójában állandó torzítás volt). Lásd TR-F03, 1. javítási kör.
+
+
+def _h2_ansatz() -> tuple[Any, Any, SeedSet]:
+    seeds = SeedSet.derive(20260922)
+    structure = build_electronic_structure(h2(H2_REFERENCE_BOND_LENGTH))
+    hamiltonian = map_to_qubits(structure, "parity", two_qubit_reduction=True)
+    from vqebd.config import AnsatzSpec
+
+    ansatz = build_ansatz(structure, hamiltonian, AnsatzSpec(kind="uccsd"), seeds)
+    return ansatz.circuit, hamiltonian.operator, seeds
+
+
+@pytest.mark.parametrize("cls", [AerShotEnergyEvaluator, AerNoisyEnergyEvaluator])
+def test_tc_1b10_sampling_noise_is_independent_per_evaluation(cls: Any) -> None:
+    """Azonos θ-nál az egymást követő kiértékelések zaja független és σ szórású."""
+    import numpy as np
+
+    circuit, observable, seeds = _h2_ansatz()
+    theta = [0.0] * circuit.num_parameters
+    evaluator = cls(circuit, observable, seeds)
+    samples = np.array([evaluator.evaluate(theta) for _ in range(300)])
+    exact = cls(circuit, observable, seeds, precision=0.0).evaluate(theta)
+
+    assert len(set(samples.tolist())) == len(samples), "ismétlődő zajhúzás"
+    sigma = 1.0 / np.sqrt(8192)
+    # 300 minta: a szórás becslésének relatív hibája ~ 1/sqrt(2·299) ≈ 4%.
+    assert samples.std(ddof=1) == pytest.approx(sigma, rel=0.15)
+    # Az átlag torzítatlan: |átlag − egzakt| < 4 standard hiba.
+    assert abs(samples.mean() - exact) < 4 * sigma / np.sqrt(len(samples))
+
+
+@pytest.mark.parametrize("cls", [AerShotEnergyEvaluator, AerNoisyEnergyEvaluator])
+def test_tc_1b10_sampling_sequence_is_reproducible(cls: Any) -> None:
+    """Azonos seed → bitre azonos zajsorozat (ADR-0005 determinizmus)."""
+    circuit, observable, seeds = _h2_ansatz()
+    theta = [0.0] * circuit.num_parameters
+    a = cls(circuit, observable, seeds)
+    b = cls(circuit, observable, seeds)
+    assert [a.evaluate(theta) for _ in range(5)] == [b.evaluate(theta) for _ in range(5)]
+
+
+@pytest.mark.parametrize("cls", [AerShotEnergyEvaluator, AerNoisyEnergyEvaluator])
+def test_tc_1b10_zero_precision_is_exact_and_negative_rejected(cls: Any) -> None:
+    """precision=0 → determinisztikus egzakt érték; negatív precision → ValueError."""
+    circuit, observable, seeds = _h2_ansatz()
+    theta = [0.0] * circuit.num_parameters
+    exact = cls(circuit, observable, seeds, precision=0.0)
+    assert exact.evaluate(theta) == exact.evaluate(theta)
+    with pytest.raises(ValueError, match="precision"):
+        cls(circuit, observable, seeds, precision=-1e-3)

@@ -21,7 +21,10 @@ from typing import Any
 from vqebd.mitigation.base import MitigationResult, MitigationStrategy
 from vqebd.seeds import SeedSet
 
-__all__ = ["MitiqZneMitigation"]
+__all__ = ["MITIQ_LOGICAL_BASIS", "MitiqZneMitigation"]
+
+MITIQ_LOGICAL_BASIS: tuple[str, ...] = ("rz", "sx", "x", "cx")
+"""A Mitiq-nek átadott logikai áramkör kapukészlete (QASM 2-ben kifejezhető)."""
 
 
 class MitiqZneMitigation(MitigationStrategy):
@@ -54,52 +57,99 @@ class MitiqZneMitigation(MitigationStrategy):
         parameters: Sequence[float],
         seeds: SeedSet,
     ) -> MitigationResult:
+        """Mitiq ZNE a megadott paramétereknél.
+
+        Lépések (a TR-000 spike M1 lépésének módszere):
+
+        1. A paraméterek **bekötése** — a Mitiq QASM-en át konvertál, ami kötetlen
+           paramétert nem visz át.
+        2. Logikai kapukészletre fordítás (``rz, sx, x, cx``, ``level=1``).
+        3. ``mitiq.zne.scaling.fold_global`` hajtogat; az executor a hajtogatott
+           logikai áramkört **optimalizálás nélkül** (``level=0``) fordítja a
+           célhardverre, hogy a hajtogatás megmaradjon.
+        4. A skálázott energiákat és a zajszorzókat a Mitiq ``Factory``-ból
+           olvassuk ki — **valódi** mért értékek, nem helykitöltők.
+        """
         try:
             import mitiq
-            from mitiq.zne import execute_with_zne
             from mitiq.zne.scaling import fold_global
         except ImportError as exc:
             raise ImportError(
                 "A 'zne_mitiq' stratégia a 'mitiq' csomagot igényli. "
-                "Telepítés: pip install mitiq (vagy használd a beépített 'zne_local'-t)."
+                "Telepítés: pip install -r requirements-mitiq.txt "
+                "(vagy használd a beépített 'zne_local'-t)."
             ) from exc
 
-        scales = list(self.scale_factors)
-        # Extrapolációs modell kiválasztása a Mitiq-ből
+        from qiskit import transpile
+
+        from vqebd.backends.estimators import IsaEnergyEvaluator, make_energy_evaluator
+        from vqebd.mitigation.folding import count_two_qubit_gates
+
+        scales = [float(s) for s in self.scale_factors]
+        inference = mitiq.zne.inference
         extrap_map = {
-            "richardson": mitiq.zne.inference.RichardsonFactory(scale_factors=scales),
-            "linear": mitiq.zne.inference.LinearFactory(scale_factors=scales),
-            "poly": mitiq.zne.inference.PolyFactory(scale_factors=scales, order=2),
-            "quadratic": mitiq.zne.inference.PolyFactory(scale_factors=scales, order=2),
-            "exponential": mitiq.zne.inference.ExpFactory(scale_factors=scales),
+            "richardson": lambda: inference.RichardsonFactory(scale_factors=scales),
+            "linear": lambda: inference.LinearFactory(scale_factors=scales),
+            "poly": lambda: inference.PolyFactory(scale_factors=scales, order=2),
+            "quadratic": lambda: inference.PolyFactory(scale_factors=scales, order=2),
+            "exponential": lambda: inference.ExpFactory(scale_factors=scales),
         }
-        factory = extrap_map.get(self.extrapolator.lower())
-        if factory is None:
-            factory = mitiq.zne.inference.RichardsonFactory(scale_factors=scales)
+        make_factory = extrap_map.get(self.extrapolator.lower())
+        if make_factory is None:
+            raise ValueError(
+                f"ismeretlen extrapolátor a zne_mitiq számára: {self.extrapolator!r} "
+                f"(ismert: {', '.join(sorted(extrap_map))})"
+            )
+        factory = make_factory()
 
-        def executor(qc_to_run: Any) -> float:
-            from vqebd.backends.estimators import make_energy_evaluator
-
-            ev = make_energy_evaluator(evaluator.kind, qc_to_run, observable, seeds)
-            return ev.evaluate(parameters)
-
-        mitigated_energy = execute_with_zne(
-            circuit,
-            executor,
-            scale_noise=fold_global,
-            factory=factory,
+        bound = circuit.assign_parameters(list(parameters))
+        logical = transpile(
+            bound,
+            basis_gates=list(MITIQ_LOGICAL_BASIS),
+            optimization_level=1,
+            seed_transpiler=seeds.transpiler,
         )
 
-        # Nyers érték kiértékelése
-        raw_val = evaluator.evaluate(parameters)
+        if isinstance(evaluator, IsaEnergyEvaluator):
+
+            def executor(qc_to_run: Any) -> float:
+                return float(evaluator.evaluate_logical(qc_to_run))
+
+        else:
+
+            def executor(qc_to_run: Any) -> float:
+                ev = make_energy_evaluator(evaluator.kind, qc_to_run, observable, seeds)
+                return float(ev.evaluate(()))
+
+        # A Mitiq az executor visszatérési ANNOTÁCIÓJÁBÓL következtet a kimenet
+        # típusára. A modul `from __future__ import annotations` miatt az annotáció
+        # itt a "float" SZÖVEG lenne, amit a Mitiq nem ismer fel (mért hiba:
+        # "Could not parse executed results from executor with type float").
+        executor.__annotations__["return"] = float
+        factory.run(logical, executor, scale_noise=fold_global)
+        mitigated_energy = float(factory.reduce())
+        measured_scales = [float(x) for x in factory.get_scale_factors()]
+        scaled_energies = [float(x) for x in factory.get_expectation_values()]
+
+        two_q_counts = [count_two_qubit_gates(fold_global(logical, scale_factor=s)) for s in scales]
+        raw_val = (
+            scaled_energies[measured_scales.index(1.0)]
+            if 1.0 in measured_scales
+            else float(evaluator.evaluate(parameters))
+        )
 
         return MitigationResult(
-            mitigated_energy=float(mitigated_energy),
+            mitigated_energy=mitigated_energy,
             raw_energy=raw_val,
-            scale_factors=tuple(float(s) for s in self.scale_factors),
-            scaled_energies=tuple(float(raw_val) for _ in self.scale_factors),  # fallback alak
+            scale_factors=tuple(measured_scales),
+            scaled_energies=tuple(scaled_energies),
             strategy_name=self.name,
             extrapolator_name=self.extrapolator,
             fit_residuals=None,
-            metadata={"library": "mitiq"},
+            metadata={
+                "library": "mitiq",
+                "mitiq_version": str(mitiq.__version__),
+                "folding_level": "logical",
+                "two_qubit_gate_counts": two_q_counts,
+            },
         )
