@@ -12,8 +12,71 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 5** — batch futtatás és molekuláris skálázás (LiH, BeH2) (`v0.8.0`).
+- **Fázis 5.H** — H₂ disszociációs görbe valódi QPU-n (`scripts/run_hardware_pes.py`),
+  amint az IBM-kvóta újra elérhető (mérve: 2026-10-21).
 - **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
+
+---
+
+## [0.8.0] — 2026-09-25 — **fejlesztés alatt, nem lezárt kiadás**
+
+**Fázis 5 — batch-futtatás, aktív tér, ismétlésen alapuló statisztika (részállapot).**
+
+A fázis **nincs lezárva**; nincs `v0.8.0` címke. A hátralévő lépéseket és a
+2026-10-21-i folytatást a [`docs/plan/phase_05_allapot.md`](docs/plan/phase_05_allapot.md) írja le.
+
+### Hozzáadva
+- **Aktív tér:** `ActiveSpaceSpec`, `energy_offset` (magtaszítás + inaktív energia),
+  L0′ CASCI-referencia (PySCF). L1 ↔ CASCI ≤ 4·10⁻¹⁴ Ha. A mért választás a
+  frozen core: LiH (2e,5o) 0.23 mHa, BeH₂ (4e,6o) 0.34 mHa csonkolással
+  (`phase_05.md` 2.).
+- **`vqebd.stats`:** Student-t alapú CI, négyállapotú kémiai pontossági
+  besorolás (`confirmed` / `consistent` / `excluded` / `undetermined`),
+  blokkátlag-alapú SEM(N), hibaköltségvetés (ADR-0007).
+- **`vqebd.batch`:** konfigurációs mátrix (preset-ek), determinisztikus `run_id`,
+  folytatható és hibaizolált végrehajtás, csoportos aggregálás. CLI:
+  `scripts/run_batch.py`.
+- **Újramintavételezés** (`VQEConfig.reestimate`): K friss kiértékelés θ_opt-ban;
+  a rekord tárolja az optimalizáló végértékét és az előzmény-minimumot is.
+- **Adatséma v2** 11 új oszloppal, automatikus v1 → v2 migrációval.
+- **Hardveres védőkorlátok** (`vqebd.hardware`): explicit engedély és
+  **kvóta-előellenőrzés beküldés előtt**. `IBMQpuEnergyEvaluator.evaluate_observables`:
+  több PUB egy jobban. `scripts/run_hardware_pes.py` (H₂ PES, `--dry-run`).
+- **Ábrák:** `fig08_ismetles`. A `fig07`/`fig09` kódja kész, az adatuk a
+  determinisztikus batch-től függ. A generátor új kapcsolója: `--replot`.
+- `ADR-0007`, `phase_05.md`, `TP-F05`, `phase_05_allapot.md`; hivatkozásjegyzék
+  1.1.0 (+[student1908], +[wecker2015]).
+
+### Mért (részeredmények)
+- **Statisztikai batch** (180 futás, `f5_statistical.json`): egyik zajos
+  konfiguráció sem kémiailag pontos (mind `excluded`). A lövészajos H₂ hibája
+  +11.6 ± 1.9 mHa, ez **optimalizálási** eredetű. A ZNE +38.2 → +11.5 mHa-re
+  javít. A LiH (2e,3o) zajosan +466 mHa: az UCCSD mélységi fala.
+- **Ismétlés (fig08):** SEM ∝ N^−½ (mért meredekség −0.48 … −0.55); a torzítás
+  N-től független.
+- **Valódi kiválasztási torzítás** (előzmény-minimum − friss átlag):
+  −25.5 mHa (H₂), −30.8 mHa (LiH).
+
+### Változott
+- `within_backend_tolerance` és `satisfies_variational_principle`: az L1-hez mér
+  (`method_error`). Teljes térben ez numerikusan azonos a korábbival; aktív térben
+  a csonkolás nem torzítja.
+- `tests/repo/test_project_structure.py`: a `data/` teszt a git-követést és a
+  `.gitignore`-szabályokat ellenőrzi, nem a futásidejű fájlok puszta létezését.
+
+### Javítva
+- **A v0.7.1 „kiválasztási torzítás” magyarázata téves volt** (TR-F01B 6.3,
+  TR-F04, mesterterv R14, README). A SciPy COBYLA a végponti utolsó értéket adja
+  vissza, nem az előzmény-minimumot. A −4.82 mHa-es L3a-érték ezért egyetlen
+  zajos húzás (statisztikus), nem kiválasztás. A dokumentumok javítva, a mező
+  neve `optimizer_final_ha` lett.
+- `scripts/gen_references.py`: álnévnél (Student) nincs „Student, .” alak; a
+  változásnapló és az online források ellenőrzési dátuma nem íródik felül.
+
+### Elhalasztva
+- **5.H — hardveres H₂ PES:** jóváhagyva, de az IBM-kvóta kimerült (630/600 s,
+  újra elérhető 2026-10-21). A kvóta-előellenőrzés megtagadta a beküldést, **job
+  nem keletkezett**.
 
 ---
 

@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | **Dokumentum** | `docs/references.md` |
-| **Dokumentum-verzió** | 1.0.0 |
-| **Dátum** | 2026-09-22 |
+| **Dokumentum-verzió** | 1.1.0 |
+| **Dátum** | 2026-09-25 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Generálta** | `scripts/gen_references.py` |
-| **Tételek** | 37 db, ebből **35** gépileg DOI-validált |
+| **Tételek** | 39 db, ebből **37** gépileg DOI-validált |
 
 ---
 
@@ -207,6 +207,17 @@ Az idézési év a **lapszám** éve (`published-print`), nem az online-first d�
   *Felhasználás:* FAIR alapelvek — a Fázis 4 adatséma és a Fázis 9 publikálás irányelve.
 
 
+## Statisztika és mérési módszertan
+
+**[student1908]** Student (1908). The Probable Error of a Mean. *Biometrika*, **6** 1.
+  DOI: [10.2307/2331554](https://doi.org/10.2307/2331554)
+  *Felhasználás:* A t-eloszlás: kis mintás (N seed) konfidencia-intervallum (vqebd.stats, ADR-0007).
+
+**[wecker2015]** Wecker, D., Hastings, M., Troyer, M. (2015). Progress towards practical quantum variational algorithms. *Physical Review A*, **92** 042303.
+  DOI: [10.1103/physreva.92.042303](https://doi.org/10.1103/physreva.92.042303)
+  *Felhasználás:* A VQE mérési költsége és a lövészaj skálázása; az ismétlés/lövésszám tervezés alapja.
+
+
 ---
 
 ## Felhasznált szoftverek
@@ -261,5 +272,6 @@ eredményrekord `*_version` mezői rögzítik. Az indoklást lásd:
 | Verzió | Dátum | Változás |
 |---|---|---|
 | 1.0.0 | 2026-09-22 | Első kiadás. 37 tétel, ebből 35 gépileg DOI-validált. |
+| 1.1.0 | 2026-09-25 | Fázis 5: +2 tétel (student1908, wecker2015) — statisztika és mérési módszertan. |
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

@@ -47,8 +47,8 @@ lett a rendszerbe.
 tartalma (friss adatbázisból, 2026-09-25). A rekordok `versions_json` mezője
 v0.7.1 óta a `vqebd` saját verzióját is tartalmazza.*
 
-¹ Kiválasztási torzítás: a COBYLA (maxiter = 50) a zajos célfüggvény kedvező
-húzásait választja ki (TR-F01B 6.3). ² 1σ-n belüli statisztikus ingadozás
+¹ Statisztikus: a COBYLA visszaadott értéke egyetlen zajos húzás a végpontban
+(σ ≈ 11 mHa; TR-F01B 6.3, javított szöveg). ² 1σ-n belüli statisztikus ingadozás
 (TR-F02 v1.1.0, 2.1). A „❌” itt nem kódhiba, hanem a rekord **helyes**, számított
 jelzője; a v0.7.0 ezt kézzel `1`-re írta.
 

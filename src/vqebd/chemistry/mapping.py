@@ -55,7 +55,11 @@ class QubitHamiltonian:
         num_qubits: Az operátor qubit-száma.
         num_terms: A Pauli-tagok száma. A mérési költség ezzel arányos, ezért
             a benchmark szempontjából lényeges mennyiség.
-        nuclear_repulsion_energy: A konstans magtaszítás (Ha), kényelmi másolat.
+        nuclear_repulsion_energy: A magtaszítás (Ha), kényelmi másolat — tárolásra.
+        energy_offset: A konstans eltolás (Ha), amelyet az elektronos energiához
+            adni kell: magtaszítás + aktív térben az inaktív elektronok energiája
+            (Fázis 5). **Minden teljesenergia-számítás ezt használja**, nem a
+            ``nuclear_repulsion_energy``-t; teljes térben a kettő bitre egyenlő.
     """
 
     operator: Any
@@ -65,6 +69,7 @@ class QubitHamiltonian:
     num_qubits: int
     num_terms: int
     nuclear_repulsion_energy: float
+    energy_offset: float
 
     def summary(self) -> str:
         """Egysoros, naplóba illő összefoglaló."""
@@ -141,4 +146,5 @@ def map_to_qubits(
         num_qubits=int(operator.num_qubits),
         num_terms=len(operator),
         nuclear_repulsion_energy=structure.nuclear_repulsion_energy,
+        energy_offset=structure.energy_offset,
     )

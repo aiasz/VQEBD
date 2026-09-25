@@ -96,8 +96,13 @@ Konfiguráció (a v0.7.0 image-ben pontosan reprodukálva):
   HF-energia + zaj). Ez **fizikai korlát**, nem optimalizáló-hiba.
 - Egyetlen zajos VQE-futás végeredménye **egy minta** egy széles eloszlásból.
   Ugyanez a konfiguráció `maxiter=50`-nel (a Fázis 4 exportja) −4.82 mHa-t adott,
-  vagyis a variációs határ **alá** került. Ez a zajos célfüggvény minimumának
-  kiválasztási torzítása: az optimalizáló a kedvező zajhúzásokat „választja ki”.
+  vagyis a variációs határ **alá** került. Ennek oka **statisztikus**: a SciPy
+  COBYLA visszaadott értéke a végpontban mért utolsó érték, azaz egyetlen zajos
+  húzás (σ ≈ 11 mHa).
+  *Javítva (2026-09-25):* ennek a pontnak az első változata „kiválasztási
+  torzítást” írt. A Fázis 5 mérése szerint ez téves: a COBYLA `fun` értéke az
+  előzmények **utolsó** eleme, nem a minimuma. Kiválasztási torzítást az
+  előzmény-minimum közlése okozna (H₂-n mérve: −20…−37 mHa); a VQEBD ezt nem teszi.
 - **Következmény a benchmarkra:** zajos szinteken a végső energiát
   (1) a θ-ban **független újramintavételezéssel**, (2) **több seed** átlagaként,
   szórással/SEM-mel kell közölni. Ez a Fázis 5 módszertani alapja

@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import time
 import warnings
+from typing import Any
 
 from vqebd.backends.estimators import make_energy_evaluator
 from vqebd.chemistry.mapping import map_to_qubits
@@ -40,7 +41,7 @@ from vqebd.seeds import SeedSet
 from vqebd.versions import environment_fingerprint, package_versions
 from vqebd.vqe.ansatz import build_ansatz
 from vqebd.vqe.optimizer import minimize_energy
-from vqebd.vqe.result import VQEResult
+from vqebd.vqe.result import ReestimateResult, VQEResult
 
 __all__ = ["run_vqe"]
 
@@ -71,7 +72,7 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     if incompatibility is not None:
         warnings.warn(incompatibility, RuntimeWarning, stacklevel=2)
 
-    structure = build_electronic_structure(config.molecule)
+    structure = build_electronic_structure(config.molecule, config.active_space)
     hamiltonian = map_to_qubits(
         structure, config.mapper, two_qubit_reduction=config.two_qubit_reduction
     )
@@ -81,7 +82,11 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     evaluator = make_energy_evaluator(config.backend, ansatz.circuit, hamiltonian.operator, seeds)
     outcome = minimize_energy(evaluator, ansatz.initial_point, config.optimizer)
 
-    mitigation_res = None
+    # A konstans eltolás: magtaszítás + aktív térben az inaktív energia (Fázis 5).
+    # NEM a `nuclear_repulsion_energy` — aktív térben az Hartree-nagyságrendű hiba lenne.
+    offset = hamiltonian.energy_offset
+
+    strategy = None
     if config.mitigation.strategy != "none":
         from vqebd.mitigation import get_mitigation_strategy
 
@@ -90,18 +95,38 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
             scale_factors=config.mitigation.scale_factors,
             extrapolator=config.mitigation.extrapolator,
         )
-        mitigation_res = strategy.execute(
-            ansatz.circuit,
-            hamiltonian.operator,
-            evaluator,
-            outcome.parameters,
-            seeds,
+
+    def estimate_once() -> tuple[float, Any]:
+        """Egy (friss) energiabecslés θ_opt-ban: hibaenyhítve vagy nyersen."""
+        if strategy is None:
+            return evaluator.evaluate(outcome.parameters), None
+        result = strategy.execute(
+            ansatz.circuit, hamiltonian.operator, evaluator, outcome.parameters, seeds
         )
-        electronic = mitigation_res.mitigated_energy
-        total = electronic + hamiltonian.nuclear_repulsion_energy
+        return result.mitigated_energy, result
+
+    mitigation_res = None
+    reestimate: ReestimateResult | None = None
+    if config.reestimate:
+        # Független újramintavételezés (G4): a kiértékelő RNG-je továbblép, így a
+        # K becslés friss, az optimalizáció közbeni húzásoktól független.
+        samples: list[float] = []
+        for _ in range(config.reestimate):
+            value, mres = estimate_once()
+            samples.append(value)
+            if mitigation_res is None:
+                mitigation_res = mres
+        reestimate = ReestimateResult(
+            samples_ha=tuple(v + offset for v in samples),
+            optimizer_final_ha=outcome.value + offset,
+            history_min_ha=min(outcome.history) + offset,
+        )
+        electronic = sum(samples) / len(samples)
+    elif strategy is not None:
+        electronic, mitigation_res = estimate_once()
     else:
         electronic = outcome.value
-        total = electronic + hamiltonian.nuclear_repulsion_energy
+    total = electronic + offset
 
     return VQEResult(
         energy=total,
@@ -128,4 +153,6 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
         versions=package_versions(),
         environment_fingerprint=environment_fingerprint(),
         mitigation=mitigation_res,
+        energy_offset=offset,
+        reestimate=reestimate,
     )

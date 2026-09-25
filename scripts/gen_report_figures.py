@@ -1126,6 +1126,605 @@ def figure_mitigation(data: dict[str, Any], out: Path) -> None:
     plt.close(fig)
 
 
+# ================================================================= Fázis 5
+F5_DATA = Path("docs/figures/data")
+REPETITION_SAMPLES = 1024
+"""Az ismétlés-kísérlet mintaszáma (fig08). 1024 = 2¹⁰: a legnagyobb (N = 32)
+blokkméret is 32 blokkot ad, így a blokkátlagok szórásbecslésének relatív hibája
+~1/√(2·31) ≈ 13%. (256 mintával ez 8 blokk és ~27% volt — mérve: a meredekség
+−0.41-re szórt.)"""
+
+
+def _load_batch(name: str) -> dict[str, Any]:
+    path = F5_DATA / f"{name}.json"
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"{path} hiányzik — előbb: python scripts/run_batch.py --preset "
+            f"{name.replace('_', '-')} --export {path}"
+        )
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return data
+
+
+def measure_active_space() -> dict[str, Any]:
+    """fig07 adatai az ``f5_deterministic`` exportból (mérés nélkül, származtatott)."""
+    batch = _load_batch("f5_deterministic")
+    points = [
+        {
+            "molecule": r["molecule_name"],
+            "bond_length": r["bond_length"],
+            "active_space": (
+                "teljes"
+                if r["active_electrons"] is None
+                else f"({r['active_electrons']}e,{r['active_orbitals']}o)"
+            ),
+            "backend": r["backend"],
+            "energy_ha": r["energy_ha"],
+            "full_ci_ha": r["full_ci_ha"],
+            "casci_ha": r["casci_ha"],
+            "exact_diag_ha": r["exact_diag_ha"],
+            "hartree_fock_ha": r["hartree_fock_ha"],
+            "n_function_evaluations": r["n_function_evaluations"],
+            "wall_time_s": r["wall_time_s"],
+        }
+        for r in batch["rows"]
+    ]
+    return {
+        "source": "f5_deterministic.json",
+        "vqebd_version": batch["vqebd_version"],
+        "points": points,
+    }
+
+
+def measure_repetition() -> dict[str, Any]:
+    """fig08: az ismétlés hatása — SEM ∝ N^−½, és a torzítás-padló (AC-5.6).
+
+    H₂ θ*-ban, rögzített seeddel: 256 független kiértékelés (1) lövészajjal,
+    (2) FakeManilaV2 zajjal nyersen, (3) ugyanazzal ZNE-Richardsonnal. A
+    referenciák: L2 (zajmentes), és a zajmodell szerinti egzakt várható érték
+    (``precision = 0``) nyersen és ZNE-vel — ezek a „padlók”.
+    """
+    from vqebd.backends.estimators import AerNoisyEnergyEvaluator, AerShotEnergyEvaluator
+    from vqebd.chemistry.mapping import map_to_qubits
+    from vqebd.chemistry.molecule import h2
+    from vqebd.chemistry.problem import build_electronic_structure
+    from vqebd.config import AnsatzSpec, VQEConfig
+    from vqebd.mitigation import get_mitigation_strategy
+    from vqebd.seeds import SeedSet
+    from vqebd.stats import block_mean_spread, loglog_slope
+    from vqebd.vqe.ansatz import build_ansatz
+    from vqebd.vqe.runner import run_vqe
+
+    l2 = run_vqe(VQEConfig(molecule=h2()))
+    theta = list(l2.optimal_parameters)
+    structure = build_electronic_structure(h2())
+    hamiltonian = map_to_qubits(structure, "parity", two_qubit_reduction=True)
+    seeds = SeedSet.derive(20260925)
+    ansatz = build_ansatz(structure, hamiltonian, AnsatzSpec(), seeds)
+    offset = hamiltonian.energy_offset
+    circuit, observable = ansatz.circuit, hamiltonian.operator
+
+    def err_mha(electronic: float) -> float:
+        return 1e3 * (electronic + offset - l2.energy)
+
+    # Külön seed a két sorozatnak: azonos seeddel ugyanazt a Gauss-sorozatot húznák
+    # (közös véletlen számok), és a két görbe bitre fedné egymást. Az azonos σ
+    # ettől még a `precision`-modell konvenciója: σ = 1/sqrt(8192) Ha, zajmodelltől
+    # függetlenül (ADR-0007, felülvizsgálati feltétel).
+    shot = AerShotEnergyEvaluator(circuit, observable, SeedSet.derive(20260926))
+    noisy = AerNoisyEnergyEvaluator(circuit, observable, seeds)
+    zne = get_mitigation_strategy("zne_local", scale_factors=(1, 3, 5), extrapolator="richardson")
+    samples = {
+        "shot": [err_mha(shot.evaluate(theta)) for _ in range(REPETITION_SAMPLES)],
+        "noisy_raw": [err_mha(noisy.evaluate(theta)) for _ in range(REPETITION_SAMPLES)],
+        "noisy_zne": [
+            err_mha(zne.execute(circuit, observable, noisy, theta, seeds).mitigated_energy)
+            for _ in range(REPETITION_SAMPLES)
+        ],
+    }
+    exact_noisy = AerNoisyEnergyEvaluator(circuit, observable, seeds, precision=0.0)
+    floors = {
+        "shot": 0.0,
+        "noisy_raw": err_mha(exact_noisy.evaluate(theta)),
+        "noisy_zne": err_mha(
+            zne.execute(circuit, observable, exact_noisy, theta, seeds).mitigated_energy
+        ),
+    }
+    sizes = [1, 2, 4, 8, 16, 32]
+    spread = {k: block_mean_spread(v, sizes) for k, v in samples.items()}
+    slopes = {k: loglog_slope(sizes, [s[n] for n in sizes]) for k, s in spread.items()}
+    return {
+        "theta_star": theta,
+        "l2_energy_ha": l2.energy,
+        "precision_per_evaluation_ha": 1.0 / 8192**0.5,
+        "n_samples": REPETITION_SAMPLES,
+        "block_sizes": sizes,
+        "samples_mha": samples,
+        "bias_floor_mha": floors,
+        "block_spread_mha": {k: {str(n): v for n, v in s.items()} for k, s in spread.items()},
+        "loglog_slope": slopes,
+    }
+
+
+# A hibaköltségvetés ábrájának sorai: (címke, export, molekula, R, aktív tér, backend, mitigáció)
+_BUDGET_ROWS: tuple[tuple[str, str, str, float, str, str, str], ...] = (
+    ("H₂ 0.735 Å · L2", "f5_deterministic", "H2", 0.735, "teljes", "qiskit_statevector", "none"),
+    ("H₂ 0.735 Å · lövészaj", "f5_statistical", "H2", 0.735, "teljes", "qiskit_aer_shot", "none"),
+    ("H₂ 0.735 Å · zajos", "f5_statistical", "H2", 0.735, "teljes", "qiskit_aer_noisy", "none"),
+    (
+        "H₂ 0.735 Å · ZNE lin.",
+        "f5_statistical",
+        "H2",
+        0.735,
+        "teljes",
+        "qiskit_aer_noisy",
+        "zne_local/linear",
+    ),
+    (
+        "H₂ 0.735 Å · ZNE Rich.",
+        "f5_statistical",
+        "H2",
+        0.735,
+        "teljes",
+        "qiskit_aer_noisy",
+        "zne_local/richardson",
+    ),
+    ("H₂ 1.5 Å · L2", "f5_deterministic", "H2", 1.5, "teljes", "qiskit_statevector", "none"),
+    ("H₂ 1.5 Å · zajos", "f5_statistical", "H2", 1.5, "teljes", "qiskit_aer_noisy", "none"),
+    (
+        "H₂ 1.5 Å · ZNE Rich.",
+        "f5_statistical",
+        "H2",
+        1.5,
+        "teljes",
+        "qiskit_aer_noisy",
+        "zne_local/richardson",
+    ),
+    ("LiH (2e,3o) · L2", "f5_deterministic", "LiH", 1.595, "(2e,3o)", "qiskit_statevector", "none"),
+    ("LiH (2e,3o) · zajos", "f5_statistical", "LiH", 1.595, "(2e,3o)", "qiskit_aer_noisy", "none"),
+    ("LiH (2e,5o) · L2", "f5_deterministic", "LiH", 1.595, "(2e,5o)", "qiskit_statevector", "none"),
+    (
+        "BeH₂ (2e,3o) · L2",
+        "f5_deterministic",
+        "BeH2",
+        1.33,
+        "(2e,3o)",
+        "qiskit_statevector",
+        "none",
+    ),
+    (
+        "BeH₂ (4e,6o) · L2",
+        "f5_deterministic",
+        "BeH2",
+        1.33,
+        "(4e,6o)",
+        "qiskit_statevector",
+        "none",
+    ),
+)
+
+
+def _statevector_energy_at(
+    molecule: str, bond: float, space: str, theta: list[float], cache: dict[Any, Any]
+) -> float:
+    """Zajmentes (állapotvektoros) teljes energia egy adott θ-ban — a θ_opt minősítéséhez."""
+    from vqebd.backends.estimators import StatevectorEnergyEvaluator
+    from vqebd.chemistry.mapping import map_to_qubits
+    from vqebd.chemistry.molecule import beh2, h2, lih
+    from vqebd.chemistry.problem import build_electronic_structure
+    from vqebd.config import ActiveSpaceSpec, AnsatzSpec
+    from vqebd.seeds import SeedSet
+    from vqebd.vqe.ansatz import build_ansatz
+
+    key = (molecule, bond, space)
+    if key not in cache:
+        factory = {"H2": h2, "LiH": lih, "BeH2": beh2}[molecule]
+        active = None
+        if space != "teljes":
+            e, o = space.strip("()").replace("e", "").replace("o", "").split(",")
+            active = ActiveSpaceSpec(int(e), int(o))
+        structure = build_electronic_structure(factory(bond), active)
+        hamiltonian = map_to_qubits(structure, "parity", two_qubit_reduction=True)
+        ansatz = build_ansatz(structure, hamiltonian, AnsatzSpec(), SeedSet.derive(0))
+        cache[key] = (
+            StatevectorEnergyEvaluator(ansatz.circuit, hamiltonian.operator),
+            hamiltonian.energy_offset,
+        )
+    evaluator, offset = cache[key]
+    return float(evaluator.evaluate(theta)) + float(offset)
+
+
+def measure_error_budget() -> dict[str, Any]:
+    """fig09: hibaköltségvetés a **két batch uniójából**, a zajos tag szétbontásával.
+
+    A könyvtári :class:`~vqebd.stats.ErrorBudget` a zajos szinten egyetlen tagot ad
+    (``átlag − L2``). Ez két, fizikailag különböző hatást mos össze, ezért itt,
+    a tárolt θ_opt-ok alapján, szétbontjuk:
+
+    - **optimalizálás zajban** = ``E_sv(θ_opt) − L2``: a zajos célfüggvényen a COBYLA
+      nem θ*-ban áll meg (a H₂ korrelációs energiája csak ~1.8σ);
+    - **eszközzaj-torzítás** = ``átlag(újramintavétel) − E_sv(θ_opt)``: a zajmodell
+      torzítása rögzített θ-ban (lövészajnál ez várhatóan 0).
+
+    A tagok összege továbbra is a teljes hiba (teleszkópikus).
+    """
+    import statistics
+
+    from vqebd.batch.aggregate import aggregate_rows, group_key
+
+    exports = {name: _load_batch(name) for name in ("f5_deterministic", "f5_statistical")}
+    rows_all = [row for batch in exports.values() for row in batch["rows"]]
+    groups = aggregate_rows(rows_all)
+    by_key = {g.key: g for g in groups}
+    members: dict[Any, list[dict[str, Any]]] = {}
+    for row in rows_all:
+        members.setdefault(group_key(row), []).append(row)
+
+    cache: dict[Any, Any] = {}
+    out_rows = []
+    for label, _export, molecule, bond, space, backend, mitigation in _BUDGET_ROWS:
+        match = [
+            g
+            for g in groups
+            if g.molecule == molecule
+            and abs(g.bond_length - bond) < 1e-9
+            and g.active_space_label == space
+            and g.backend == backend
+            and g.mitigation_label == mitigation
+        ]
+        if len(match) != 1:
+            raise ValueError(f"a(z) '{label}' sorhoz {len(match)} csoport illeszkedik (1 kell)")
+        g = match[0]
+        budget = g.budget.to_dict() if g.budget is not None else {}
+        entry: dict[str, Any] = {
+            "label": label,
+            "n": g.n,
+            "accuracy": g.accuracy,
+            "error_vs_fci": g.error_vs_fci.to_dict() if g.error_vs_fci else None,
+            "selection_bias_ha": g.selection_bias,
+            "truncation": budget.get("truncation"),
+            "mapping": budget.get("mapping"),
+            "ansatz": budget.get("ansatz"),
+            "optimization": None,
+            "device_bias": None,
+            "statistical": budget.get("statistical"),
+            "total": budget.get("total"),
+        }
+        l2_key = (*g.key[:4], "qiskit_statevector", "SLSQP", "none", None)
+        l2 = by_key.get(l2_key)
+        if backend != "qiskit_statevector" and l2 is not None:
+            sv = [
+                _statevector_energy_at(
+                    molecule, bond, space, json.loads(r["optimal_parameters_json"]), cache
+                )
+                for r in members[g.key]
+            ]
+            sv_mean = statistics.fmean(sv)
+            entry["optimization"] = sv_mean - l2.energy.mean
+            entry["device_bias"] = g.energy.mean - sv_mean
+        out_rows.append(entry)
+    return {"sources": sorted(exports), "rows": out_rows}
+
+
+def figure_active_space(data: dict[str, Any], out: Path) -> None:
+    """fig07: LiH és BeH₂ PES aktív térben — FCI, CASCI, VQE (3 platform) + csonkolás."""
+    import matplotlib.pyplot as plt
+
+    points = data["points"]
+    fig, axes = plt.subplots(
+        2,
+        2,
+        figsize=(12.5, 8.2),
+        facecolor=SURFACE,
+        gridspec_kw={"height_ratios": [1.6, 1.0], "hspace": 0.42, "wspace": 0.22},
+    )
+    chem = CHEMICAL_ACCURACY_HA * 1e3
+    space_style = {
+        "(2e,3o)": ("--", "o", "minimális"),
+        "(2e,5o)": ("-", "s", "frozen core"),
+        "(4e,6o)": ("-", "s", "frozen core"),
+    }
+    markers = {"qiskit_statevector": "o", "cirq_simulator": "x", "qsim": "^"}
+
+    for col, molecule in enumerate(("LiH", "BeH2")):
+        ax, ax_t = axes[0][col], axes[1][col]
+        mol_pts = [p for p in points if p["molecule"] == molecule]
+        bonds = sorted({p["bond_length"] for p in mol_pts})
+        fci = {p["bond_length"]: p["full_ci_ha"] for p in mol_pts}
+        hf = {p["bond_length"]: p["hartree_fock_ha"] for p in mol_pts}
+        ax.plot(bonds, [fci[b] for b in bonds], color=INK, lw=2.0, label="L0 Full CI", zorder=3)
+        ax.plot(
+            bonds,
+            [hf[b] for b in bonds],
+            color=INK_MUTED,
+            lw=1.0,
+            ls=":",
+            label="Hartree–Fock",
+            zorder=2,
+        )
+        for space in sorted({p["active_space"] for p in mol_pts}):
+            ls, _, name = space_style[space]
+            sp = sorted({p["bond_length"] for p in mol_pts if p["active_space"] == space})
+            cas = {p["bond_length"]: p["casci_ha"] for p in mol_pts if p["active_space"] == space}
+            ax.plot(
+                sp,
+                [cas[b] for b in sp],
+                color=INK_SECONDARY,
+                lw=1.3,
+                ls=ls,
+                marker="." if len(sp) == 1 else None,
+                label=f"L0′ CASCI {space} — {name}",
+                zorder=2,
+            )
+            for backend, marker in markers.items():
+                vq = sorted(
+                    (p["bond_length"], p["energy_ha"])
+                    for p in mol_pts
+                    if p["active_space"] == space and p["backend"] == backend
+                )
+                if vq:
+                    ax.scatter(
+                        [b for b, _ in vq],
+                        [e for _, e in vq],
+                        marker=marker,
+                        s=46,
+                        color=SERIES[backend],
+                        lw=1.4,
+                        zorder=5,
+                        facecolor="none" if marker == "o" else SERIES[backend],
+                    )
+            trunc = [1e3 * (cas[b] - fci[b]) for b in sp]
+            ax_t.plot(
+                sp, trunc, color=INK_SECONDARY, ls=ls, marker="o", ms=4, label=f"{space} — {name}"
+            )
+            for b, t in zip(sp, trunc, strict=True):
+                ax_t.annotate(
+                    f"{t:.2f}",
+                    (b, t),
+                    textcoords="offset points",
+                    xytext=(4, 4),
+                    fontsize=7.5,
+                    color=INK_SECONDARY,
+                )
+        for backend, marker in markers.items():
+            ax.scatter(
+                [],
+                [],
+                marker=marker,
+                color=SERIES[backend],
+                facecolor="none" if marker == "o" else SERIES[backend],
+                label=f"L2 VQE — {LABELS[backend]}",
+            )
+        ax.set_xlabel("Kötéshossz R (Å)", color=INK_SECONDARY, fontsize=9.5)
+        ax.set_ylabel("Energia (Ha)", color=INK_SECONDARY, fontsize=9.5)
+        style_axes(ax)
+        name = "LiH" if molecule == "LiH" else "BeH₂"
+        title(
+            ax,
+            f"{name} — aktív tér és referencialánc",
+            "a VQE pontok a saját CASCI-görbéjükön; az FCI-től a csonkolás választja el őket",
+        )
+        leg = ax.legend(frameon=False, fontsize=7.8, loc="upper right")
+        for t in leg.get_texts():
+            t.set_color(INK_SECONDARY)
+
+        ax_t.axhline(chem, color=STATUS["good"], lw=1.4, ls="--")
+        ax_t.text(
+            max(bonds),
+            chem * 1.25,
+            "kémiai pontosság (1.6 mHa)",
+            color=STATUS["good"],
+            fontsize=8,
+            ha="right",
+            va="bottom",
+            fontweight="600",
+        )
+        ax_t.set_yscale("log")
+        ax_t.set_ylim(0.05, 200)
+        ax_t.set_xlabel("Kötéshossz R (Å)", color=INK_SECONDARY, fontsize=9.5)
+        ax_t.set_ylabel("Csonkolás CASCI − FCI (mHa)", color=INK_SECONDARY, fontsize=9.5)
+        style_axes(ax_t)
+        title(ax_t, "Az aktív tér ára", "determinisztikus modellhiba — ismétléssel nem csökken")
+        leg = ax_t.legend(frameon=False, fontsize=7.8, loc="lower right")
+        for t in leg.get_texts():
+            t.set_color(INK_SECONDARY)
+
+    fig.subplots_adjust(left=0.07, right=0.985, top=0.93, bottom=0.07)
+    fig.savefig(out / "fig07_aktiv_ter.png", dpi=200, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def figure_repetition(data: dict[str, Any], out: Path) -> None:
+    """fig08: az ismétlés a szórást csökkenti (N^−½), a torzítást nem."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from scipy import stats as sps
+
+    series = {
+        "shot": ("lövészaj (zajmentes eszköz)", SERIES["qiskit_statevector"]),
+        "noisy_raw": ("FakeManilaV2, nyers", SERIES["cirq_simulator"]),
+        "noisy_zne": ("FakeManilaV2 + ZNE Richardson", SERIES["qsim"]),
+    }
+    fig, (ax_a, ax_b) = plt.subplots(
+        1, 2, figsize=(12.5, 5.4), facecolor=SURFACE, gridspec_kw={"wspace": 0.25}
+    )
+    sizes = data["block_sizes"]
+    for key, (label, color) in series.items():
+        spread = [data["block_spread_mha"][key][str(n)] for n in sizes]
+        ax_a.plot(
+            sizes,
+            spread,
+            "o",
+            color=color,
+            ms=6,
+            zorder=4,
+            label=f"{label} (meredekség {data['loglog_slope'][key]:+.2f})",
+        )
+        ref = spread[0] / np.sqrt(np.asarray(sizes, float))
+        ax_a.plot(sizes, ref, color=color, lw=1.0, ls="--", zorder=3)
+    ax_a.axhline(CHEMICAL_ACCURACY_HA * 1e3, color=STATUS["good"], lw=1.3, ls=":")
+    ax_a.text(
+        sizes[0],
+        CHEMICAL_ACCURACY_HA * 1e3 * 1.08,
+        "kémiai pontosság (1.6 mHa)",
+        ha="left",
+        va="bottom",
+        fontsize=8,
+        color=STATUS["good"],
+        fontweight="600",
+    )
+    ax_a.set_xscale("log", base=2)
+    ax_a.set_yscale("log")
+    from matplotlib.ticker import FixedLocator, FuncFormatter, NullLocator
+
+    ax_a.yaxis.set_major_locator(FixedLocator([1.5, 2, 3, 5, 10, 20, 30]))
+    ax_a.yaxis.set_minor_locator(NullLocator())
+    ax_a.yaxis.set_major_formatter(FuncFormatter(lambda v, _pos: f"{v:g}"))
+    ax_a.xaxis.set_major_formatter(FuncFormatter(lambda v, _pos: f"{v:g}"))
+    ax_a.set_xlabel(
+        "Ismétlésszám N (átlagolt független kiértékelés)", color=INK_SECONDARY, fontsize=9.5
+    )
+    ax_a.set_ylabel("Az N-es átlag szórása (mHa)", color=INK_SECONDARY, fontsize=9.5)
+    style_axes(ax_a, grid_axis="both")
+    title(
+        ax_a,
+        "1 · Az ismétlés a PRECIZITÁST javítja",
+        "szaggatott: elméleti σ/√N; mért meredekség ≈ −½ mindhárom zajra",
+    )
+    leg = ax_a.legend(frameon=False, fontsize=8, loc="upper right")
+    for t in leg.get_texts():
+        t.set_color(INK_SECONDARY)
+
+    n_axis = np.arange(1, data["n_samples"] + 1)
+    for key in ("noisy_raw", "noisy_zne"):
+        label, color = series[key]
+        vals = np.asarray(data["samples_mha"][key])
+        mean = np.cumsum(vals) / n_axis
+        sd = np.array([vals[: i + 1].std(ddof=1) if i else np.nan for i in range(vals.size)])
+        tcrit = sps.t.ppf(0.975, np.maximum(n_axis - 1, 1))
+        half = tcrit * sd / np.sqrt(n_axis)
+        # A t-CI N = 2–3-nál (df = 1–2, t = 12.7 / 4.3) extrém széles; N ≥ 4-től ábrázoljuk.
+        ax_b.fill_between(
+            n_axis[3:], (mean - half)[3:], (mean + half)[3:], color=color, alpha=0.18, lw=0
+        )
+        ax_b.plot(n_axis, mean, color=color, lw=1.8, label=f"{label}: futó átlag ± 95% CI")
+        floor = data["bias_floor_mha"][key]
+        ax_b.axhline(floor, color=color, lw=1.0, ls="--")
+        ax_b.text(
+            n_axis[-1],
+            floor,
+            f" torzítás {floor:+.2f} mHa",
+            color=color,
+            fontsize=8,
+            va="bottom",
+            ha="right",
+        )
+    ax_b.axhspan(
+        -CHEMICAL_ACCURACY_HA * 1e3,
+        CHEMICAL_ACCURACY_HA * 1e3,
+        color=STATUS["good"],
+        alpha=0.15,
+        lw=0,
+    )
+    ax_b.axhline(0.0, color=INK, lw=0.9)
+    ax_b.set_xscale("log", base=2)
+    ax_b.xaxis.set_major_formatter(FuncFormatter(lambda v, _pos: f"{v:g}"))
+    ax_b.set_ylim(-40, 70)
+    ax_b.set_xlabel("Ismétlésszám N", color=INK_SECONDARY, fontsize=9.5)
+    ax_b.set_ylabel("Hiba a zajmentes L2-höz (mHa)", color=INK_SECONDARY, fontsize=9.5)
+    style_axes(ax_b)
+    title(
+        ax_b,
+        "2 · A TORZÍTÁST nem — azt a módszer (ZNE) javítja",
+        "a nyers átlag a torzítás-padlóhoz tart, nem a nullához; zöld = kémiai pontosság",
+    )
+    leg = ax_b.legend(frameon=False, fontsize=8, loc="upper right")
+    for t in leg.get_texts():
+        t.set_color(INK_SECONDARY)
+
+    fig.subplots_adjust(left=0.07, right=0.985, top=0.86, bottom=0.12)
+    fig.savefig(out / "fig08_ismetles.png", dpi=200, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def figure_error_budget(data: dict[str, Any], out: Path) -> None:
+    """fig09: hibaköltségvetés-táblázat — forrásonként, színezve a nagyság szerint."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from matplotlib.colors import LinearSegmentedColormap, LogNorm
+
+    columns = [
+        ("truncation", "csonkolás\nCASCI−FCI"),
+        ("mapping", "leképezés\nL1−CASCI"),
+        ("ansatz", "ansatz\nL2−L1"),
+        ("optimization", "optimalizálás\nzajban"),
+        ("device_bias", "eszközzaj\nθ_opt-ban"),
+        ("statistical", "statisztikus\n(SEM)"),
+        ("total", "teljes\nátlag−FCI"),
+    ]
+    rows = data["rows"]
+    cmap = LinearSegmentedColormap.from_list("vqebd_blue", BLUE_RAMP)
+    norm = LogNorm(vmin=1e-3, vmax=1e2)  # mHa
+    fig, ax = plt.subplots(figsize=(12.5, 0.52 * len(rows) + 2.2), facecolor=SURFACE)
+    chem = CHEMICAL_ACCURACY_HA * 1e3
+    for i, row in enumerate(rows):
+        for j, (key, _) in enumerate(columns):
+            value = row.get(key)
+            if value is None:
+                ax.add_patch(plt.Rectangle((j, i), 1, 1, color=GRID, alpha=0.35, lw=0))
+                ax.text(
+                    j + 0.5, i + 0.5, "—", ha="center", va="center", color=INK_MUTED, fontsize=8.5
+                )
+                continue
+            mha = 1e3 * value
+            mag = max(abs(mha), 1e-3)
+            face = cmap(norm(mag))
+            ax.add_patch(plt.Rectangle((j, i), 1, 1, color=face, lw=0))
+            dark = norm(mag) > 0.55
+            over = abs(mha) >= chem and key != "statistical"
+            text = f"{mha:+.2e}" if abs(mha) < 1e-2 else f"{mha:+.2f}"
+            ax.text(
+                j + 0.5,
+                i + 0.5,
+                text + (" ▲" if over else ""),
+                ha="center",
+                va="center",
+                fontsize=8.3,
+                color=SURFACE if dark else INK,
+                fontweight="700" if over else "normal",
+            )
+        ax.text(
+            len(columns) + 0.08,
+            i + 0.5,
+            f"n={row['n']} · {row['accuracy']}",
+            va="center",
+            fontsize=8.3,
+            color=INK_SECONDARY,
+        )
+    ax.set_xlim(0, len(columns) + 1.6)
+    ax.set_ylim(len(rows), 0)
+    ax.set_xticks(np.arange(len(columns)) + 0.5)
+    ax.set_xticklabels([c[1] for c in columns], fontsize=8.8, color=INK_SECONDARY)
+    ax.xaxis.tick_top()
+    ax.set_yticks(np.arange(len(rows)) + 0.5)
+    ax.set_yticklabels([r["label"] for r in rows], fontsize=8.8, color=INK_SECONDARY)
+    for side in ("top", "right", "bottom", "left"):
+        ax.spines[side].set_visible(False)
+    ax.tick_params(length=0)
+    ax.set_title(
+        "Hibaköltségvetés (mHa) — ▲ = a kémiai pontosság (1.6 mHa) fölött; "
+        "szín: |érték| log-skálán",
+        color=INK,
+        fontsize=11.5,
+        fontweight="600",
+        loc="left",
+        pad=46,
+    )
+    fig.subplots_adjust(left=0.19, right=0.99, top=0.84, bottom=0.03)
+    fig.savefig(out / "fig09_hibakoltsegvetes.png", dpi=200, facecolor=SURFACE)
+    plt.close(fig)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--out", default=Path("docs/figures"), type=Path)
@@ -1134,6 +1733,11 @@ def main(argv: list[str] | None = None) -> int:
         "--only",
         default=None,
         help="csak a megnevezett mérés/ábra (pl. mitigacio); a többi adat érintetlen marad",
+    )
+    parser.add_argument(
+        "--replot",
+        action="store_true",
+        help="nincs újramérés: a mentett docs/figures/data/<név>.json-ból rajzol",
     )
     args = parser.parse_args(argv)
 
@@ -1151,6 +1755,11 @@ def main(argv: list[str] | None = None) -> int:
         ("optimalizalo_matrix", measure_optimizer_matrix, figure_optimizer_matrix),
         ("disszociacio", measure_dissociation, figure_dissociation),
         ("mitigacio", measure_mitigation, figure_mitigation),
+        # Fázis 5 — az aktiv_ter és a hibakoltsegvetes a batch-exportokból dolgozik
+        # (scripts/run_batch.py), az ismetles saját, rögzített seedű mérés.
+        ("aktiv_ter", measure_active_space, figure_active_space),
+        ("ismetles", measure_repetition, figure_repetition),
+        ("hibakoltsegvetes", measure_error_budget, figure_error_budget),
     ]
     if not args.quick:
         steps.append(("skalazas", measure_scaling, figure_scaling))
@@ -1160,13 +1769,18 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(f"ismeretlen mérés: {args.only!r}")
 
     for name, measure, draw in steps:
-        print(f"[mérés] {name} …", flush=True)
+        data_file = data_dir / f"{name}.json"
         started = time.perf_counter()
-        measured = measure()
+        if args.replot:
+            print(f"[adat ] {name} ← {data_file}", flush=True)
+            measured = json.loads(data_file.read_text(encoding="utf-8"))
+        else:
+            print(f"[mérés] {name} …", flush=True)
+            measured = measure()
+            data_file.write_text(
+                json.dumps(measured, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n"
+            )
         elapsed = time.perf_counter() - started
-        (data_dir / f"{name}.json").write_text(
-            json.dumps(measured, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n"
-        )
         draw(measured, out)
         print(f"[ábra ] {name} kész ({elapsed:.1f} s)", flush=True)
 

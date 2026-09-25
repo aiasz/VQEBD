@@ -255,6 +255,19 @@ ENTRIES: list[tuple[str, str | None, str, str]] = [
         "Adatkezelés",
         "FAIR alapelvek — a Fázis 4 adatséma és a Fázis 9 publikálás irányelve.",
     ),
+    # --- Statisztika és mérési módszertan (Fázis 5) ---
+    (
+        "student1908",
+        "10.2307/2331554",
+        "Statisztika és mérési módszertan",
+        "A t-eloszlás: kis mintás (N seed) konfidencia-intervallum (vqebd.stats, ADR-0007).",
+    ),
+    (
+        "wecker2015",
+        "10.1103/PhysRevA.92.042303",
+        "Statisztika és mérési módszertan",
+        "A VQE mérési költsége és a lövészaj skálázása; az ismétlés/lövésszám tervezés alapja.",
+    ),
     # --- DOI nélküli tételek ---
     ("kraft1988", None, "Optimalizálók", "Az SLSQP algoritmus eredeti technikai jelentése."),
     (
@@ -389,8 +402,10 @@ def resolve(key: str, doi: str | None) -> tuple[Record, JsonDict | None]:
         return dict(MANUAL[key]), None
     try:
         raw = fetch_crossref(doi)
+        # Álnévnél (pl. „Student”, 1908) nincs utónév: ilyenkor csak a családnév.
         names = [
-            f"{a.get('family', '?')}, {a.get('given', '')[:1]}." for a in raw.get("author") or []
+            f"{a.get('family', '?')}, {a['given'][:1]}." if a.get("given") else a.get("family", "?")
+            for a in raw.get("author") or []
         ]
         # Az idézési év a lapszám éve (published-print), ha van; különben az issued dátum.
         dates = raw.get("published-print", {}).get("date-parts") or raw.get("issued", {}).get(
@@ -455,6 +470,24 @@ def citation_line(rec: Record) -> str:
     return " ".join(parts).replace("* **", "*, **").rstrip(".") + "."
 
 
+DOC_VERSION = "1.1.0"
+"""A jegyzék dokumentum-verziója; új tételnél lép (``00_master_plan.md`` 8.3)."""
+
+CHANGELOG_ROWS: list[tuple[str, str, str]] = [
+    ("1.0.0", "2026-09-22", "Első kiadás. 37 tétel, ebből 35 gépileg DOI-validált."),
+    (
+        "1.1.0",
+        "2026-09-25",
+        "Fázis 5: +2 tétel (student1908, wecker2015) — statisztika és mérési módszertan.",
+    ),
+]
+"""A jegyzék változásnaplója. Kézzel vezetett: a generálás dátuma nem írja felül."""
+
+ONLINE_CHECKED = "2026-09-22"
+"""Az online források utolsó (kézi) ellenőrzésének napja. A generátor ezeket az
+URL-eket NEM ellenőrzi, ezért a generálás napja itt félrevezető lenne."""
+
+
 def render(records: dict[str, Record], today: str) -> str:
     notes = {k: n for k, _, _, n in ENTRIES}
     n_doi = sum(1 for _, d, _, _ in ENTRIES if d)
@@ -464,7 +497,7 @@ def render(records: dict[str, Record], today: str) -> str:
     add("# VQEBD — Hivatkozásjegyzék\n")
     add("| | |\n|---|---|")
     add("| **Dokumentum** | `docs/references.md` |")
-    add("| **Dokumentum-verzió** | 1.0.0 |")
+    add(f"| **Dokumentum-verzió** | {DOC_VERSION} |")
     add(f"| **Dátum** | {today} |")
     add("| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |")
     add("| **Generálta** | `scripts/gen_references.py` |")
@@ -533,16 +566,14 @@ def render(records: dict[str, Record], today: str) -> str:
     add("| Forrás | URL | Utolsó ellenőrzés |")
     add("|---|---|---|")
     for name, url in ONLINE:
-        add(f"| {name} | <{url}> | {today} |")
+        add(f"| {name} | <{url}> | {ONLINE_CHECKED} |")
     add("")
     add("---\n")
     add("## Változásnapló\n")
     add("| Verzió | Dátum | Változás |")
     add("|---|---|---|")
-    add(
-        f"| 1.0.0 | {today} | Első kiadás. {len(ENTRIES)} tétel, ebből "
-        f"{n_doi} gépileg DOI-validált. |"
-    )
+    for version, date, change in CHANGELOG_ROWS:
+        add(f"| {version} | {date} | {change} |")
     add("")
     add("*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*")
     return "\n".join(lines) + "\n"

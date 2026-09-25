@@ -169,3 +169,113 @@ def test_tc_406_schema_version_mismatch(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="sémaverzió eltérés"):
         Database(db_file)
+
+
+# --- Séma v2 és v1 → v2 migráció (AC-5.9, Fázis 5) -------------------------------
+
+
+def _make_v1_database(path: Path) -> dict[str, object]:
+    """Egy v0.7.x-kori (séma v1) adatbázis létrehozása egyetlen rekorddal."""
+    from vqebd.storage.schema import SCHEMA_V1_DDL
+
+    record: dict[str, object] = {
+        "run_id": "v1-rekord",
+        "timestamp": "2026-09-23T09:52:06Z",
+        "schema_version": 1,
+        "molecule_name": "H2",
+        "geometry": "H 0 0 0; H 0 0 0.735000",
+        "bond_length": 0.735,
+        "basis": "sto3g",
+        "mapper": "parity",
+        "two_qubit_reduction": 1,
+        "ansatz_kind": "uccsd",
+        "initial_point": "zeros",
+        "optimizer_method": "SLSQP",
+        "optimizer_maxiter": 300,
+        "n_iterations": 5,
+        "n_function_evaluations": 20,
+        "converged": 1,
+        "optimizer_message": "ok",
+        "backend": "qiskit_statevector",
+        "platform": "qiskit",
+        "precision": "complex128",
+        "energy_ha": -1.1373060357533910,
+        "electronic_energy_ha": -1.8572750302023797,
+        "nuclear_repulsion_ha": 0.7199689944489797,
+        "hartree_fock_ha": -1.116998996754004,
+        "within_chemical_accuracy": 1,
+        "satisfies_variational_principle": 1,
+        "master_seed": 20260922,
+        "seeds_json": "{}",
+        "config_hash": "f365310d0350b2e45c616047246e9c36d00684e400ae962e20a38905fc102546",
+        "environment_fingerprint": "0" * 64,
+        "versions_json": "{}",
+        "wall_time_s": 0.5,
+        "optimal_parameters_json": "[0.0, 0.0, -0.1117]",
+    }
+    conn = sqlite3.connect(path)
+    conn.executescript(SCHEMA_V1_DDL)
+    conn.execute("INSERT INTO meta (key, value) VALUES ('schema_version', '1')")
+    keys = list(record)
+    conn.execute(
+        f"INSERT INTO results ({', '.join(keys)}) VALUES ({', '.join(':' + k for k in keys)})",
+        record,
+    )
+    conn.commit()
+    conn.close()
+    return record
+
+
+def test_schema_v2_migration_preserves_v1_records(tmp_path: Path) -> None:
+    """AC-5.9: egy v1 adatbázis megnyitva v2-re migrál; a v1 rekord bitre változatlan."""
+    from vqebd.storage.schema import SCHEMA_V2_COLUMNS
+
+    db_file = tmp_path / "v1.sqlite"
+    original = _make_v1_database(db_file)
+
+    with Database(db_file) as db:
+        meta = dict(db._conn.execute("SELECT key, value FROM meta").fetchall())
+        assert meta["schema_version"] == "2"
+        assert "migrated_v1_to_v2_at" in meta
+        row = db.get_result("v1-rekord")
+        assert row is not None
+        for key, value in original.items():
+            assert row[key] == value, key
+        for name, _ in SCHEMA_V2_COLUMNS:
+            assert row[name] is None, name
+
+    # Második megnyitás: nincs újabb migráció, a naplóbejegyzés sem változik.
+    with Database(db_file) as db:
+        meta2 = dict(db._conn.execute("SELECT key, value FROM meta").fetchall())
+    assert meta2["migrated_v1_to_v2_at"] == meta["migrated_v1_to_v2_at"]
+
+
+def test_fresh_and_migrated_schemas_are_identical(tmp_path: Path) -> None:
+    """AC-5.9: a friss és a migrált adatbázis oszlopai (sorrenddel, típussal) azonosak."""
+    migrated = tmp_path / "migrated.sqlite"
+    _make_v1_database(migrated)
+    fresh = tmp_path / "fresh.sqlite"
+
+    def columns(path: Path) -> list[tuple[str, str]]:
+        with Database(path) as db:
+            return [(r["name"], r["type"]) for r in db._conn.execute("PRAGMA table_info(results)")]
+
+    assert columns(migrated) == columns(fresh)
+
+
+def test_active_space_result_is_stored_with_v2_fields(tmp_path: Path) -> None:
+    """Aktív térbeli futás: az aktív tér, a CASCI és az energiaeltolás tárolódik."""
+    from vqebd.chemistry.molecule import lih
+    from vqebd.config import ActiveSpaceSpec
+
+    cfg = VQEConfig(molecule=lih(), active_space=ActiveSpaceSpec(2, 3))
+    result = run_vqe(cfg)
+    with Database(tmp_path / "a.sqlite") as db:
+        db.insert_result(result, run_id="lih-23", batch_id="teszt", repeat_index=0)
+        row = db.get_result("lih-23")
+    assert row is not None
+    assert (row["active_electrons"], row["active_orbitals"]) == (2, 3)
+    assert row["casci_ha"] == pytest.approx(result.reference.casci)
+    assert row["energy_offset_ha"] == pytest.approx(result.offset)
+    assert row["energy_offset_ha"] != pytest.approx(row["nuclear_repulsion_ha"])
+    assert (row["batch_id"], row["repeat_index"]) == ("teszt", 0)

@@ -173,12 +173,47 @@ def test_no_stray_python_at_src_root(repo_root: Path) -> None:
     assert entries == {"vqebd"}, f"a src/ nem csak a vqebd csomagot tartalmazza: {sorted(entries)}"
 
 
+RUNTIME_DATA_DIRS = ("data/db", "data/raw", "data/exports")
+"""A futásidejű adat helye; tartalmukat a ``.gitignore`` kizárja (``dir/*``)."""
+
+
 def test_data_dir_is_not_tracked_content(repo_root: Path) -> None:
-    """A ``data/`` futásidejű; a repóban nem lehet benne adatfájl."""
+    """A ``data/`` futásidejű; a repóban nem lehet benne **verziózott** adatfájl.
+
+    A futásidejű fájlok (pl. egy batch SQLite-adatbázisa) a munkakönyvtárban
+    megengedettek, de csak a ``.gitignore`` által kizárt könyvtárakban. A v0.8.0
+    előtti változat minden helyi fájlt hibának vett, így rendeltetésszerű
+    használat (``scripts/run_batch.py --db data/db/...``) után bukott.
+
+    Ha a git elérhető (fejlesztői gép), a tényleges követést is ellenőrzi; a CI
+    konténerében nincs git, ott a szabályalapú ellenőrzés fut.
+    """
+    import shutil
+    import subprocess
+
+    gitignore = (repo_root / ".gitignore").read_text(encoding="utf-8").splitlines()
+    for directory in RUNTIME_DATA_DIRS:
+        assert f"{directory}/*" in gitignore, f"hiányzó .gitignore-szabály: {directory}/*"
+
     data = repo_root / "data"
-    offenders = [
+    outside = [
         p.relative_to(repo_root).as_posix()
         for p in data.rglob("*")
-        if p.is_file() and p.name != ".gitkeep"
+        if p.is_file()
+        and p.name != ".gitkeep"
+        and not p.relative_to(repo_root)
+        .as_posix()
+        .startswith(tuple(d + "/" for d in RUNTIME_DATA_DIRS))
     ]
-    assert not offenders, f"a data/ alatt nem lehet verziózott adatfájl: {offenders}"
+    assert not outside, f"a data/ alatt kizárt könyvtáron kívüli fájl: {outside}"
+
+    git = shutil.which("git")
+    if git is not None and (repo_root / ".git").exists():
+        tracked = subprocess.run(
+            [git, "-C", str(repo_root), "ls-files", "data"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.split()
+        offenders = [t for t in tracked if not t.endswith("/.gitkeep")]
+        assert not offenders, f"a data/ alatt nem lehet verziózott adatfájl: {offenders}"

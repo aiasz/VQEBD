@@ -5,12 +5,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T23:44:17Z",
-      "timestamp": 1790034257533,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T01:29:09Z",
+      "timestamp": 1790299749238,
+      "version": "4.1.0"
     },
     "reference-count": 37,
     "publisher": "Springer Science and Business Media LLC",
@@ -73,7 +73,7 @@
     },
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 4129,
+    "is-referenced-by-count": 4149,
     "title": [
       "A variational eigenvalue solver on a photonic quantum processor"
     ],
@@ -682,12 +682,12 @@
         [
           2026,
           9,
-          21
+          24
         ]
       ],
-      "date-time": "2026-09-21T10:28:07Z",
-      "timestamp": 1789986487754,
-      "version": "4.0.1"
+      "date-time": "2026-09-24T21:54:36Z",
+      "timestamp": 1790286876122,
+      "version": "4.1.0"
     },
     "reference-count": 96,
     "publisher": "IOP Publishing",
@@ -854,7 +854,7 @@
     "page": "023023",
     "update-policy": "https://doi.org/10.1088/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 2010,
+    "is-referenced-by-count": 2016,
     "title": [
       "The theory of variational hybrid quantum-classical algorithms"
     ],
@@ -1569,12 +1569,12 @@
         [
           2026,
           9,
-          22
+          23
         ]
       ],
-      "date-time": "2026-09-22T01:47:38Z",
-      "timestamp": 1790041658085,
-      "version": "4.0.1"
+      "date-time": "2026-09-23T10:17:59Z",
+      "timestamp": 1790158679842,
+      "version": "4.1.0"
     },
     "reference-count": 44,
     "publisher": "American Physical Society (APS)",
@@ -1698,7 +1698,7 @@
       "timestamp": 1468865335000
     },
     "source": "Crossref",
-    "is-referenced-by-count": 759,
+    "is-referenced-by-count": 760,
     "title": [
       "Scalable Quantum Simulation of Molecular Energies"
     ],
@@ -2419,12 +2419,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T08:09:58Z",
-      "timestamp": 1789978198232,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T00:42:44Z",
+      "timestamp": 1790296964816,
+      "version": "4.1.0"
     },
     "reference-count": 30,
     "publisher": "Springer Science and Business Media LLC",
@@ -2480,7 +2480,7 @@
     "page": "242-246",
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 2741,
+    "is-referenced-by-count": 2755,
     "title": [
       "Hardware-efficient variational quantum eigensolver for small molecules and quantum magnets"
     ],
@@ -3001,11 +3001,11 @@
         [
           2026,
           9,
-          21
+          23
         ]
       ],
-      "date-time": "2026-09-21T06:31:27Z",
-      "timestamp": 1789972287025,
+      "date-time": "2026-09-23T05:10:01Z",
+      "timestamp": 1790140201459,
       "version": "4.0.1"
     },
     "reference-count": 110,
@@ -3202,7 +3202,7 @@
     },
     "update-policy": "https://doi.org/10.1103/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 448,
+    "is-referenced-by-count": 450,
     "title": [
       "Quantum Chemistry Calculations on a Trapped-Ion Quantum Simulator"
     ],
@@ -4617,12 +4617,12 @@
         [
           2026,
           9,
-          15
+          23
         ]
       ],
-      "date-time": "2026-09-15T18:59:11Z",
-      "timestamp": 1789498751410,
-      "version": "build-2803163510"
+      "date-time": "2026-09-23T16:57:43Z",
+      "timestamp": 1790182663248,
+      "version": "4.1.0"
     },
     "reference-count": 88,
     "publisher": "IOP Publishing",
@@ -4758,7 +4758,7 @@
     "page": "014008",
     "update-policy": "https://doi.org/10.1088/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 622,
+    "is-referenced-by-count": 623,
     "title": [
       "Strategies for quantum computing molecular energies using the unitary coupled cluster ansatz"
     ],
@@ -5960,12 +5960,12 @@
         [
           2026,
           9,
-          20
+          23
         ]
       ],
-      "date-time": "2026-09-20T10:07:44Z",
-      "timestamp": 1789898864515,
-      "version": "4.0.1"
+      "date-time": "2026-09-23T17:38:39Z",
+      "timestamp": 1790185119657,
+      "version": "4.1.0"
     },
     "reference-count": 749,
     "publisher": "Elsevier BV",
@@ -6247,7 +6247,7 @@
     "page": "1-128",
     "update-policy": "https://doi.org/10.1016/elsevier_cm_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 996,
+    "is-referenced-by-count": 997,
     "special_numbering": "C",
     "title": [
       "The Variational Quantum Eigensolver: A review of methods and best practices"
@@ -13976,12 +13976,12 @@
         [
           2026,
           9,
-          21
+          24
         ]
       ],
-      "date-time": "2026-09-21T14:17:22Z",
-      "timestamp": 1790000242223,
-      "version": "4.0.1"
+      "date-time": "2026-09-24T23:03:08Z",
+      "timestamp": 1790290988517,
+      "version": "4.1.0"
     },
     "reference-count": 26,
     "publisher": "AIP Publishing",
@@ -14019,7 +14019,7 @@
     "page": "2657-2664",
     "update-policy": "https://doi.org/10.1063/aip-crossmark-policy-page",
     "source": "Crossref",
-    "is-referenced-by-count": 3948,
+    "is-referenced-by-count": 3953,
     "title": [
       "Self-Consistent Molecular-Orbital Methods. I. Use of Gaussian Expansions of Slater-Type Atomic Orbitals"
     ],
@@ -14404,12 +14404,12 @@
         [
           2026,
           9,
-          19
+          25
         ]
       ],
-      "date-time": "2026-09-19T12:44:40Z",
-      "timestamp": 1789821880061,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T07:07:28Z",
+      "timestamp": 1790320048081,
+      "version": "4.1.0"
     },
     "reference-count": 436,
     "publisher": "American Chemical Society (ACS)",
@@ -14631,7 +14631,7 @@
     },
     "page": "10856-10915",
     "source": "Crossref",
-    "is-referenced-by-count": 1524,
+    "is-referenced-by-count": 1530,
     "title": [
       "Quantum Chemistry in the Age of Quantum Computing"
     ],
@@ -17224,12 +17224,12 @@
         [
           2026,
           9,
-          19
+          24
         ]
       ],
-      "date-time": "2026-09-19T21:18:38Z",
-      "timestamp": 1789852718207,
-      "version": "4.0.1"
+      "date-time": "2026-09-24T03:11:04Z",
+      "timestamp": 1790219464072,
+      "version": "4.1.0"
     },
     "reference-count": 300,
     "publisher": "American Physical Society (APS)",
@@ -17340,7 +17340,7 @@
     },
     "update-policy": "https://doi.org/10.1103/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 1462,
+    "is-referenced-by-count": 1465,
     "title": [
       "Quantum computational chemistry"
     ],
@@ -19050,12 +19050,12 @@
         [
           2026,
           9,
-          22
+          25
         ]
       ],
-      "date-time": "2026-09-22T01:13:38Z",
-      "timestamp": 1790039618001,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T09:40:39Z",
+      "timestamp": 1790329239561,
+      "version": "4.1.0"
     },
     "reference-count": 74,
     "publisher": "Wiley",
@@ -19146,7 +19146,7 @@
       "timestamp": 1506601030000
     },
     "source": "Crossref",
-    "is-referenced-by-count": 1692,
+    "is-referenced-by-count": 1701,
     "title": [
       "P\n                    <scp>y</scp>\n                    SCF: the Python‐based simulations of chemistry framework"
     ],
@@ -19847,12 +19847,12 @@
         [
           2026,
           9,
-          22
+          25
         ]
       ],
-      "date-time": "2026-09-22T01:13:40Z",
-      "timestamp": 1790039620456,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T03:54:25Z",
+      "timestamp": 1790308465155,
+      "version": "4.1.0"
     },
     "reference-count": 174,
     "publisher": "AIP Publishing",
@@ -20219,7 +20219,7 @@
     },
     "update-policy": "https://doi.org/10.1063/aip-crossmark-policy-page",
     "source": "Crossref",
-    "is-referenced-by-count": 1206,
+    "is-referenced-by-count": 1211,
     "title": [
       "Recent developments in the P\n                    <scp>y</scp>\n                    SCF program package"
     ],
@@ -22656,12 +22656,12 @@
         [
           2026,
           9,
-          20
+          24
         ]
       ],
-      "date-time": "2026-09-20T04:44:28Z",
-      "timestamp": 1789879468624,
-      "version": "4.0.1"
+      "date-time": "2026-09-24T21:54:38Z",
+      "timestamp": 1790286878133,
+      "version": "4.1.0"
     },
     "reference-count": 0,
     "publisher": "Springer Science and Business Media LLC",
@@ -22714,7 +22714,7 @@
     },
     "page": "631-651",
     "source": "Crossref",
-    "is-referenced-by-count": 2342,
+    "is-referenced-by-count": 2347,
     "title": [
       "�ber das Paulische �quivalenzverbot"
     ],
@@ -22852,12 +22852,12 @@
         [
           2026,
           9,
-          20
+          24
         ]
       ],
-      "date-time": "2026-09-20T01:26:11Z",
-      "timestamp": 1789867571044,
-      "version": "4.0.1"
+      "date-time": "2026-09-24T05:25:38Z",
+      "timestamp": 1790227538487,
+      "version": "4.1.0"
     },
     "reference-count": 16,
     "publisher": "Elsevier BV",
@@ -22910,7 +22910,7 @@
     },
     "page": "210-226",
     "source": "Crossref",
-    "is-referenced-by-count": 883,
+    "is-referenced-by-count": 884,
     "title": [
       "Fermionic Quantum Computation"
     ],
@@ -23678,12 +23678,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T19:20:21Z",
-      "timestamp": 1790018421534,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T00:42:44Z",
+      "timestamp": 1790296964842,
+      "version": "4.1.0"
     },
     "reference-count": 24,
     "publisher": "American Physical Society (APS)",
@@ -23732,7 +23732,7 @@
       "timestamp": 1509706927000
     },
     "source": "Crossref",
-    "is-referenced-by-count": 1302,
+    "is-referenced-by-count": 1310,
     "title": [
       "Error Mitigation for Short-Depth Quantum Circuits"
     ],
@@ -24006,12 +24006,12 @@
         [
           2026,
           9,
-          12
+          25
         ]
       ],
-      "date-time": "2026-09-12T00:20:45Z",
-      "timestamp": 1789172445963,
-      "version": "build-2803163510"
+      "date-time": "2026-09-25T00:30:46Z",
+      "timestamp": 1790296246189,
+      "version": "4.1.0"
     },
     "reference-count": 54,
     "publisher": "American Physical Society (APS)",
@@ -24069,7 +24069,7 @@
       "timestamp": 1498774191000
     },
     "source": "Crossref",
-    "is-referenced-by-count": 665,
+    "is-referenced-by-count": 667,
     "title": [
       "Efficient Variational Quantum Simulator Incorporating Active Error Minimization"
     ],
@@ -24495,12 +24495,12 @@
         [
           2026,
           9,
-          17
+          25
         ]
       ],
-      "date-time": "2026-09-17T18:18:12Z",
-      "timestamp": 1789669092938,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T00:30:39Z",
+      "timestamp": 1790296239101,
+      "version": "4.1.0"
     },
     "reference-count": 28,
     "publisher": "American Physical Society (APS)",
@@ -24586,7 +24586,7 @@
     },
     "update-policy": "https://doi.org/10.1103/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 552,
+    "is-referenced-by-count": 553,
     "title": [
       "Practical Quantum Error Mitigation for Near-Future Applications"
     ],
@@ -24873,11 +24873,11 @@
         [
           2026,
           9,
-          21
+          22
         ]
       ],
-      "date-time": "2026-09-21T17:25:31Z",
-      "timestamp": 1790011531265,
+      "date-time": "2026-09-22T16:15:01Z",
+      "timestamp": 1790093701301,
       "version": "4.0.1"
     },
     "reference-count": 28,
@@ -24960,7 +24960,7 @@
     },
     "page": "306-316",
     "source": "Crossref",
-    "is-referenced-by-count": 194,
+    "is-referenced-by-count": 195,
     "title": [
       "Digital zero noise extrapolation for quantum error mitigation"
     ],
@@ -25262,12 +25262,12 @@
         [
           2026,
           9,
-          9
+          22
         ]
       ],
-      "date-time": "2026-09-09T14:05:04Z",
-      "timestamp": 1788962704812,
-      "version": "build-2803163510"
+      "date-time": "2026-09-22T16:15:37Z",
+      "timestamp": 1790093737779,
+      "version": "4.0.1"
     },
     "reference-count": 32,
     "publisher": "American Physical Society (APS)",
@@ -25314,7 +25314,7 @@
     },
     "update-policy": "https://doi.org/10.1103/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 271,
+    "is-referenced-by-count": 272,
     "title": [
       "Scalable Mitigation of Measurement Errors on Quantum Computers"
     ],
@@ -26463,12 +26463,12 @@
         [
           2026,
           9,
-          21
+          24
         ]
       ],
-      "date-time": "2026-09-21T17:25:46Z",
-      "timestamp": 1790011546423,
-      "version": "4.0.1"
+      "date-time": "2026-09-24T21:54:36Z",
+      "timestamp": 1790286876516,
+      "version": "4.1.0"
     },
     "reference-count": 38,
     "publisher": "Springer Science and Business Media LLC",
@@ -26540,7 +26540,7 @@
     "page": "1116-1121",
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 281,
+    "is-referenced-by-count": 284,
     "title": [
       "Probabilistic error cancellation with sparse Pauli–Lindblad models on noisy quantum processors"
     ],
@@ -27121,12 +27121,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T17:25:19Z",
-      "timestamp": 1790011519444,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T00:30:46Z",
+      "timestamp": 1790296246960,
+      "version": "4.1.0"
     },
     "reference-count": 217,
     "publisher": "American Physical Society (APS)",
@@ -27375,7 +27375,7 @@
     },
     "update-policy": "https://doi.org/10.1103/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 595,
+    "is-referenced-by-count": 597,
     "title": [
       "Quantum error mitigation"
     ],
@@ -28707,12 +28707,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T17:31:12Z",
-      "timestamp": 1790011872317,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T05:52:52Z",
+      "timestamp": 1790315572505,
+      "version": "4.1.0"
     },
     "reference-count": 45,
     "publisher": "Springer Science and Business Media LLC",
@@ -28786,7 +28786,7 @@
     "page": "500-505",
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 1059,
+    "is-referenced-by-count": 1067,
     "title": [
       "Evidence for the utility of quantum computing before fault tolerance"
     ],
@@ -29521,12 +29521,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T03:01:12Z",
-      "timestamp": 1789959672849,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T03:23:32Z",
+      "timestamp": 1790306612929,
+      "version": "4.1.0"
     },
     "reference-count": 35,
     "publisher": "American Physical Society (APS)",
@@ -29597,7 +29597,7 @@
     },
     "update-policy": "https://doi.org/10.1103/crossmark-policy",
     "source": "Crossref",
-    "is-referenced-by-count": 608,
+    "is-referenced-by-count": 610,
     "title": [
       "Validating quantum computers using randomized model circuits"
     ],
@@ -31091,12 +31091,12 @@
         [
           2026,
           9,
-          22
+          25
         ]
       ],
-      "date-time": "2026-09-22T00:39:35Z",
-      "timestamp": 1790037575862,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T03:26:21Z",
+      "timestamp": 1790306781807,
+      "version": "4.1.0"
     },
     "reference-count": 0,
     "publisher": "Oxford University Press (OUP)",
@@ -31132,7 +31132,7 @@
     },
     "page": "308-313",
     "source": "Crossref",
-    "is-referenced-by-count": 23298,
+    "is-referenced-by-count": 23380,
     "title": [
       "A Simplex Method for Function Minimization"
     ],
@@ -31252,12 +31252,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T21:21:30Z",
-      "timestamp": 1790025690837,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T06:04:40Z",
+      "timestamp": 1790316280669,
+      "version": "4.1.0"
     },
     "reference-count": 34,
     "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
@@ -31310,7 +31310,7 @@
     },
     "page": "332-341",
     "source": "Crossref",
-    "is-referenced-by-count": 1829,
+    "is-referenced-by-count": 1832,
     "title": [
       "Multivariate stochastic approximation using a simultaneous perturbation gradient approximation"
     ],
@@ -31607,12 +31607,12 @@
         [
           2026,
           9,
-          21
+          25
         ]
       ],
-      "date-time": "2026-09-21T22:50:04Z",
-      "timestamp": 1790031004366,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T05:39:19Z",
+      "timestamp": 1790314759368,
+      "version": "4.1.0"
     },
     "publisher-location": "Dordrecht",
     "reference-count": 9,
@@ -31654,7 +31654,7 @@
     },
     "page": "51-67",
     "source": "Crossref",
-    "is-referenced-by-count": 817,
+    "is-referenced-by-count": 826,
     "title": [
       "A Direct Search Optimization Method That Models the Objective and Constraint Functions by Linear Interpolation"
     ],
@@ -32067,12 +32067,12 @@
         [
           2026,
           9,
-          22
+          25
         ]
       ],
-      "date-time": "2026-09-22T03:32:01Z",
-      "timestamp": 1790047921122,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T03:06:31Z",
+      "timestamp": 1790305591077,
+      "version": "4.1.0"
     },
     "reference-count": 57,
     "publisher": "Springer Science and Business Media LLC",
@@ -32146,7 +32146,7 @@
     "page": "357-362",
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 24436,
+    "is-referenced-by-count": 24576,
     "title": [
       "Array programming with NumPy"
     ],
@@ -33122,12 +33122,12 @@
         [
           2026,
           9,
-          22
+          25
         ]
       ],
-      "date-time": "2026-09-22T03:19:38Z",
-      "timestamp": 1790047178670,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T03:26:08Z",
+      "timestamp": 1790306768493,
+      "version": "4.1.0"
     },
     "reference-count": 122,
     "publisher": "Springer Science and Business Media LLC",
@@ -33201,7 +33201,7 @@
     "page": "261-272",
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 38186,
+    "is-referenced-by-count": 38348,
     "title": [
       "SciPy 1.0: fundamental algorithms for scientific computing in Python"
     ],
@@ -35698,12 +35698,12 @@
         [
           2026,
           9,
-          22
+          25
         ]
       ],
-      "date-time": "2026-09-22T03:16:56Z",
-      "timestamp": 1790047016161,
-      "version": "4.0.1"
+      "date-time": "2026-09-25T03:20:54Z",
+      "timestamp": 1790306454691,
+      "version": "4.1.0"
     },
     "reference-count": 32,
     "publisher": "Springer Science and Business Media LLC",
@@ -35767,7 +35767,7 @@
     },
     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
     "source": "Crossref",
-    "is-referenced-by-count": 15257,
+    "is-referenced-by-count": 15326,
     "title": [
       "The FAIR Guiding Principles for scientific data management and stewardship"
     ],
@@ -36993,5 +36993,479 @@
       }
     ],
     "article-number": "160018"
+  },
+  "student1908": {
+    "indexed": {
+      "date-parts": [
+        [
+          2026,
+          9,
+          25
+        ]
+      ],
+      "date-time": "2026-09-25T02:17:30Z",
+      "timestamp": 1790302650549,
+      "version": "4.1.0"
+    },
+    "reference-count": 0,
+    "publisher": "JSTOR",
+    "issue": "1",
+    "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+    },
+    "short-container-title": [
+      "Biometrika"
+    ],
+    "published-print": {
+      "date-parts": [
+        [
+          1908,
+          3
+        ]
+      ]
+    },
+    "DOI": "10.2307/2331554",
+    "type": "journal-article",
+    "created": {
+      "date-parts": [
+        [
+          2006,
+          4,
+          23
+        ]
+      ],
+      "date-time": "2006-04-23T02:43:06Z",
+      "timestamp": 1145760186000
+    },
+    "page": "1",
+    "source": "Crossref",
+    "is-referenced-by-count": 9868,
+    "title": [
+      "The Probable Error of a Mean"
+    ],
+    "prefix": "10.2307",
+    "volume": "6",
+    "author": [
+      {
+        "family": "Student",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "member": "1121",
+    "container-title": [
+      "Biometrika"
+    ],
+    "original-title": [],
+    "deposited": {
+      "date-parts": [
+        [
+          2018,
+          5,
+          9
+        ]
+      ],
+      "date-time": "2018-05-09T03:41:54Z",
+      "timestamp": 1525837314000
+    },
+    "score": 1,
+    "resource": {
+      "primary": {
+        "URL": "https://www.jstor.org/stable/2331554?origin=crossref"
+      }
+    },
+    "subtitle": [],
+    "short-title": [],
+    "issued": {
+      "date-parts": [
+        [
+          1908,
+          3
+        ]
+      ]
+    },
+    "references-count": 0,
+    "aliases": [
+      "10.1093/biomet/6.1.1",
+      "10.1093/biomet/6.1.1",
+      "10.1093/biomet/6.1.1",
+      "10.1093/biomet/6.1.1",
+      "10.1093/biomet/6.1.1",
+      "10.1093/biomet/6.1.1"
+    ],
+    "journal-issue": {
+      "issue": "1",
+      "published-print": {
+        "date-parts": [
+          [
+            1908,
+            3
+          ]
+        ]
+      }
+    },
+    "URL": "https://doi.org/10.2307/2331554",
+    "relation": {},
+    "ISSN": [
+      "0006-3444"
+    ],
+    "issn-type": [
+      {
+        "value": "0006-3444",
+        "type": "print"
+      }
+    ],
+    "subject": [],
+    "published": {
+      "date-parts": [
+        [
+          1908,
+          3
+        ]
+      ]
+    }
+  },
+  "wecker2015": {
+    "indexed": {
+      "date-parts": [
+        [
+          2026,
+          9,
+          24
+        ]
+      ],
+      "date-time": "2026-09-24T21:54:36Z",
+      "timestamp": 1790286876147,
+      "version": "4.1.0"
+    },
+    "reference-count": 15,
+    "publisher": "American Physical Society (APS)",
+    "issue": "4",
+    "license": [
+      {
+        "start": {
+          "date-parts": [
+            [
+              2015,
+              10,
+              2
+            ]
+          ],
+          "date-time": "2015-10-02T00:00:00Z",
+          "timestamp": 1443744000000
+        },
+        "content-version": "vor",
+        "delay-in-days": 0,
+        "URL": "http://link.aps.org/licenses/aps-default-license"
+      },
+      {
+        "start": {
+          "date-parts": [
+            [
+              2016,
+              10,
+              1
+            ]
+          ],
+          "date-time": "2016-10-01T00:00:00Z",
+          "timestamp": 1475280000000
+        },
+        "content-version": "am",
+        "delay-in-days": 365,
+        "URL": "http://link.aps.org/licenses/aps-default-accepted-manuscript-license"
+      }
+    ],
+    "funder": [
+      {
+        "DOI": "10.13039/100006112",
+        "name": "Microsoft Research",
+        "doi-asserted-by": "publisher",
+        "id": [
+          {
+            "id": "10.13039/100006112",
+            "id-type": "DOI",
+            "asserted-by": "publisher"
+          }
+        ]
+      },
+      {
+        "DOI": "10.13039/100000001",
+        "name": "National Science Foundation",
+        "doi-asserted-by": "publisher",
+        "award": [
+          "PHY-1066293"
+        ],
+        "award-info": [
+          {
+            "award-number": [
+              "PHY-1066293"
+            ]
+          }
+        ],
+        "id": [
+          {
+            "id": "10.13039/100000001",
+            "id-type": "DOI",
+            "asserted-by": "publisher"
+          }
+        ]
+      }
+    ],
+    "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+    },
+    "short-container-title": [
+      "Phys. Rev. A"
+    ],
+    "DOI": "10.1103/physreva.92.042303",
+    "type": "journal-article",
+    "created": {
+      "date-parts": [
+        [
+          2015,
+          10,
+          2
+        ]
+      ],
+      "date-time": "2015-10-02T17:09:59Z",
+      "timestamp": 1443805799000
+    },
+    "source": "Crossref",
+    "is-referenced-by-count": 667,
+    "title": [
+      "Progress towards practical quantum variational algorithms"
+    ],
+    "prefix": "10.1103",
+    "volume": "92",
+    "author": [
+      {
+        "given": "Dave",
+        "family": "Wecker",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Matthew B.",
+        "family": "Hastings",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Matthias",
+        "family": "Troyer",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "member": "16",
+    "published-online": {
+      "date-parts": [
+        [
+          2015,
+          10,
+          2
+        ]
+      ]
+    },
+    "reference": [
+      {
+        "key": "PhysRevA.92.042303Cc1R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1016/j.aop.2010.09.012"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc2R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevLett.101.110501"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc4R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevLett.108.110502"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc5R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevA.88.032321"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc6R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevLett.98.140506"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc7R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevLett.100.130501"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc8R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1038/ncomms5213"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc9R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1002/qua.21198"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc13R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1016/j.aop.2004.09.010"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc14R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1093/comjnl/7.2.155"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc15R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevA.65.042323"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc16R1",
+        "doi-asserted-by": "crossref",
+        "first-page": "1",
+        "DOI": "10.26421/QIC15.1-2-1",
+        "volume": "15",
+        "author": "M. B. Hastings",
+        "year": "2015",
+        "journal-title": "Quantum Information & Computation"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc17R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1080/00268976.2011.552441"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc18R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1002/wcms.93"
+      },
+      {
+        "key": "PhysRevA.92.042303Cc19R1",
+        "doi-asserted-by": "publisher",
+        "DOI": "10.1103/PhysRevLett.113.046402"
+      }
+    ],
+    "container-title": [
+      "Physical Review A"
+    ],
+    "original-title": [],
+    "language": "en",
+    "link": [
+      {
+        "URL": "http://link.aps.org/accepted/10.1103/PhysRevA.92.042303",
+        "content-type": "application/pdf",
+        "content-version": "am",
+        "intended-application": "unspecified"
+      },
+      {
+        "URL": "http://link.aps.org/article/10.1103/PhysRevA.92.042303",
+        "content-type": "unspecified",
+        "content-version": "vor",
+        "intended-application": "syndication"
+      },
+      {
+        "URL": "http://harvest.aps.org/v2/journals/articles/10.1103/PhysRevA.92.042303/fulltext",
+        "content-type": "unspecified",
+        "content-version": "vor",
+        "intended-application": "similarity-checking"
+      }
+    ],
+    "deposited": {
+      "date-parts": [
+        [
+          2022,
+          5,
+          22
+        ]
+      ],
+      "date-time": "2022-05-22T16:07:38Z",
+      "timestamp": 1653235658000
+    },
+    "score": 1,
+    "resource": {
+      "primary": {
+        "URL": "https://link.aps.org/doi/10.1103/PhysRevA.92.042303"
+      }
+    },
+    "subtitle": [],
+    "short-title": [],
+    "issued": {
+      "date-parts": [
+        [
+          2015,
+          10,
+          2
+        ]
+      ]
+    },
+    "references-count": 15,
+    "journal-issue": {
+      "issue": "4",
+      "published-print": {
+        "date-parts": [
+          [
+            2015,
+            10
+          ]
+        ]
+      }
+    },
+    "URL": "https://doi.org/10.1103/physreva.92.042303",
+    "relation": {},
+    "ISSN": [
+      "1050-2947",
+      "1094-1622"
+    ],
+    "issn-type": [
+      {
+        "value": "1050-2947",
+        "type": "print"
+      },
+      {
+        "value": "1094-1622",
+        "type": "electronic"
+      }
+    ],
+    "subject": [],
+    "published": {
+      "date-parts": [
+        [
+          2015,
+          10,
+          2
+        ]
+      ]
+    },
+    "article-number": "042303"
   }
 }

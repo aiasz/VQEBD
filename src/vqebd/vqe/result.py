@@ -26,7 +26,71 @@ from vqebd.chemistry.reference import CHEMICAL_ACCURACY_HA, ReferenceEnergies
 from vqebd.config import VQEConfig
 from vqebd.seeds import SeedSet
 
-__all__ = ["VQEResult"]
+__all__ = ["ReestimateResult", "VQEResult"]
+
+
+@dataclass(frozen=True, slots=True)
+class ReestimateResult:
+    """A végső energia független újramintavételezése θ_opt-ban (Fázis 5, G4).
+
+    Zajos backenden két „kézenfekvő” végső érték is hibás volna:
+
+    - az optimalizáló **visszaadott** értéke (SciPy COBYLA: a végpontban mért
+      utolsó érték) **egyetlen zajos húzás** — torzítatlan, de nagy szórású
+      (σ ≈ 11 mHa 8192 lövésnél);
+    - a kiértékelési előzmények **minimuma** **kiválasztási torzítást** hordoz: a
+      sok zajos húzás közül a kedvezőt választja (mérve: −20…−37 mHa, H₂).
+
+    A K friss kiértékelés átlaga torzítatlan, és a szórása √K-szor kisebb.
+
+    Attributes:
+        samples_ha: A K friss kiértékelés **teljes** energiája (Ha).
+        optimizer_final_ha: Az optimalizáló visszaadott értéke (teljes energia, Ha).
+        history_min_ha: Az optimalizálás közbeni kiértékelések minimuma (teljes, Ha).
+    """
+
+    samples_ha: tuple[float, ...]
+    optimizer_final_ha: float
+    history_min_ha: float
+
+    @property
+    def n(self) -> int:
+        """A friss kiértékelések száma (K)."""
+        return len(self.samples_ha)
+
+    @property
+    def mean_ha(self) -> float:
+        """A friss kiértékelések átlaga — a végső energiabecslés."""
+        return sum(self.samples_ha) / len(self.samples_ha)
+
+    @property
+    def sem_ha(self) -> float:
+        """Az átlag standard hibája (Ha)."""
+        from vqebd.stats import summarize
+
+        return summarize(self.samples_ha).sem
+
+    @property
+    def selection_bias_ha(self) -> float:
+        """``history_min − mean`` (Ha): a „minimumot jelentő” stratégia torzítása (< 0).
+
+        Ennyit tévedne egy implementáció, amely a zajos kiértékelések minimumát
+        közölné végső energiaként. A VQEBD ezt nem teszi; a mennyiséget a módszertani
+        összehasonlítás kedvéért rögzítjük (ADR-0007 D2).
+        """
+        return self.history_min_ha - self.mean_ha
+
+    def to_dict(self) -> dict[str, Any]:
+        """Szótár-alak az exporthoz."""
+        return {
+            "n": self.n,
+            "mean_ha": self.mean_ha,
+            "sem_ha": self.sem_ha,
+            "optimizer_final_ha": self.optimizer_final_ha,
+            "history_min_ha": self.history_min_ha,
+            "selection_bias_ha": self.selection_bias_ha,
+            "samples_ha": list(self.samples_ha),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,9 +98,10 @@ class VQEResult:
     """Egyetlen VQE-futtatás teljes eredménye.
 
     Attributes:
-        energy: A **teljes** alapállapoti energia (Ha), a magtaszítással együtt.
-            Ez az alapterv által kért érték.
-        electronic_energy: Az elektronos rész (Ha), magtaszítás nélkül.
+        energy: A **teljes** alapállapoti energia (Ha), a konstans eltolással
+            együtt. Ez az alapterv által kért érték. Újramintavételezéskor
+            (``config.reestimate > 0``) a friss kiértékelések átlaga.
+        electronic_energy: Az elektronos rész (Ha), eltolás nélkül.
         nuclear_repulsion_energy: A magtaszítási energia (Ha).
         optimal_parameters: Az optimális variációs paraméterek.
         reference: A klasszikus referenciaszintek (L0, L1, Hartree–Fock).
@@ -58,6 +123,10 @@ class VQEResult:
         seeds: A használt seedek.
         versions: A futásidejű csomagverziók.
         environment_fingerprint: A környezet SHA-256 ujjlenyomata.
+        mitigation: A hibaenyhítés eredménye (``MitigationResult``) vagy ``None``.
+        energy_offset: A konstans eltolás (Ha): magtaszítás + aktív térben az
+            inaktív energia. ``None`` = a ``nuclear_repulsion_energy`` (teljes tér).
+        reestimate: Az újramintavételezés eredménye, vagy ``None``.
     """
 
     energy: float
@@ -84,6 +153,15 @@ class VQEResult:
     versions: Mapping[str, str]
     environment_fingerprint: str
     mitigation: Any = None
+    energy_offset: float | None = None
+    reestimate: ReestimateResult | None = None
+
+    @property
+    def offset(self) -> float:
+        """A ténylegesen alkalmazott konstans eltolás (Ha)."""
+        return (
+            self.energy_offset if self.energy_offset is not None else self.nuclear_repulsion_energy
+        )
 
     # ---------------------------------------------------------------- hibák
 
@@ -122,14 +200,28 @@ class VQEResult:
         return (self.reference.hartree_fock - self.energy) / (-correlation)
 
     @property
+    def method_error(self) -> float:
+        """A hiba ugyanannak a qubit-Hamilton-operátornak az egzakt megoldásához (Ha).
+
+        ``E_VQE − E_L1``, ha az L1 elérhető, különben ``E_VQE − E_ref``. Aktív térben
+        ez **nem** tartalmazza a csonkolási hibát (CASCI − FCI), így a módszer és a
+        platform numerikus minőségét méri. Teljes térben az L1 és az FCI gépi
+        pontossággal egyezik (≤ 1e-14 Ha), így a két definíció ott azonos.
+        """
+        exact = self.error_vs_exact_diagonalization
+        return exact if exact is not None else self.error_vs_reference
+
+    @property
     def within_backend_tolerance(self) -> bool:
         """A platform saját, számábrázolásból levezetett toleranciáján belül van-e.
 
         Ez szigorúbb (vagy lazább) a kémiai pontosságnál, platformtól függően:
         a ``complex64`` qsimtől 1e-5 Ha-t fogadunk el, a ``complex128``
-        platformoktól 1e-9 Ha-t. Lásd: :mod:`vqebd.platforms`.
+        platformoktól 1e-9 Ha-t. Lásd: :mod:`vqebd.platforms`. A
+        :attr:`method_error`-t méri (v0.8.0 óta), mert a platform pontossága az
+        aktívtér-csonkolástól független.
         """
-        return abs(self.error_vs_reference) < self.backend_tolerance_ha
+        return abs(self.method_error) < self.backend_tolerance_ha
 
     @property
     def within_chemical_accuracy(self) -> bool:
@@ -138,12 +230,14 @@ class VQEResult:
 
     @property
     def satisfies_variational_principle(self) -> bool:
-        """Teljesül-e a variációs elv: ``E_VQE ≥ E_exact``.
+        """Teljesül-e a variációs elv: ``E_VQE ≥ E_L1`` (ugyanarra az operátorra).
 
         Numerikus tűréssel: a lebegőpontos aritmetika miatt a gépi pontosság
-        nagyságrendjében az alácsúszás megengedett.
+        nagyságrendjében az alácsúszás megengedett. Az L1-hez mérünk (v0.8.0), mert
+        a variációs elv az adott Hamilton-operátorra érvényes; aktív térben egy
+        hibás energiaeltolást is így lehet elkapni.
         """
-        return self.error_vs_reference > -1e-9
+        return self.method_error > -1e-9
 
     # ---------------------------------------------------------------- kimenet
 
@@ -153,6 +247,7 @@ class VQEResult:
             "energy_ha": self.energy,
             "electronic_energy_ha": self.electronic_energy,
             "nuclear_repulsion_energy_ha": self.nuclear_repulsion_energy,
+            "energy_offset_ha": self.offset,
             "optimal_parameters": list(self.optimal_parameters),
             "reference": self.reference.to_dict(),
             "error_vs_reference_ha": self.error_vs_reference,
@@ -180,6 +275,7 @@ class VQEResult:
             "versions": dict(self.versions),
             "environment_fingerprint": self.environment_fingerprint,
             "mitigation": self.mitigation.to_dict() if self.mitigation is not None else None,
+            "reestimate": self.reestimate.to_dict() if self.reestimate is not None else None,
         }
 
     def report(self) -> str:
@@ -201,11 +297,13 @@ class VQEResult:
         ]
         if ref.full_ci is not None:
             lines.append(f"  L0  Full CI ....... {ref.full_ci:+.10f}")
+        if ref.casci is not None and self.config.active_space is not None:
+            lines.append(f"  L0′ CASCI {self.config.active_space.label:<8s} {ref.casci:+.10f}")
         if ref.exact_diagonalization is not None:
             lines.append(f"  L1  egzakt diag. .. {ref.exact_diagonalization:+.10f}")
 
         raw_total = (
-            self.mitigation.raw_energy + self.nuclear_repulsion_energy
+            self.mitigation.raw_energy + self.offset
             if self.mitigation is not None and self.mitigation.strategy_name != "none"
             else self.energy
         )
@@ -227,8 +325,11 @@ class VQEResult:
 
         lines.append("")
         lines.append("Hibák:")
+        if ref.truncation_error is not None:
+            lines.append(f"  csonkolás (L0′−L0)  {ref.truncation_error:+.3e} Ha")
         if ref.mapping_error is not None:
-            lines.append(f"  leképezés (L1−L0) . {ref.mapping_error:+.3e} Ha")
+            label = "L1−L0′" if ref.casci is not None else "L1−L0"
+            lines.append(f"  leképezés ({label}) {ref.mapping_error:+.3e} Ha")
         if self.error_vs_exact_diagonalization is not None:
             if self.config.backend in ("qiskit_aer_shot", "qiskit_aer_noisy"):
                 lines.append(f"  ansatz+zaj (L3−L1)  {self.error_vs_exact_diagonalization:+.3e} Ha")
@@ -248,6 +349,13 @@ class VQEResult:
         lines.append(
             f"Konvergált: {'igen' if self.converged else 'NEM'} ({self.optimizer_message})"
         )
+        if self.reestimate is not None:
+            r = self.reestimate
+            lines.append(
+                f"Újramintavételezés .. K={r.n}, átlag {r.mean_ha:+.10f} ± {r.sem_ha:.2e} Ha "
+                f"(optimalizáló végértéke: {r.optimizer_final_ha:+.10f}; előzmény-minimum "
+                f"{r.history_min_ha:+.10f}, kiválasztási torzítás {r.selection_bias_ha:+.2e} Ha)"
+            )
         lines.append(f"Futásidő: {self.wall_time_s:.3f} s")
         lines.append(f"Konfiguráció-ujjlenyomat: {self.config.short_fingerprint()}")
         return "\n".join(lines)

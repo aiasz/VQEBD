@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 __all__ = [
+    "ActiveSpaceSpec",
     "AnsatzSpec",
     "BackendKind",
     "ExtrapolatorKind",
@@ -117,6 +118,41 @@ class MoleculeSpec:
 
 
 @dataclass(frozen=True, slots=True)
+class ActiveSpaceSpec:
+    """Aktív tér: a korrelált számításba bevont elektronok és térbeli pályák (Fázis 5).
+
+    A Qiskit Nature ``ActiveSpaceTransformer``-e a Fermi-szint körüli pályákat
+    választja; a többi betöltött pálya befagyasztott (inaktív), energiájuk konstans
+    eltolásként jelenik meg (:attr:`~vqebd.chemistry.problem.ElectronicStructure.energy_offset`).
+
+    Attributes:
+        num_electrons: Az aktív elektronok száma.
+        num_spatial_orbitals: Az aktív térbeli pályák száma.
+
+    Lásd: ``docs/plan/phase_05.md`` 2. fejezet (a választás mért indoklása).
+    """
+
+    num_electrons: int
+    num_spatial_orbitals: int
+
+    def __post_init__(self) -> None:
+        if self.num_electrons < 1:
+            raise ValueError(f"az aktív elektronok száma legalább 1: {self.num_electrons}")
+        if self.num_spatial_orbitals < 1:
+            raise ValueError(f"az aktív pályák száma legalább 1: {self.num_spatial_orbitals}")
+        if self.num_electrons > 2 * self.num_spatial_orbitals:
+            raise ValueError(
+                f"{self.num_electrons} elektron nem fér el {self.num_spatial_orbitals} "
+                f"térbeli pályán (legfeljebb {2 * self.num_spatial_orbitals})"
+            )
+
+    @property
+    def label(self) -> str:
+        """Kémiai jelölés, pl. ``"(2e,5o)"``."""
+        return f"({self.num_electrons}e,{self.num_spatial_orbitals}o)"
+
+
+@dataclass(frozen=True, slots=True)
 class AnsatzSpec:
     """A variációs próbaállapot (ansatz) leírása.
 
@@ -201,6 +237,11 @@ class VQEConfig:
         backend: A kiértékelés módja.
         seed: A **mester**-seed; ebből származik az összes többi (:mod:`vqebd.seeds`).
         mitigation: A hibaenyhítés beállításai (ADR-0003).
+        active_space: Aktív tér (Fázis 5); ``None`` = teljes pályatér.
+        reestimate: A végső energia független újramintavételezéseinek száma
+            (K, Fázis 5, G4). ``0`` = kikapcsolva. Zajos backenden az optimalizáló
+            végértéke egyetlen zajos húzás; a K friss kiértékelés átlaga √K-szor
+            kisebb szórású, és — az előzmény-minimummal ellentétben — torzítatlan.
     """
 
     molecule: MoleculeSpec
@@ -211,12 +252,30 @@ class VQEConfig:
     backend: BackendKind = "qiskit_statevector"
     seed: int = 20260922
     mitigation: MitigationSpec = field(default_factory=MitigationSpec)
+    active_space: ActiveSpaceSpec | None = None
+    reestimate: int = 0
+
+    def __post_init__(self) -> None:
+        if self.reestimate < 0:
+            raise ValueError(f"a reestimate nem lehet negatív: {self.reestimate}")
+        if self.reestimate == 1:
+            raise ValueError(
+                "a reestimate 0 (ki) vagy legalább 2 — egyetlen mintából nem becsülhető SEM"
+            )
 
     def to_dict(self) -> dict[str, Any]:
-        """Beágyazott szótár-alak — naplózáshoz és az adatsémához."""
+        """Beágyazott szótár-alak — naplózáshoz és az adatsémához.
+
+        A v0.8.0-ban bevezetett mezők (``active_space``, ``reestimate``)
+        **alapértékük esetén kimaradnak**: így a korábbi konfigurációk kanonikus
+        alakja és ujjlenyomata (``config_hash``) bitre változatlan (AC-5.2).
+        """
         d = dataclasses.asdict(self)
         if "mitigation" in d and "scale_factors" in d["mitigation"]:
             d["mitigation"]["scale_factors"] = list(d["mitigation"]["scale_factors"])
+        for name, default in _OMIT_WHEN_DEFAULT.items():
+            if d.get(name) == default:
+                del d[name]
         return d
 
     def canonical_json(self) -> str:
@@ -238,3 +297,7 @@ class VQEConfig:
     def short_fingerprint(self) -> str:
         """Az ujjlenyomat első 12 karaktere — naplókhoz és fájlnevekhez."""
         return self.fingerprint()[:12]
+
+
+_OMIT_WHEN_DEFAULT: dict[str, Any] = {"active_space": None, "reestimate": 0}
+"""Alapértékük esetén a kanonikus alakból kimaradó mezők (kompatibilis ujjlenyomat)."""

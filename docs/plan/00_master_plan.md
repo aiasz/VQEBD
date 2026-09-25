@@ -4,10 +4,10 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.1.0 |
-| **Dátum** | 2026-09-22 |
+| **Dokumentum-verzió** | 1.2.0 |
+| **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
-| **Státusz** | Elfogadott — Fázis 0 és 1 lezárva, Fázis 1M végrehajtása engedélyezett |
+| **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
 | **Alapdokumentum** | `quantum-benchmark-projektterv.md` (v0, 2026-09-22) |
 | **Licenc** | MIT |
 
@@ -366,7 +366,7 @@ Az alapterv 10 fázisa megmarad. A változások:
 | **2** | Valódi hardver | Változatlan cél, de az 1b után már *validált* kóddal futunk rá. |
 | **3** | Mitiq ZNE | + saját ISA-biztos ZNE, + measurement mitigation (M5), + extrapolátor-összehasonlítás, + Mitiq-keresztvalidáció (M4) |
 | **4** | Adatséma | + sémaverzió, + környezet-ujjlenyomat, + provenance-mezők, + FAIR-elvek |
-| **5** | Batch futtatás | + aktív tér (active space) redukció LiH/BeH2-re (mért indoklás: 4. fejezet táblázata), + **platform a kombinációs mátrix dimenziója** |
+| **5** | Batch futtatás | + aktív tér (active space) redukció LiH/BeH2-re (mért indoklás: 4. fejezet táblázata), + **platform a kombinációs mátrix dimenziója**, + **ismétlésen alapuló statisztika** (N seed, t-CI, újramintavételezés, hibaköltségvetés — ADR-0007, [`phase_05.md`](phase_05.md)) |
 | **6** | Automatizálás | + strukturált hibatárolás, + újrapróbálkozási politika |
 | **7** | Dashboard | változatlan, 4 belső lépés |
 | **8** | Konténerizáció | változatlan |
@@ -487,6 +487,10 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | R10 | Qubit-sorrend (endianness) eltérése Qiskit és Cirq között | **Magas** | **Bekövetkezett** | Mátrixszintű konverziós teszt; `reversed(qubits)` rögzítve (ADR-0006) | Kezelve |
 | R11 | A qsim egyszeres pontossága félrevezeti az összehasonlítást | Közepes | **Bekövetkezett** | Platformonkénti tolerancia; a rekord tárolja a pontosságot | Kezelve |
 | R12 | Az IBM Open Plan kvótája (10 perc / 28 nap) kimerül | Magas | Közepes | Fázis 1M + 1b: két kvótamentes platform; `VQEBD_ALLOW_HARDWARE=false` alapértelmezés | Figyelt |
+| R13 | A szimulált mintavételi zaj nem független (közös eltolás) | **Magas** | **Bekövetkezett** (v0.3.0–v0.7.0) | Saját, hívásonként továbblépő RNG (v0.7.1); TC-1B10 és TC-506 regressziós tesztek | Kezelve |
+| R14 | Zajos VQE végső energiája: egyetlen húzás (nagy szórás), ill. az előzmény-minimum kiválasztási torzítása (−20…−37 mHa, H₂) | Közepes | Mérve (Fázis 5) | Független újramintavételezés θ_opt-ban (ADR-0007 D2); a minimumot nem közöljük | Kezelve |
+| R15 | Az UCCSD mélysége H₂-n túl a zajos szinteket értelmetlenné teszi (172+ CX) | Magas | **Bekövetkezett** (phase_05.md 2.) | A zajos szintek ezt a falat *mérik*; hardverhatékony ansatz → Fázis 6+ | Figyelt |
+| R16 | Az Aer Estimator nem modellezi a readout-hibát (az L3b optimistább a hardvernél) | Közepes | **Bekövetkezett** (ADR-0003, 1. kieg.) | Dokumentálva; Sampler-alapú becslő → Fázis 6 | Figyelt |
 
 ---
 
@@ -518,6 +522,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 |---|---|---|
 | 1.0.0 | 2026-09-22 | Első kiadás. Alapterv bővítése a TR-000 spike mérései alapján. |
 | 1.1.0 | 2026-09-22 | **Platform-dimenzió bevezetése** (3.3. fejezet, ADR-0006): Qiskit ↔ Cirq ↔ qsim. Új Fázis 1M. Stack bővítve `cirq-core 1.4.1` és `qsimcirq 0.22.1` csomagokkal. R9–R12 kockázatok felvéve. |
+| 1.2.0 | 2026-09-25 | v0.7.1 javítókör (M6-jegyzet); Fázis 5: ismétlésen alapuló statisztika (ADR-0007), Q3 megválaszolva (frozen-core aktív tér, `phase_05.md` 2.). R13–R16 kockázatok felvéve. |
 
 ---
 

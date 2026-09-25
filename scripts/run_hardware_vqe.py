@@ -33,6 +33,13 @@ from vqebd.chemistry.problem import build_electronic_structure
 from vqebd.chemistry.reference import collect_references
 from vqebd.config import AnsatzSpec, OptimizerSpec, VQEConfig
 from vqebd.credentials import load_ibm_credentials
+from vqebd.hardware import (
+    QuotaExhaustedError,
+    assert_hardware_allowed,
+    assert_quota_available,
+    connect_service,
+    quota_summary,
+)
 from vqebd.seeds import SeedSet
 from vqebd.vqe.ansatz import build_ansatz
 from vqebd.vqe.runner import run_vqe
@@ -105,6 +112,15 @@ def main() -> int:
     print(f"  L1 Egzakt diagonalizáció ... {references.exact_diagonalization:+.10f} Ha")
     print(f"  L2 VQE (statevector) ....... {res_l2.energy:+.10f} Ha")
     print(f"  Optimális paraméterek (θ*) .. {opt_params}")
+
+    # Védőkorlátok beküldés előtt: explicit engedély és kvóta (vqebd.hardware).
+    assert_hardware_allowed()
+    usage = quota_summary(connect_service().usage())
+    try:
+        assert_quota_available(usage, required_seconds=30.0)
+    except QuotaExhaustedError as exc:
+        print(f"MEGTAGADVA: {exc}", file=sys.stderr)
+        return 2
 
     # 3. Transzpiláció és beküldés az IBM Heron QPU-ra
     print(f"\n[2/4] Csatlakozás és ISA transzpiláció a(z) {args.backend} eszközre...")

@@ -335,7 +335,7 @@ docker run --rm -v "$PWD:/spike" -w /spike vqebd-spike:py311 python spike_test4.
 |---|---|---|
 | Q1 | Mennyi lövés kell a kémiai pontossághoz molekulánként? | Fázis 1b |
 | Q2 | Mely IBM backend elérhető és milyen kvótával? | Fázis 2 |
-| Q3 | Melyik aktív tér a „tisztességes" LiH/BeH2-re? | Fázis 5 terve |
+| Q3 | Melyik aktív tér a „tisztességes" LiH/BeH2-re? | Fázis 5 terve — **megválaszolva (2026-09-25):** frozen-core aktív tér, [`phase_05.md`](../plan/phase_05.md) 2. fejezet |
 | Q4 | A `zne_local` és `zne_mitiq` egyezik-e statisztikailag zajos futáson is? | Fázis 3 |
 | Q5 | Skálázódik-e a Richardson-extrapoláció λ>5-re a lövészaj mellett? | Fázis 3 |
 

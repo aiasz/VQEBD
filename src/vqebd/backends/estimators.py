@@ -561,6 +561,65 @@ class IBMQpuEnergyEvaluator(IsaEnergyEvaluator):
         }
         return float(data.evs)
 
+    def evaluate_observables(
+        self,
+        observables: Sequence[Any],
+        parameter_sets: Sequence[Sequence[float]],
+    ) -> list[dict[str, Any]]:
+        """Több PUB **egyetlen jobban**: azonos ISA-áramkör, más observable és paraméter.
+
+        Kvótatakarékos pásztázáshoz (pl. H₂ disszociációs görbe): a H₂ UCCSD-áramköre
+        minden kötéshossznál azonos, csak a θ*(R) és a Hamilton-operátor változik.
+        Egy job 5 PUB-bal kevesebb QPU-időt és sorban állást igényel, mint 5 job.
+
+        Args:
+            observables: **Logikai** (layout nélküli) qubit-Hamilton-operátorok; a
+                konstruktorbeli ISA-layoutra képezzük le őket.
+            parameter_sets: A PUB-onkénti paraméterek (azonos hosszú lista).
+
+        Returns:
+            PUB-onként: ``evs``, ``stds``, ``ensemble_standard_error`` és ``metadata``
+            (elektronos energia, Ha). A job azonosítója a :attr:`last_job_id`-ben.
+
+        Raises:
+            ValueError: Eltérő hosszú bemenet vagy eltérő qubit-számú observable esetén.
+        """
+        if len(observables) != len(parameter_sets) or not observables:
+            raise ValueError(
+                f"az observable-ök ({len(observables)}) és a paraméterkészletek "
+                f"({len(parameter_sets)}) száma azonos és pozitív legyen"
+            )
+        layout = self._isa_circuit.layout
+        pubs = []
+        for observable, params in zip(observables, parameter_sets, strict=True):
+            if int(observable.num_qubits) != self.num_qubits:
+                raise ValueError(
+                    f"az observable qubit-száma ({observable.num_qubits}) eltér az "
+                    f"áramkörétől ({self.num_qubits})"
+                )
+            isa_observable = observable.apply_layout(layout) if layout is not None else observable
+            pubs.append((self._isa_circuit, isa_observable, list(params)))
+        job = self._estimator.run(pubs)
+        self._last_job_id = job.job_id()
+        result = job.result()
+        out: list[dict[str, Any]] = []
+        for pub_result in result:
+            data = pub_result.data
+            out.append(
+                {
+                    "evs": float(data.evs),
+                    "stds": float(data.stds) if hasattr(data, "stds") else None,
+                    "ensemble_standard_error": (
+                        float(data.ensemble_standard_error)
+                        if hasattr(data, "ensemble_standard_error")
+                        else None
+                    ),
+                    "metadata": dict(getattr(pub_result, "metadata", {}) or {}),
+                }
+            )
+        self._last_metadata = {"result": dict(getattr(result, "metadata", {}) or {})}
+        return out
+
 
 def make_energy_evaluator(
     kind: BackendKind,

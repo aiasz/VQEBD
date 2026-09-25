@@ -17,6 +17,13 @@ Az ``L0 ≡ L1`` egyezés igazolja, hogy a fermion → qubit leképezés **helye
 eltérnek, a hiba a leképezésben van, nem a VQE-ben — és ezt a két szint
 szétválasztása nélkül nem lehetne megállapítani.
 
+**L0′ — CASCI (PySCF, Fázis 5).**
+    Aktív térben az L1 már nem az FCI-t, hanem az aktív térbeli egzakt megoldást
+    (CASCI) közelíti. A kettő különbsége, a **csonkolási hiba** (CASCI − FCI), a
+    modell tudatos egyszerűsítése, nem implementációs hiba. Az L0′ a PySCF
+    ``mcscf.CASCI`` független számítása, így aktív térben az ``L0′ ≡ L1`` egyezés
+    igazolja a leképezést (``docs/plan/phase_05.md`` 2. fejezet: ≤ 4·10⁻¹⁴ Ha).
+
 Skálázási korlát
 ----------------
 Az L1 sűrű mátrixot épít: a memóriaigény ``4^n`` komplex szám ``n`` qubitre.
@@ -35,12 +42,13 @@ from typing import Final
 
 from vqebd.chemistry.mapping import QubitHamiltonian
 from vqebd.chemistry.problem import ElectronicStructure
-from vqebd.config import MoleculeSpec
+from vqebd.config import ActiveSpaceSpec, MoleculeSpec
 
 __all__ = [
     "CHEMICAL_ACCURACY_HA",
     "MAX_EXACT_DIAGONALIZATION_QUBITS",
     "ReferenceEnergies",
+    "casci_energy",
     "collect_references",
     "exact_ground_state_energy",
     "fci_energy",
@@ -75,14 +83,17 @@ class ReferenceEnergies:
         full_ci: L0 — a Full CI teljes energia (Ha), vagy ``None``, ha a feladat
             túl nagy a klasszikus egzakt megoldáshoz.
         exact_diagonalization: L1 — a qubit-Hamilton-operátor legkisebb
-            sajátértéke + magtaszítás (Ha), vagy ``None``, ha túl nagy.
+            sajátértéke + energiaeltolás (Ha), vagy ``None``, ha túl nagy.
         nuclear_repulsion: A magtaszítási energia (Ha).
+        casci: L0′ — CASCI energia az aktív térben (Ha); ``None`` teljes térben,
+            vagy ha a klasszikus referenciát nem kértük.
     """
 
     hartree_fock: float
     full_ci: float | None
     exact_diagonalization: float | None
     nuclear_repulsion: float
+    casci: float | None = None
 
     @property
     def correlation_energy(self) -> float | None:
@@ -97,14 +108,27 @@ class ReferenceEnergies:
 
     @property
     def mapping_error(self) -> float | None:
-        """``L1 − L0`` (Ha) — a fermion → qubit leképezés hibája.
+        """``L1 − L0`` (teljes tér) vagy ``L1 − L0′`` (aktív tér), Ha-ben.
 
-        Helyes leképezésnél ez gépi pontossággal nulla. Bármi ennél nagyobb
-        implementációs hibát jelez.
+        A fermion → qubit leképezés hibája. Helyes leképezésnél gépi pontossággal
+        nulla; bármi ennél nagyobb implementációs hibát jelez. Aktív térben a
+        CASCI-hoz mérünk, különben a csonkolási hiba (akár 34 mHa) leképezési
+        hibának látszana.
         """
-        if self.full_ci is None or self.exact_diagonalization is None:
+        exact_reference = self.casci if self.casci is not None else self.full_ci
+        if exact_reference is None or self.exact_diagonalization is None:
             return None
-        return self.exact_diagonalization - self.full_ci
+        return self.exact_diagonalization - exact_reference
+
+    @property
+    def truncation_error(self) -> float | None:
+        """``L0′ − L0`` = CASCI − FCI (Ha) — az aktívtér-csonkolás hibája.
+
+        Nemnegatív (a CASCI variációs a teljes térhez képest). Teljes térben ``None``.
+        """
+        if self.casci is None or self.full_ci is None:
+            return None
+        return self.casci - self.full_ci
 
     @property
     def best(self) -> float:
@@ -123,6 +147,7 @@ class ReferenceEnergies:
         data: dict[str, float | None] = dict(asdict(self))
         data["correlation_energy"] = self.correlation_energy
         data["mapping_error"] = self.mapping_error
+        data["truncation_error"] = self.truncation_error
         return data
 
 
@@ -176,8 +201,52 @@ def fci_energy(spec: MoleculeSpec) -> float:
     return float(energy)
 
 
+def casci_energy(spec: MoleculeSpec, active_space: ActiveSpaceSpec) -> float:
+    """L0′ — CASCI energia PySCF-fel az aktív térben (Ha).
+
+    A PySCF alapértelmezett pályaválasztása (``ncore = (N − n_akt)/2`` legalsó
+    pálya befagyasztva, utána ``n_pálya`` aktív) megegyezik a Qiskit Nature
+    ``ActiveSpaceTransformer``-ével; a két kódút egyezését az AC-5.1 teszt őrzi.
+
+    Args:
+        spec: A molekula leírása.
+        active_space: Az aktív tér.
+
+    Returns:
+        A CASCI teljes energia Hartree-ban.
+
+    Raises:
+        RuntimeError: Ha a PySCF nem tudja megoldani a feladatot.
+    """
+    from pyscf import gto, mcscf, scf
+
+    try:
+        mol = gto.M(
+            atom=spec.atom,
+            basis=spec.basis,
+            charge=spec.charge,
+            spin=spec.spin,
+            unit="Angstrom",
+            verbose=0,
+        )
+        mean_field = scf.RHF(mol) if spec.spin == 0 else scf.ROHF(mol)
+        mean_field.run()
+        if not mean_field.converged:
+            raise RuntimeError("a Hartree–Fock SCF nem konvergált")
+        casci = mcscf.CASCI(
+            mean_field, active_space.num_spatial_orbitals, active_space.num_electrons
+        )
+        energy = casci.kernel()[0]
+    except Exception as exc:
+        raise RuntimeError(
+            f"a(z) '{spec.name}' molekula {active_space.label} CASCI energiája nem "
+            f"számolható: {type(exc).__name__}: {exc}"
+        ) from exc
+    return float(energy)
+
+
 def exact_ground_state_energy(hamiltonian: QubitHamiltonian) -> float:
-    """L1 — a qubit-Hamilton-operátor legkisebb sajátértéke + magtaszítás (Ha).
+    """L1 — a qubit-Hamilton-operátor legkisebb sajátértéke + energiaeltolás (Ha).
 
     Sűrű mátrixot épít és ``numpy.linalg.eigvalsh``-t hív. Mivel a Hamilton-operátor
     hermitikus, az ``eigvalsh`` (nem ``eigvals``) a helyes választás: gyorsabb, és
@@ -204,7 +273,7 @@ def exact_ground_state_energy(hamiltonian: QubitHamiltonian) -> float:
 
     matrix = hamiltonian.operator.to_matrix()
     electronic = float(np.linalg.eigvalsh(matrix)[0])
-    return electronic + hamiltonian.nuclear_repulsion_energy
+    return electronic + hamiltonian.energy_offset
 
 
 def collect_references(
@@ -224,6 +293,11 @@ def collect_references(
         A :class:`ReferenceEnergies`.
     """
     full_ci: float | None = fci_energy(structure.spec) if compute_fci else None
+    casci: float | None = (
+        casci_energy(structure.spec, structure.active_space)
+        if compute_fci and structure.active_space is not None
+        else None
+    )
 
     exact: float | None
     try:
@@ -237,4 +311,5 @@ def collect_references(
         full_ci=full_ci,
         exact_diagonalization=exact,
         nuclear_repulsion=structure.nuclear_repulsion_energy,
+        casci=casci,
     )

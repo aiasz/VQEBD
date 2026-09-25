@@ -12,7 +12,12 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from vqebd.storage.schema import CURRENT_SCHEMA_VERSION, SCHEMA_V1_DDL
+from vqebd.storage.schema import (
+    CURRENT_SCHEMA_VERSION,
+    SCHEMA_V1_DDL,
+    SCHEMA_V2_COLUMNS,
+    SCHEMA_V2_INDEXES,
+)
 from vqebd.vqe.result import VQEResult
 
 __all__ = ["DEFAULT_DB_PATH", "Database"]
@@ -62,35 +67,62 @@ class Database:
         self._conn.close()
 
     def _init_schema(self) -> None:
-        """Séma inicializálása és verzióellenőrzés."""
+        """Séma inicializálása, verzióellenőrzés és szükség esetén v1 → v2 migráció.
+
+        Friss adatbázis: v1 DDL + v2 oszlopok, ugyanazon az úton, mint egy migráció
+        (így a kettő szerkezete konstrukció szerint azonos). Ismeretlen (újabb vagy
+        értelmetlen) verziónál hibát ad — egy régebbi kód nem írhat újabb sémába.
+        """
+        now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         with self._conn:
             self._conn.executescript(SCHEMA_V1_DDL)
             cur = self._conn.cursor()
             cur.execute("SELECT value FROM meta WHERE key = 'schema_version'")
             row = cur.fetchone()
             if row is None:
+                self._add_v2_columns()
                 cur.execute(
                     "INSERT INTO meta (key, value) VALUES ('schema_version', ?)",
                     (str(CURRENT_SCHEMA_VERSION),),
                 )
+                cur.execute("INSERT INTO meta (key, value) VALUES ('created_at', ?)", (now,))
+                return
+            db_ver = int(row["value"])
+            if db_ver == 1:
+                self._add_v2_columns()
+                cur.execute("UPDATE meta SET value = '2' WHERE key = 'schema_version'")
                 cur.execute(
-                    "INSERT INTO meta (key, value) VALUES ('created_at', ?)",
-                    (time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),),
+                    "INSERT OR REPLACE INTO meta (key, value) VALUES ('migrated_v1_to_v2_at', ?)",
+                    (now,),
                 )
-            else:
-                db_ver = int(row["value"])
-                if db_ver != CURRENT_SCHEMA_VERSION:
-                    raise ValueError(
-                        f"adatbázis sémaverzió eltérés: várt={CURRENT_SCHEMA_VERSION}, "
-                        f"talált={db_ver}. Migráció szükséges."
-                    )
+            elif db_ver != CURRENT_SCHEMA_VERSION:
+                raise ValueError(
+                    f"adatbázis sémaverzió eltérés: várt={CURRENT_SCHEMA_VERSION}, "
+                    f"talált={db_ver}. Ismeretlen verzióra nem migrálunk."
+                )
 
-    def insert_result(self, result: VQEResult, *, run_id: str | None = None) -> str:
+    def _add_v2_columns(self) -> None:
+        """A v2 oszlopok hozzáadása (idempotens: a meglévőket kihagyja)."""
+        existing = {r["name"] for r in self._conn.execute("PRAGMA table_info(results)")}
+        for name, sql_type in SCHEMA_V2_COLUMNS:
+            if name not in existing:
+                self._conn.execute(f"ALTER TABLE results ADD COLUMN {name} {sql_type}")
+        self._conn.executescript(SCHEMA_V2_INDEXES)
+
+    def insert_result(
+        self,
+        result: VQEResult,
+        *,
+        run_id: str | None = None,
+        batch_id: str | None = None,
+        repeat_index: int | None = None,
+    ) -> str:
         """Egy VQEResult objektum mentése az adatbázisba."""
         rid = run_id or str(uuid.uuid4())
         ref = result.reference
         cfg = result.config
         mit = result.mitigation
+        rest = result.reestimate
 
         record: dict[str, Any] = {
             "run_id": rid,
@@ -134,9 +166,8 @@ class Database:
             "energy_ha": result.energy,
             "electronic_energy_ha": result.electronic_energy,
             "nuclear_repulsion_ha": result.nuclear_repulsion_energy,
-            "raw_energy_ha": (
-                (mit.raw_energy + result.nuclear_repulsion_energy) if mit else result.energy
-            ),
+            "energy_offset_ha": result.offset,
+            "raw_energy_ha": ((mit.raw_energy + result.offset) if mit else result.energy),
             "hartree_fock_ha": ref.hartree_fock,
             "full_ci_ha": ref.full_ci,
             "exact_diag_ha": ref.exact_diagonalization,
@@ -157,6 +188,17 @@ class Database:
             "wall_time_s": result.wall_time_s,
             "optimal_parameters_json": json.dumps(list(result.optimal_parameters)),
             "metadata_json": json.dumps(mit.metadata if mit else {}),
+            # --- v2 (Fázis 5) ---
+            "active_electrons": cfg.active_space.num_electrons if cfg.active_space else None,
+            "active_orbitals": cfg.active_space.num_spatial_orbitals if cfg.active_space else None,
+            "casci_ha": ref.casci,
+            "batch_id": batch_id,
+            "repeat_index": repeat_index,
+            "optimizer_final_ha": rest.optimizer_final_ha if rest else None,
+            "optimizer_history_min_ha": rest.history_min_ha if rest else None,
+            "reestimate_mean_ha": rest.mean_ha if rest else None,
+            "reestimate_sem_ha": rest.sem_ha if rest else None,
+            "reestimate_n": rest.n if rest else None,
         }
         return self.insert_record(record)
 
@@ -208,6 +250,13 @@ class Database:
 
         cur = self._conn.cursor()
         cur.execute(query, params)
+        return [dict(row) for row in cur.fetchall()]
+
+    def batch_results(self, batch_id: str) -> list[dict[str, Any]]:
+        """Egy batch összes rekordja, ``run_id`` szerint rendezve (determinisztikus)."""
+        cur = self._conn.execute(
+            "SELECT * FROM results WHERE batch_id = ? ORDER BY run_id", (batch_id,)
+        )
         return [dict(row) for row in cur.fetchall()]
 
     def count(self) -> int:

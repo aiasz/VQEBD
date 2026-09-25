@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | **Dokumentum** | `docs/04_data_schema.md` |
-| **Dokumentum-verzió** | 1.0.0 |
-| **Dátum** | 2026-09-23 |
-| **Projektverzió** | 0.7.0 |
+| **Dokumentum-verzió** | 1.1.0 |
+| **Dátum** | 2026-09-23 · 2026-09-25 (séma v2) |
+| **Projektverzió** | 0.8.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 4 — Adatséma és tárolás |
 
@@ -69,6 +69,30 @@ A VQEBD adattárolási rétege (`vqebd.storage`) a **FAIR adatkezelési alapelve
 
 ---
 
+## 2b. Séma v2 (Fázis 5, `v0.8.0`)
+
+A v2 tizenegy **nullázható** oszlopot ad a `results` táblához ([`phase_05.md`](plan/phase_05.md)
+7. fejezet). Egy v1 rekordnál a `NULL` jelentése: teljes pályatér, nem batch-futás,
+nincs újramintavételezés.
+
+| Oszlop | Típus | Jelentés |
+|---|---|---|
+| `active_electrons`, `active_orbitals` | INTEGER | aktív tér; `NULL` = teljes tér |
+| `casci_ha` | REAL | L0′ — CASCI (PySCF) az aktív térben |
+| `energy_offset_ha` | REAL | konstans eltolás: magtaszítás + inaktív energia |
+| `batch_id`, `repeat_index` | TEXT, INTEGER | batch és ismétlés (`vqebd.batch`) |
+| `optimizer_final_ha` | REAL | az optimalizáló visszaadott értéke (egyetlen zajos húzás) |
+| `optimizer_history_min_ha` | REAL | az optimalizálás közbeni kiértékelések minimuma (kiválasztott, torzított) |
+| `reestimate_mean_ha`, `reestimate_sem_ha`, `reestimate_n` | REAL, REAL, INTEGER | független újramintavételezés θ_opt-ban (ADR-0007 D2) |
+
+**Migráció:** egy v1 adatbázis megnyitásakor a `Database` automatikusan hozzáadja
+az oszlopokat (`ALTER TABLE … ADD COLUMN`). Egyetlen tranzakcióban frissíti a
+`meta.schema_version`-t 2-re, és naplózza a `migrated_v1_to_v2_at` időpontot.
+Meglévő sort nem módosít (append-only). Friss adatbázis ugyanezen az úton jön
+létre, ezért a friss és a migrált séma konstrukció szerint azonos. Ezt a TC-509
+teszt ellenőrzi. Ismeretlen (újabb) verziójú adatbázist a kód nem migrál, hanem
+hibát ad.
+
 ## 3. Használat
 
 ### Adatbázis elérése Pythonból
@@ -88,5 +112,5 @@ for r in records:
 ### Exportálás CSV / JSON formátumba
 
 ```bash
-docker run --rm -v "${PWD}:/repo" vqebd:0.7.0 python scripts/export_results.py
+docker run --rm -v "${PWD}:/repo" vqebd:0.8.0 python scripts/export_results.py
 ```

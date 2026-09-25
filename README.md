@@ -2,9 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.7.1-orange.svg)](CHANGELOG.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.8.0--dev-orange.svg)](CHANGELOG.md)
 [![Fázis](https://img.shields.io/badge/fázis-4%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-455%20zöld-brightgreen.svg)](docs/testing/TR-F03_mitigation.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-528%20zöld-brightgreen.svg)](docs/testing/TR-F03_mitigation.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -22,11 +22,19 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 4 lezárva, javítókör (`v0.7.1`)** — a VQE-mag működik
+Jelenlegi állapot: **Fázis 5 folyamatban (`0.8.0` fejlesztés alatt), utolsó kiadás
+`v0.7.1`** — a VQE-mag működik
 három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
 Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.storage`).
+
+> **Fázis 5 — részállapot (2026-09-25).** Elkészült az aktív tér (LiH, BeH₂;
+> CASCI-keresztvalidáció ≤ 4·10⁻¹⁴ Ha), a batch-motor, az ismétlésen alapuló
+> statisztika (ADR-0007) és a séma v2. A statisztikai batch (180 futás) lefutott.
+> **A hardveres kiegészítés (H₂ disszociációs görbe) az IBM-kvóta kimerülése miatt
+> 2026-10-21 utánra halasztva.** A folytatás teljes leírása:
+> [`docs/plan/phase_05_allapot.md`](docs/plan/phase_05_allapot.md).
 
 > **v0.7.1 — javítókör (2026-09-25).** A Fázis 5 előtti átvizsgálás három mérési
 > hibát tárt fel és javított: (1) az Aer-mintavétel minden kiértékelésnél ugyanazt
@@ -46,7 +54,7 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 | **2** | **Egyszeri futás valódi IBM-hardveren (`ibm_kingston` Heron QPU, L5)** | ✅ **Lezárva** (`v0.5.0`) |
 | **3** | **Hibaenyhítés (ISA ZNE + Mitiq keresztvalidáció, L4)** | ✅ **Lezárva** (`v0.6.0`) |
 | **4** | **Adatséma és perzisztens tárolás (SQLite / CSV / JSON)** | ✅ **Lezárva** (`v0.7.0`) |
-| 5 | Batch futtatás, több molekula (LiH, BeH2) | ⏳ **Következő** (`v0.8.0`) |
+| **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | 🔄 **Folyamatban** (`0.8.0`) — [állapot](docs/plan/phase_05_allapot.md) |
 | 6 | Automatizálás és ütemezés | ⬜ Tervezett |
 | 7 | Streamlit dashboard | ⬜ Tervezett |
 | 8 | Teljes konténerizáció | ⬜ Tervezett |
@@ -193,7 +201,7 @@ JSON exportok készülnek. A verziózott referencia-export:
 | **L4** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1075860081 | +29.7 mHa |
 | **L5** | `ibm_kingston` | ibm_resilience_1 (TREX) | −1.1412691258 | −4.0 mHa ² |
 
-¹ a zajos minimum kiválasztási torzítása (TR-F01B 6.3) · ² 1σ-n belül (TR-F02)
+¹ statisztikus: egyetlen zajos végponti húzás, σ ≈ 11 mHa (TR-F01B 6.3) · ² 1σ-n belül (TR-F02)
 
 Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](docs/testing/TR-F04_storage.md).
 
@@ -204,20 +212,20 @@ Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (455 teszt)
+make test       # teljes tesztkészlet (528 teszt)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.7.1 python -m vqebd
+docker run --rm vqebd:0.8.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.1 .
-docker run --rm vqebd:0.7.1 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.0 .
+docker run --rm vqebd:0.8.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -314,12 +322,20 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 4 completed, correction round (`v0.7.1`)** — the VQE core
+Current status: **Phase 5 in progress (`0.8.0` under development), last release
+`v0.7.1`** — the VQE core
 works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
 mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 (`vqebd.storage`).
+
+> **Phase 5 — interim state (2026-09-25).** Active-space support (LiH, BeH₂; CASCI
+> cross-validation ≤ 4·10⁻¹⁴ Ha), the batch engine, the repetition-based
+> statistics (ADR-0007) and schema v2 are done. The statistical batch (180 runs)
+> has completed. **The hardware extension (H₂ dissociation curve) is postponed until
+> after 2026-10-21 because the IBM quota is exhausted.** Full continuation guide
+> (in Hungarian): [`docs/plan/phase_05_allapot.md`](docs/plan/phase_05_allapot.md).
 
 > **v0.7.1 — correction round (2026-09-25).** The review before Phase 5 found and
 > fixed three measurement defects: (1) Aer sampling applied the same offset to
@@ -339,7 +355,7 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 | **2** | **Single run on real IBM hardware (`ibm_kingston` Heron QPU, L5)** | ✅ **Completed** (`v0.5.0`) |
 | **3** | **Error mitigation (ISA ZNE + Mitiq cross-validation, L4)** | ✅ **Completed** (`v0.6.0`) |
 | **4** | **Data schema and persistent storage (SQLite / CSV / JSON)** | ✅ **Completed** (`v0.7.0`) |
-| 5 | Batch runs, multiple molecules (LiH, BeH2) | ⏳ **Next** (`v0.8.0`) |
+| **5** | **Batch runs, active space (LiH, BeH2), statistics** | 🔄 **In progress** (`0.8.0`) — [status](docs/plan/phase_05_allapot.md) |
 | 6 | Automation and scheduling | ⬜ Planned |
 | 7 | Streamlit dashboard | ⬜ Planned |
 | 8 | Full containerization | ⬜ Planned |
@@ -488,7 +504,7 @@ versioned reference export:
 | **L4** | `qiskit_aer_noisy` | zne_local (Rich.) | −1.1075860081 | +29.7 mHa |
 | **L5** | `ibm_kingston` | ibm_resilience_1 (TREX) | −1.1412691258 | −4.0 mHa ² |
 
-¹ selection bias of the noisy minimum (TR-F01B 6.3) · ² within 1σ (TR-F02)
+¹ statistical: a single noisy draw at the endpoint, σ ≈ 11 mHa (TR-F01B 6.3) · ² within 1σ (TR-F02)
 
 Details: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](docs/testing/TR-F04_storage.md).
 
@@ -499,20 +515,20 @@ Details: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](d
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (455 tests)
+make test       # full test suite (528 tests)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.7.1 python -m vqebd
+docker run --rm vqebd:0.8.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.7.1 .
-docker run --rm vqebd:0.7.1 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.0 .
+docker run --rm vqebd:0.8.0 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**

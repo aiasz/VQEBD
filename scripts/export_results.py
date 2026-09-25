@@ -20,6 +20,7 @@ from pathlib import Path
 from vqebd.chemistry.molecule import H2_REFERENCE_BOND_LENGTH, h2
 from vqebd.config import MitigationSpec, OptimizerSpec, VQEConfig
 from vqebd.storage import (
+    CURRENT_SCHEMA_VERSION,
     DEFAULT_DB_PATH,
     Database,
     export_to_csv,
@@ -123,7 +124,7 @@ def populate_benchmark_runs(db: Database) -> int:
             hw_record = {
                 "run_id": run_id_hw,
                 "timestamp": hw_raw.get("timestamp", "2026-09-23T09:52:06Z"),
-                "schema_version": 1,
+                "schema_version": CURRENT_SCHEMA_VERSION,
                 "molecule_name": "H2",
                 "geometry": "H 0 0 0; H 0 0 0.735000",
                 "bond_length": 0.735,
@@ -154,6 +155,7 @@ def populate_benchmark_runs(db: Database) -> int:
                 "energy_ha": hw_energy,
                 "electronic_energy_ha": hw_raw.get("electronic_energy_ha", -1.8612381202),
                 "nuclear_repulsion_ha": hw_raw.get("nuclear_repulsion_ha", 0.7199689944),
+                "energy_offset_ha": hw_raw.get("nuclear_repulsion_ha", 0.7199689944),
                 "raw_energy_ha": hw_energy,
                 "hartree_fock_ha": res_exact.reference.hartree_fock,
                 "full_ci_ha": res_exact.reference.full_ci,
