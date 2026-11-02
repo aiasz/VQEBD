@@ -1,0 +1,4 @@
+6352160344462f26a5547a0874c2bc88412c970f886e5433ca755431147e93c9 57a421b 2026-11-02
+# Fázis 11 — befagyasztott protokoll. Az első token a vqebd.heron_model.PROTOCOL SHA-256 ujjlenyomata,
+# a második a kód commitja (11.A), a harmadik a befagyasztás napja. A szerző jóváhagyta (2026-11-02).
+# A protokoll (δ, geometriák, qubitpár, blokkszám, kvótahatár) módosítása új protokoll, nem javítás.

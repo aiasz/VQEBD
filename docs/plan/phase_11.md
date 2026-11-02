@@ -5,7 +5,7 @@
 | **Fázis** | 11 *(a mesterterv 10. „közösségi visszacsatolás" fázisától független, kísérleti ág; a számozás nem jelent időrendet)* |
 | **Dokumentum-verzió** | 1.2.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a befagyasztás (`FROZEN`, címke) a szerzőre vár. Semmilyen hardveres futtatás nem indult; a blokkokat a szerző blokkonként külön hagyja jóvá.** |
+| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). Semmilyen hardveres futtatás nem indult; a blokkokat a szerző blokkonként külön hagyja jóvá.** |
 | **Célverzió** | `v1.1.0` (ha a fázis lezárul) |
 | **Tesztterv** | [`TP-F11`](../testing/TP-F11_heron_modell.md) |
 | **Előzmény** | [`phase_09.md`](phase_09.md), [`TR-F05` 7.](../testing/TR-F05_batch.md), [`10_literature_positioning.md`](../10_literature_positioning.md), v1.0.0 |
@@ -187,7 +187,7 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 | AC-11.2 | ✅ a futtató blokk előtt és után menti a pillanatképet; a modell a blokk kalibrációjából épül (a blokk végén nem épül újra) |
 | AC-11.3 | ✅ `tests/unit/test_heron_analysis.py` (5 mHa eltolás kimutatva, eltolás nélkül egyenértékű, döntési szabály) |
 | AC-11.4 | ✅ `tests/unit/test_heron_model.py` (80% kapu, ütemterv-összeg, hiányzó engedély, hiányzó `FROZEN`); a szárazfutás **0 QPU-s** |
-| AC-11.5 | ⬜ a szerzőre vár (`FROZEN` + címke) |
+| AC-11.5 | ✅ befagyasztva 2026-11-02: `docs/figures/data/f11/FROZEN` (ujjlenyomat `63521603…e93c9`, kód: `57a421b`) + annotált címke `protocol-f11-frozen`; az első blokk (B0) még nem futott |
 | AC-11.6–7 | ⬜ a mérések után |
 
 ## 7. Kockázatok és korlátok
