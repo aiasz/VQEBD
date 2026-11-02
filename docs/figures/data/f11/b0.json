@@ -1,0 +1,213 @@
+{
+  "block": "B0",
+  "kind": "pilot",
+  "vqebd_version": "1.0.0",
+  "protocol_fingerprint": "6352160344462f26a5547a0874c2bc88412c970f886e5433ca755431147e93c9",
+  "timestamp": "2026-11-02T17:39:56Z",
+  "backend": "ibm_kingston",
+  "shots": 8192,
+  "physical_qubits": [
+    1,
+    2
+  ],
+  "quota_before": {
+    "usage_consumed_seconds": 57,
+    "usage_limit_seconds": 600,
+    "usage_remaining_seconds": 543,
+    "usage_limit_reached": false,
+    "usage_period": {
+      "start_time": "2026-10-05T17:01:42.538Z",
+      "end_time": "2026-11-02T17:01:42.538Z"
+    },
+    "time_available_at": null
+  },
+  "quota_after": {
+    "usage_consumed_seconds": 114,
+    "usage_limit_seconds": 600,
+    "usage_remaining_seconds": 486,
+    "usage_limit_reached": false,
+    "usage_period": {
+      "start_time": "2026-10-05T17:39:58.441Z",
+      "end_time": "2026-11-02T17:39:58.441Z"
+    },
+    "time_available_at": null
+  },
+  "calibration_before": {
+    "backend": "ibm_kingston",
+    "last_update_date": "2026-11-02T16:10:11+00:00",
+    "captured_utc": "2026-11-02T17:01:45Z",
+    "physical_qubits": [
+      1,
+      2
+    ],
+    "qubits": {
+      "1": {
+        "t1_s": 0.00039360803328975685,
+        "t2_s": 0.0006966840823622926,
+        "readout_error": 0.0108642578125,
+        "sx_error": 0.0002589022690465791,
+        "x_error": 0.0002589022690465791
+      },
+      "2": {
+        "t1_s": 0.00032013458727239816,
+        "t2_s": 0.00012676589860406958,
+        "readout_error": 0.0091552734375,
+        "sx_error": 0.0002067563453589604,
+        "x_error": 0.0002067563453589604
+      }
+    },
+    "cz_errors": {
+      "1-2": 0.0011305198812263106,
+      "2-1": 0.0011305198812263106
+    }
+  },
+  "calibration_after": {
+    "backend": "ibm_kingston",
+    "last_update_date": "2026-11-02T16:10:11+00:00",
+    "captured_utc": "2026-11-02T17:39:56Z",
+    "physical_qubits": [
+      1,
+      2
+    ],
+    "qubits": {
+      "1": {
+        "t1_s": 0.00039360803328975685,
+        "t2_s": 0.0006966840823622926,
+        "readout_error": 0.0108642578125,
+        "sx_error": 0.0002589022690465791,
+        "x_error": 0.0002589022690465791
+      },
+      "2": {
+        "t1_s": 0.00032013458727239816,
+        "t2_s": 0.00012676589860406958,
+        "readout_error": 0.0091552734375,
+        "sx_error": 0.0002067563453589604,
+        "x_error": 0.0002067563453589604
+      }
+    },
+    "cz_errors": {
+      "1-2": 0.0011305198812263106,
+      "2-1": 0.0011305198812263106
+    }
+  },
+  "hardware_mha": {
+    "raw": {
+      "0.5": 52.985878193032576,
+      "0.735": 39.98669306445146,
+      "1.0": 25.94856941238266,
+      "1.5": 16.89581426798736,
+      "2.0": 15.933731434172316
+    },
+    "trex": {
+      "0.5": 13.668842608002052,
+      "0.735": 7.07838053810006,
+      "1.0": 3.2475762083339355,
+      "1.5": 2.7942737287882657,
+      "2.0": 2.372313144013427
+    }
+  },
+  "model_mha": {
+    "readout": {
+      "0.5": 35.61014458436005,
+      "0.735": 25.905370926647283,
+      "1.0": 18.20659358860666,
+      "1.5": 13.39659437606151,
+      "2.0": 13.508645964100044
+    },
+    "no_readout": {
+      "0.5": 11.863454998709333,
+      "0.735": 9.120356325131063,
+      "1.0": 5.7515638010755765,
+      "1.5": 3.9384651289247956,
+      "2.0": 3.327820161879269
+    }
+  },
+  "runs": [
+    {
+      "resilience_level": 0,
+      "job_id": "dbkc5m0nceqs73aljbt0",
+      "wall_time_s": 2018.341661169019,
+      "quantum_seconds": 24,
+      "timestamps": {
+        "created": "2026-11-02T17:05:28.550145Z",
+        "finished": "2026-11-02T17:39:01.704489Z",
+        "running": "2026-11-02T17:38:25.4853Z"
+      },
+      "points": [
+        {
+          "bond_length": 0.5,
+          "energy_ha": -1.0021739162775922,
+          "stds_ha": 0.0035253787004813427,
+          "ensemble_standard_error_ha": 0.0035253787004813427
+        },
+        {
+          "bond_length": 0.735,
+          "energy_ha": -1.097319342688949,
+          "stds_ha": 0.00304091075306969,
+          "ensemble_standard_error_ha": 0.00304091075306969
+        },
+        {
+          "bond_length": 1.0,
+          "energy_ha": -1.075201760820236,
+          "stds_ha": 0.002780093692700221,
+          "ensemble_standard_error_ha": 0.002780093692700221
+        },
+        {
+          "bond_length": 1.5,
+          "energy_ha": -0.9812535392034227,
+          "stds_ha": 0.0024227951235047743,
+          "ensemble_standard_error_ha": 0.0024227951235047743
+        },
+        {
+          "bond_length": 2.0,
+          "energy_ha": -0.932707380742013,
+          "stds_ha": 0.001694062417448614,
+          "ensemble_standard_error_ha": 0.001694062417448614
+        }
+      ]
+    },
+    {
+      "resilience_level": 1,
+      "job_id": "dbkclel6p51s73cmcas0",
+      "wall_time_s": 52.20816467097029,
+      "quantum_seconds": 33,
+      "timestamps": {
+        "created": "2026-11-02T17:39:06.927181Z",
+        "finished": "2026-11-02T17:39:56.657197Z",
+        "running": "2026-11-02T17:39:08.029824Z"
+      },
+      "points": [
+        {
+          "bond_length": 0.5,
+          "energy_ha": -1.0414909518626227,
+          "stds_ha": 0.003986621326481434,
+          "ensemble_standard_error_ha": 0.0035261898655369727
+        },
+        {
+          "bond_length": 0.735,
+          "energy_ha": -1.1302276552153003,
+          "stds_ha": 0.004009835399738016,
+          "ensemble_standard_error_ha": 0.0030346460799922067
+        },
+        {
+          "bond_length": 1.0,
+          "energy_ha": -1.0979027540242847,
+          "stds_ha": 0.0029626101093471967,
+          "ensemble_standard_error_ha": 0.0028427256554258854
+        },
+        {
+          "bond_length": 1.5,
+          "energy_ha": -0.9953550797426218,
+          "stds_ha": 0.0021300522447274275,
+          "ensemble_standard_error_ha": 0.002527646628490029
+        },
+        {
+          "bond_length": 2.0,
+          "energy_ha": -0.9462687990321719,
+          "stds_ha": 0.0018506439768301835,
+          "ensemble_standard_error_ha": 0.0018262659721143863
+        }
+      ]
+    }
+  ]
+}

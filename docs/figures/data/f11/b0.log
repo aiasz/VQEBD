@@ -1,0 +1,11 @@
+Blokk B0 (pilot): 5 geometria × (nyers + TREX), R = (0.5, 0.735, 1.0, 1.5, 2.0) Å
+Becsült QPU-igény: 57.0 s (a kapu 71.2 s-mal számol)
+Kvóta: {"usage_consumed_seconds": 57, "usage_limit_seconds": 600, "usage_remaining_seconds": 543, "usage_limit_reached": false, "usage_period": {"start_time": "2026-10-05T17:01:42.538Z", "end_time": "2026-11-02T17:01:42.538Z"}, "time_available_at": null}
+Fizikai qubitek: [1, 2] (a protokollban előre rögzítve)
+Kalibráció: 2026-11-02T16:10:11+00:00
+Modell-előrejelzés (kvóta nélkül)…
+  modell (readout): 0.5: +35.61, 0.735: +25.91, 1.0: +18.21, 1.5: +13.40, 2.0: +13.51
+  modell (no_readout): 0.5: +11.86, 0.735: +9.12, 1.0: +5.75, 1.5: +3.94, 2.0: +3.33
+  szint 0: job dbkc5m0nceqs73aljbt0, 24 QPU-s
+  szint 1: job dbkclel6p51s73cmcas0, 33 QPU-s
+Mentve: docs/figures/data/f11/b0.json

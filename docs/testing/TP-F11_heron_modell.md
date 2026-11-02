@@ -8,7 +8,7 @@
 | **Fázis** | 11 — Kalibrációból épített Heron-zajmodell validálása valódi hardveren |
 | **Terv** | [`phase_11.md`](../plan/phase_11.md) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic) — a terv MI-vel készült, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész. A hardveres mérések (11.B, 11.C) és a TR-F11 még nem készültek.** |
+| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A megerősítő blokkok (11.C) és a végleges TR-F11 még nem készültek.** |
 
 ---
 
@@ -35,7 +35,8 @@
 | **TC-1109** | AC-11.4 | a futtató megtagadja a blokkot, ha a keret átlépődne (kilépési kód 2); engedély nélkül `HardwareNotAllowedError`; `FROZEN` nélkül `RuntimeError`; ismeretlen blokknév elutasítva | ugyanott |
 | **TC-1110** | AC-11.5 | a protokoll-ujjlenyomat módosításra változik; az eltérő `FROZEN` megtagadja a beküldést | ugyanott |
 | **TC-1111** | AC-11.4 | a protokoll a jóváhagyott értékeket tartalmazza (δ = 3,0 mHa; {0,735; 1,5; 2,0} Å; 8 blokk; 80%; qubitpár [1, 2]) | ugyanott |
-| **TC-1112** | AC-11.4 | `--dry-run` B0: 0 QPU-s, beküldés nélkül lefut, modell-előrejelzést ad | kézi végrehajtás, `phase_11.md` M9–M11 |
+| **TC-1112** | AC-11.4 | `--dry-run` B0: 0 QPU-s, beküldés nélkül lefut, modell-előrejelzést ad | kézi végrehajtás, `phase_11.md` M9–M11; megismételve a B0 előtt (2026-11-02), ✅ |
+| **TC-1114** | AC-11.4 | a B0 valódi futtatása: a kapuk átengedik, a tényleges QPU-idő = a becsült (57 s), a kvóta 57 → 114 s, a kimenet teljes | `b0.json`, `b0.log`, TR-F11 1. szakasz — ✅ |
 | **TC-1113** | AC-11.6 | a mért adat H1–H4 szerinti kiértékelése, a feltáró és megerősítő adat külön jelölve | `scripts/analyze_heron.py` a mérések után (TR-F11) |
 
 ## 3. A mérések kapui (nem teszt, hanem eljárás)

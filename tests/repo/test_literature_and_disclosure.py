@@ -144,7 +144,7 @@ def _cost(row_cost: str) -> float:
 
 def test_phase_11_schedule_stays_within_the_quota_rule(repo_root: Path) -> None:
     text = _read(repo_root, "docs/plan/phase_11.md")
-    assert "Semmilyen hardveres futtatás nem indult" in text
+    assert "A B0 pilot lefutott" in text  # a hardveres futások állása a tervben naprakész
     rows = re.findall(r"^\| (B0 pilot|C\d) \| \d+ \| ([\d,]+ s) \|", text, re.M)
     assert [r[0] for r in rows] == ["B0 pilot"] + [f"C{i}" for i in range(1, 9)]
     existing = 57.0  # a meglévő 5.H használat (TR-F05 7.)
