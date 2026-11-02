@@ -43,12 +43,15 @@ eltolás **magtaszítás + inaktív energia**. Aktív térben ez nem azonos a
 
 ### Melyik teret válasszuk?
 
-| Tér | Qubit | Csonkolás (CASCI − FCI) | Megjegyzés |
+| Tér | Qubit¹ | Csonkolás (CASCI − FCI) | Megjegyzés |
 |---|---|---|---|
-| LiH (2e,3o) — minimális | 6 | 15.7–71.8 mHa | a korrelációs energia töredékét tartja meg |
+| LiH (2e,3o) — minimális | 4 | 15.7–71.8 mHa | a korrelációs energia töredékét tartja meg |
 | **LiH (2e,5o) — frozen core** | 8 | **0.23–0.34 mHa** | kémiai pontosságon belül |
-| BeH₂ (2e,3o) — minimális | 6 | 25.3–67.6 mHa | |
+| BeH₂ (2e,3o) — minimális | 4 | 25.3–67.6 mHa | |
 | **BeH₂ (4e,6o) — frozen core** | 10 | **0.34 mHa** (1.33 Å) | |
+
+¹ Parity leképezés kétqubites redukcióval (a VQEBD alapértelmezése): `2 · pályák − 2` qubit. Mért
+(2026-11-02): H₂ 2, (2e,3o) 4, LiH (2e,5o) 8, BeH₂ (4e,6o) 10 qubit; 3, 8, 24, 92 paraméter.
 
 A minimális tér modellhibája **determinisztikus**: ismétléssel nem csökken. A
 választás mért indoklása: [`phase_05.md`](plan/phase_05.md) 2. fejezet, ábra:

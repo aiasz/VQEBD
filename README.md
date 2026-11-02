@@ -296,6 +296,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | A Fázis 4 részletes terve |
 | [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | A Fázis 5 részletes terve |
 | [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | A Fázis 6 részletes terve |
+| [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | A Fázis 7 terve (dashboard) — **terv, nincs megvalósítva** |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
@@ -660,6 +661,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | Detailed Phase 4 plan |
 | [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | Detailed Phase 5 plan |
 | [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | Detailed Phase 6 plan |
+| [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | Phase 7 plan (dashboard) — **plan only, not implemented** |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |

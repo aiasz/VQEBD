@@ -11,6 +11,10 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Javítva
+- `docs/05_batch.md`: a minimális (2e,3o) terek qubitszáma **4**, nem 6 (a táblázatban a pályaszám
+  kétszerese szerepelt; mérve parity leképezéssel, kétqubites redukcióval).
+
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés (a repó pusholása után).

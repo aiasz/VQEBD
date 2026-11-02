@@ -4,7 +4,7 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.4.0 |
+| **Dokumentum-verzió** | 1.5.0 |
 | **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
@@ -368,7 +368,7 @@ Az alapterv 10 fázisa megmarad. A változások:
 | **4** | Adatséma | + sémaverzió, + környezet-ujjlenyomat, + provenance-mezők, + FAIR-elvek |
 | **5** | Batch futtatás | + aktív tér (active space) redukció LiH/BeH2-re (mért indoklás: 4. fejezet táblázata), + **platform a kombinációs mátrix dimenziója**, + **ismétlésen alapuló statisztika** (N seed, t-CI, újramintavételezés, hibaköltségvetés — ADR-0007, [`phase_05.md`](phase_05.md)) |
 | **6** | Automatizálás | + strukturált hibatárolás, + újrapróbálkozási politika, + hardver alapértelmezésben nincs ütemezve ([`phase_06.md`](phase_06.md), ADR-0008) |
-| **7** | Dashboard | változatlan, 4 belső lépés |
+| **7** | Dashboard | változatlan, 4 belső lépés; + reprodukálható build (a lock betartatása), + három adatforrás ([`phase_07.md`](phase_07.md), ADR-0009) |
 | **8** | Konténerizáció | változatlan |
 | **9** | Publikálás | + CITATION.cff, + Zenodo |
 | **10** | Közösség | változatlan |
@@ -525,6 +525,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | 1.2.0 | 2026-09-25 | v0.7.1 javítókör (M6-jegyzet); Fázis 5: ismétlésen alapuló statisztika (ADR-0007), Q3 megválaszolva (frozen-core aktív tér, `phase_05.md` 2.). R13–R16 kockázatok felvéve. |
 | 1.3.0 | 2026-11-02 | Fázis 5 lezárva (v0.8.0/v0.8.1). Fázis 6 terve ([`phase_06.md`](phase_06.md), ADR-0008): hibatárolás, osztályozott újrapróbálás, hardver alapértelmezésben nem ütemezett (K7 tanulsága). |
 | 1.4.0 | 2026-11-02 | Fázis 6 lezárva (v0.9.0): hibatárolás (séma v3), osztályozott újrapróbálás, ütemező; ADR-0008 elfogadva. Terv-eltérés: a batch szintű kvótakapu a megvalósítás során pótolva ([`TR-F06`](../testing/TR-F06_automatizalas.md) 3.). |
+| 1.5.0 | 2026-11-02 | Fázis 7 terve ([`phase_07.md`](phase_07.md), ADR-0009). Előmérés: a Streamlit rejtett `pyarrow`/NumPy-ütközése (`pyarrow==25.0.0`), a `requirements.lock` nincs betartatva a buildben (21/71 eltérés). |
 
 ---
 
