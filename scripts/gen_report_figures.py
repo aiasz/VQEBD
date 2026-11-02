@@ -1498,6 +1498,10 @@ def figure_active_space(data: dict[str, Any], out: Path) -> None:
         ax.set_xlabel("Kötéshossz R (Å)", color=INK_SECONDARY, fontsize=9.5)
         ax.set_ylabel("Energia (Ha)", color=INK_SECONDARY, fontsize=9.5)
         style_axes(ax)
+        # Fejtér a jelmagyarázatnak: az adatok az y-tengely alsó ~62%-ában maradnak,
+        # így a jelmagyarázat egyetlen pontot vagy görbét sem takar.
+        y_lo, y_hi = ax.get_ylim()
+        ax.set_ylim(y_lo, y_lo + (y_hi - y_lo) / 0.62)
         name = "LiH" if molecule == "LiH" else "BeH₂"
         title(
             ax,

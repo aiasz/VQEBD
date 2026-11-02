@@ -2,9 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.8.0--dev-orange.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-4%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-528%20zöld-brightgreen.svg)](docs/testing/TR-F03_mitigation.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.8.0-blue.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-5%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-528%20zöld-brightgreen.svg)](docs/testing/TR-F05_batch.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -22,19 +22,19 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 5 folyamatban (`0.8.0` fejlesztés alatt), utolsó kiadás
-`v0.7.1`** — a VQE-mag működik
+Jelenlegi állapot: **Fázis 5 lezárva (`v0.8.0`)** — a VQE-mag működik
 három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
 Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.storage`).
 
-> **Fázis 5 — részállapot (2026-09-25).** Elkészült az aktív tér (LiH, BeH₂;
+> **Fázis 5 — lezárva (2026-11-02).** Elkészült az aktív tér (LiH, BeH₂;
 > CASCI-keresztvalidáció ≤ 4·10⁻¹⁴ Ha), a batch-motor, az ismétlésen alapuló
-> statisztika (ADR-0007) és a séma v2. A statisztikai batch (180 futás) lefutott.
-> **A hardveres kiegészítés (H₂ disszociációs görbe) az IBM-kvóta kimerülése miatt
-> 2026-10-21 utánra halasztva.** A folytatás teljes leírása:
-> [`docs/plan/phase_05_allapot.md`](docs/plan/phase_05_allapot.md).
+> statisztika (ADR-0007) és a séma v2. Mindkét batch lefutott (50 + 180 futás),
+> a 10 elfogadási kritérium teljesült: [`TR-F05`](docs/testing/TR-F05_batch.md).
+> **A hardveres H₂ disszociációs görbe (5.H) nem része a lezárásnak**; a
+> kvóta-ablak nyitva van, a mérés külön jóváhagyásra vár
+> ([`phase_05_allapot.md`](docs/plan/phase_05_allapot.md)).
 
 > **v0.7.1 — javítókör (2026-09-25).** A Fázis 5 előtti átvizsgálás három mérési
 > hibát tárt fel és javított: (1) az Aer-mintavétel minden kiértékelésnél ugyanazt
@@ -54,7 +54,7 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 | **2** | **Egyszeri futás valódi IBM-hardveren (`ibm_kingston` Heron QPU, L5)** | ✅ **Lezárva** (`v0.5.0`) |
 | **3** | **Hibaenyhítés (ISA ZNE + Mitiq keresztvalidáció, L4)** | ✅ **Lezárva** (`v0.6.0`) |
 | **4** | **Adatséma és perzisztens tárolás (SQLite / CSV / JSON)** | ✅ **Lezárva** (`v0.7.0`) |
-| **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | 🔄 **Folyamatban** (`0.8.0`) — [állapot](docs/plan/phase_05_allapot.md) |
+| **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | ✅ **Lezárva** (`v0.8.0`) |
 | 6 | Automatizálás és ütemezés | ⬜ Tervezett |
 | 7 | Streamlit dashboard | ⬜ Tervezett |
 | 8 | Teljes konténerizáció | ⬜ Tervezett |
@@ -206,13 +206,39 @@ JSON exportok készülnek. A verziózott referencia-export:
 Részletek: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](docs/testing/TR-F04_storage.md).
 
 
+### Fázis 5 — batch-futtatás, aktív tér és ismétlésen alapuló statisztika
+
+A zajos futás eredménye valószínűségi változó, ezért a Fázis 5 **N seeddel és K
+friss kiértékeléssel** méri, és a hibát konfidenciaintervallummal (95%, Student-t)
+osztályozza a kémiai pontossághoz (±1.6 mHa) képest.
+
+| Mért konfiguráció (H₂, N = 20 seed) | Hiba a Full CI-hez (95% CI) | Besorolás |
+|---|---|---|
+| lövészaj | +11.6 mHa [+7.7, +15.5] | `excluded` |
+| zajos (FakeManilaV2) | +38.2 mHa [+34.2, +42.1] | `excluded` |
+| zajos + ZNE (Richardson) | +11.5 mHa [+6.8, +16.2] | `excluded` |
+
+- **Egyik zajos konfiguráció sem kémiailag pontos**, és ezt a CI ki is zárja.
+- **Az ismétlés a szórást N^−½ szerint csökkenti, a torzítást nem** (mért
+  meredekség −0.48 … −0.55). A torzítás ellen a módszer (ZNE) hat.
+- **Aktív tér:** a frozen core LiH (2e,5o) 8 qubiten 0.23 mHa, BeH₂ (4e,6o) 10
+  qubiten 0.34 mHa csonkolással kémiai pontosságon belül marad; a minimális
+  (2e,3o) tér 15–72 mHa-t veszít.
+- **Ismert korlát:** LiH (2e,3o) zajosan +466 mHa (az UCCSD mélységi fala).
+
+![Aktív tér: LiH és BeH₂](docs/figures/fig07_aktiv_ter.png)
+![Az ismétlés hatása](docs/figures/fig08_ismetles.png)
+![Hibaköltségvetés](docs/figures/fig09_hibakoltsegvetes.png)
+
+Részletek: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_batch.md).
+
 ### Gyors indítás
 
 ```bash
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (528 teszt)
+make test       # teljes tesztkészlet (529 teszt, 1 kihagyott)
 ```
 
 Az első kvantumszámítás futtatása:
@@ -242,15 +268,17 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_02.md`](docs/plan/phase_02.md) | A Fázis 2 részletes terve |
 | [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | A Fázis 3 részletes terve |
 | [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | A Fázis 4 részletes terve |
+| [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | A Fázis 5 részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
 | [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Hibaenyhítés és Zero-Noise Extrapolation (L4)** |
 | [`docs/04_data_schema.md`](docs/04_data_schema.md) | **Adatséma, SQLite adattárolás és FAIR exportálás** |
+| [`docs/05_batch.md`](docs/05_batch.md) | **Batch-futtatás, aktív tér és statisztika** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
-| [`docs/adr/`](docs/adr/) | Architektúra-döntések (ADR-0001…0005) |
+| [`docs/adr/`](docs/adr/) | Architektúra-döntések (ADR-0001…0007) |
 | [`docs/testing/`](docs/testing/) | Teszttervek és mérési jegyzőkönyvek |
 
 #### Architektúra-döntések
@@ -263,6 +291,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [0004](docs/adr/ADR-0004-adattarolas.md) | SQLite kanonikus tároló, sémaverziózással, FAIR-elvek szerint |
 | [0005](docs/adr/ADR-0005-determinizmus.md) | Minden véletlenforrás explicit seedet kap, és rekordba kerül |
 | [0006](docs/adr/ADR-0006-tobbplatformos-architektura.md) | **A platform önálló benchmark-dimenzió** — Qiskit ↔ Cirq ↔ qsim |
+| [0007](docs/adr/ADR-0007-batch-statisztika.md) | **Ismétlésen alapuló statisztika és hibaköltségvetés** — N seed × K friss kiértékelés, t-CI |
 
 ### Módszertani alapelvek
 
@@ -322,20 +351,21 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 5 in progress (`0.8.0` under development), last release
-`v0.7.1`** — the VQE core
+Current status: **Phase 5 completed (`v0.8.0`)** — the VQE core
 works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
 mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 (`vqebd.storage`).
 
-> **Phase 5 — interim state (2026-09-25).** Active-space support (LiH, BeH₂; CASCI
+> **Phase 5 — completed (2026-11-02).** Active-space support (LiH, BeH₂; CASCI
 > cross-validation ≤ 4·10⁻¹⁴ Ha), the batch engine, the repetition-based
-> statistics (ADR-0007) and schema v2 are done. The statistical batch (180 runs)
-> has completed. **The hardware extension (H₂ dissociation curve) is postponed until
-> after 2026-10-21 because the IBM quota is exhausted.** Full continuation guide
-> (in Hungarian): [`docs/plan/phase_05_allapot.md`](docs/plan/phase_05_allapot.md).
+> statistics (ADR-0007) and schema v2 are done. Both batches have completed
+> (50 + 180 runs) and all 10 acceptance criteria are met:
+> [`TR-F05`](docs/testing/TR-F05_batch.md) (in Hungarian). **The hardware H₂
+> dissociation curve (5.H) is not part of the closure**; the quota window is open
+> again and the measurement awaits separate approval
+> ([`phase_05_allapot.md`](docs/plan/phase_05_allapot.md), in Hungarian).
 
 > **v0.7.1 — correction round (2026-09-25).** The review before Phase 5 found and
 > fixed three measurement defects: (1) Aer sampling applied the same offset to
@@ -355,7 +385,7 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 | **2** | **Single run on real IBM hardware (`ibm_kingston` Heron QPU, L5)** | ✅ **Completed** (`v0.5.0`) |
 | **3** | **Error mitigation (ISA ZNE + Mitiq cross-validation, L4)** | ✅ **Completed** (`v0.6.0`) |
 | **4** | **Data schema and persistent storage (SQLite / CSV / JSON)** | ✅ **Completed** (`v0.7.0`) |
-| **5** | **Batch runs, active space (LiH, BeH2), statistics** | 🔄 **In progress** (`0.8.0`) — [status](docs/plan/phase_05_allapot.md) |
+| **5** | **Batch runs, active space (LiH, BeH2), statistics** | ✅ **Completed** (`v0.8.0`) |
 | 6 | Automation and scheduling | ⬜ Planned |
 | 7 | Streamlit dashboard | ⬜ Planned |
 | 8 | Full containerization | ⬜ Planned |
@@ -509,13 +539,40 @@ versioned reference export:
 Details: [`docs/04_data_schema.md`](docs/04_data_schema.md), [`TR-F04 v1.1.0`](docs/testing/TR-F04_storage.md).
 
 
+### Phase 5 — Batch Runs, Active Space and Repetition-Based Statistics
+
+A noisy run's result is a random variable, so Phase 5 measures it with **N seeds
+and K fresh evaluations**, and classifies the error by its confidence interval
+(95%, Student-t) against chemical accuracy (±1.6 mHa).
+
+| Measured configuration (H₂, N = 20 seeds) | Error vs Full CI (95% CI) | Class |
+|---|---|---|
+| shot noise | +11.6 mHa [+7.7, +15.5] | `excluded` |
+| noisy (FakeManilaV2) | +38.2 mHa [+34.2, +42.1] | `excluded` |
+| noisy + ZNE (Richardson) | +11.5 mHa [+6.8, +16.2] | `excluded` |
+
+- **No noisy configuration is chemically accurate**, and the CI rules it out.
+- **Repetition shrinks the variance as N^−½ but not the bias** (measured log-log
+  slope −0.48 … −0.55). The *method* (ZNE) is what acts on the bias.
+- **Active space:** the frozen core keeps LiH (2e,5o) on 8 qubits at 0.23 mHa and
+  BeH₂ (4e,6o) on 10 qubits at 0.34 mHa truncation, within chemical accuracy; the
+  minimal (2e,3o) space loses 15–72 mHa.
+- **Known limit:** LiH (2e,3o) under noise is +466 mHa (the UCCSD depth wall).
+
+![Active space: LiH and BeH₂](docs/figures/fig07_aktiv_ter.png)
+![Effect of repetition](docs/figures/fig08_ismetles.png)
+![Error budget](docs/figures/fig09_hibakoltsegvetes.png)
+
+Details: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_batch.md)
+(both in Hungarian).
+
 ### Quick Start
 
 ```bash
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (528 tests)
+make test       # full test suite (529 tests, 1 skipped)
 ```
 
 Running the first quantum computation:
@@ -545,15 +602,17 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_02.md`](docs/plan/phase_02.md) | Detailed Phase 2 plan |
 | [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | Detailed Phase 3 plan |
 | [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | Detailed Phase 4 plan |
+| [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | Detailed Phase 5 plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
 | [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Error mitigation and Zero-Noise Extrapolation (L4)** |
 | [`docs/04_data_schema.md`](docs/04_data_schema.md) | **Data schema, SQLite database and FAIR exports** |
+| [`docs/05_batch.md`](docs/05_batch.md) | **Batch runs, active space and statistics** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |
-| [`docs/adr/`](docs/adr/) | Architecture decisions (ADR-0001…0005) |
+| [`docs/adr/`](docs/adr/) | Architecture decisions (ADR-0001…0007) |
 | [`docs/testing/`](docs/testing/) | Test plans and measurement logs |
 
 #### Architecture Decisions
@@ -565,6 +624,8 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [0003](docs/adr/ADR-0003-mitigacios-architektura.md) | Plugin-based error mitigation, **custom ISA-safe ZNE** (Mitiq loses qubits on ISA circuits) |
 | [0004](docs/adr/ADR-0004-adattarolas.md) | SQLite as canonical storage, with schema versioning, following FAIR principles |
 | [0005](docs/adr/ADR-0005-determinizmus.md) | Every random source gets an explicit seed and is recorded |
+| [0006](docs/adr/ADR-0006-tobbplatformos-architektura.md) | **The platform is its own benchmark dimension** — Qiskit ↔ Cirq ↔ qsim |
+| [0007](docs/adr/ADR-0007-batch-statisztika.md) | **Repetition-based statistics and error budget** — N seeds × K fresh evaluations, t-CI |
 
 ### Methodological Principles
 

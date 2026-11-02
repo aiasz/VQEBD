@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/plan/phase_05_allapot.md` |
 | **Rögzítve** | 2026-09-25 |
 | **Tervezett folytatás** | **2026-10-21** (az IBM-kvóta újra elérhető: `2026-10-21T11:27Z`) |
-| **Kódállapot** | `VERSION` = `0.8.0` — **fejlesztés alatt, a Fázis 5 nincs lezárva** |
+| **Kódállapot** | `VERSION` = `0.8.0` — **T1–T7 kész (2026-11-02); hátra: commit, címke, 5.H** |
 | **Utolsó lezárt kiadás** | `v0.7.1` (javítókör) |
 | **Terv** | [`phase_05.md`](phase_05.md) · [`ADR-0007`](../adr/ADR-0007-batch-statisztika.md) · [`TP-F05`](../testing/TP-F05_batch.md) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
@@ -128,6 +128,13 @@ a pontossághoz?”) mért válasza, a `phase_05.md` 3. fejezetének táblázat�
 
 ## 4. Ami félkész vagy hátravan
 
+> **Frissítés (2026-11-02):** T1–T7 elkészült. A determinisztikus batch 50/50,
+> fig07 és fig09 kész, a [`TR-F05`](../testing/TR-F05_batch.md), a
+> [`docs/05_batch.md`](../05_batch.md), a README (HU és EN) és a CHANGELOG lezárva.
+> K5 lezárva (TR-F05 6. pont). **Új: K8** (qsim tűrés, TR-F05 3.2). Hátra: a
+> `v0.8.0` commit és címke (felhasználói jóváhagyással), valamint T8 (5.H).
+> Az alábbi táblázat az eredeti állapotot rögzíti.
+
 | # | Teendő | Függ | Hogyan |
 |---|---|---|---|
 | T1 | **Determinisztikus batch befejezése** | — | 5.1 szakasz |
@@ -199,12 +206,32 @@ $RUN python -W ignore scripts/run_batch.py --preset f5-deterministic \
 4. **Még megírandó:** fig10 (hardveres PES, L0/L2 görbe és a két szint pontjai
    hibasávval, alul hiba vs. R), valamint a TR-F05 és a TR-F02 kiegészítése.
 
-**Kvótahelyzet a jegyzet írásakor** (`service.usage()`, csak olvasás):
-630 / 600 s felhasználva, `usage_limit_reached = true`,
-`time_available_at = 2026-10-21T11:27:12.987Z`. A 630 s-ból a projekt Fázis 2-es
-jobja 15 s volt. **A többi 615 s nem a projekt futásaiból származik.**
-Figyelem: a keret gördülő 28 napos ablak. A 2026-10-21 utáni tényleges
-hátralévő időt a `--dry-run` mutatja meg.
+**Kvótahelyzet** (`service.usage()` és `service.jobs()`, csak olvasás; frissítve 2026-09-28):
+
+- 632 / 600 s felhasználva, `usage_limit_reached = true`,
+  `time_available_at = 2026-10-21T11:27:59Z` (magyar idő szerint 13:27).
+- **A fogyasztás forrása: 2026-09-23, 43 job az `ibm_kingston`-on, mindegyik
+  pontosan 15 QPU-s:**
+  - 09:51 UTC — a Fázis 2 egyetlen mérése (`dapq25kak42c73cj1hu0`);
+  - 11:26–12:01 UTC — **42 job: egy teljes VQE-optimalizálás közvetlenül a QPU-n**
+    (`--backend ibm_qpu`), kiértékelésenként egy jobbal. A 2–4. job paraméterei
+    `[0,0,0]`, `[1,0,0]`, `[0,1,0]` — a COBYLA kezdő szimplexe. 41 job lefutott
+    (615 s), a 42. sorban ragadt.
+  - *Javítva (2026-09-28):* a jegyzet első változata szerint „a többi 615 s nem a
+    projekt futásaiból származik”. Ez téves volt: a projekt kódja fogyasztotta,
+    a hardveres VQE-útvonalon.
+- **A beragadt 42. jobot (`daprvcqc505c73cio2g0`) a felhasználó jóváhagyásával
+  2026-09-28-án töröltük** (`CANCELLED`, a saját számlázása 0 s). Így a kvóta
+  visszatérésekor nem fut le. A törléssel egy időben a fiókszintű számláló
+  630 → 632 s-ra nőtt (10.3184 → 10.3467 RU); jobhoz nem köthető, valószínűleg a
+  törölt job elszámolása.
+- A keret **gördülő 28 napos ablak**. Mivel minden job 09-23-án futott, a teljes
+  keret 2026-10-21-én ~12:05 UTC körül áll vissza. A tényleges hátralévő időt a
+  `--dry-run` mutatja meg.
+
+**Tanulság (javítandó, K7):** a `run_vqe` / `python -m vqebd --backend ibm_qpu`
+útvonal **nem** ellenőrzi a kvótát, és nem korlátozza a jobok számát. Egy
+optimalizálás annyi jobot küld be, amennyi kiértékelést az optimalizáló kér.
 
 ---
 
@@ -218,6 +245,7 @@ hátralévő időt a `--dry-run` mutatja meg.
 | K4 | UCCSD mélységi fal (LiH (2e,3o): +466 mHa zajosan) | mérve | hardverhatékony ansatz (Fázis 6+) |
 | K5 | Az optimalizáló végértéke +2.5 ± 1.0 mHa-val a friss átlag fölött | nyitott | TR-F05-ben kivizsgálni |
 | K6 | 5.H a lezárás előtt vagy után (4. fejezet) | **felhasználói döntés** | — |
+| K7 | A hardveres VQE-útvonal (`run_vqe`, CLI `--backend ibm_qpu`) kvótavédelem és jobszám-korlát nélkül fut — ez fogyasztotta el a keretet | mérve (5.2) | engedély + kvóta-előellenőrzés + kiértékelési keret a `run_vqe`-ben is (felajánlva, jóváhagyásra vár) |
 
 ---
 

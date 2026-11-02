@@ -12,18 +12,24 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ## [Unreleased] — Nem kiadott
 
 ### Tervezett
-- **Fázis 5.H** — H₂ disszociációs görbe valódi QPU-n (`scripts/run_hardware_pes.py`),
-  amint az IBM-kvóta újra elérhető (mérve: 2026-10-21).
+- **Fázis 5.H** — H₂ disszociációs görbe valódi QPU-n (`scripts/run_hardware_pes.py`).
+  A kvóta-ablak 2026-10-21 óta nyitva van; a mérés `--dry-run` és külön jóváhagyás
+  után indítható. Nem elfogadási kritérium, `v0.8.1` kiegészítés lehet.
+- **K7** — kvótavédelem és jobszám-korlát a hardveres VQE-útvonalon (`run_vqe`).
+- **K8** — a qsim platformtűrés (10⁻⁵ Ha) és a LiH (2e,5o) qsim-eltérés (2.8·10⁻⁵ Ha)
+  rendezése: tűrés a tér méretéhez kötve, vagy a cella kivétele a platformegyezésből.
 - **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
 
 ---
 
-## [0.8.0] — 2026-09-25 — **fejlesztés alatt, nem lezárt kiadás**
+## [0.8.0] — 2026-11-02
 
-**Fázis 5 — batch-futtatás, aktív tér, ismétlésen alapuló statisztika (részállapot).**
+**Fázis 5 — batch-futtatás, aktív tér, ismétlésen alapuló statisztika.**
 
-A fázis **nincs lezárva**; nincs `v0.8.0` címke. A hátralévő lépéseket és a
-2026-10-21-i folytatást a [`docs/plan/phase_05_allapot.md`](docs/plan/phase_05_allapot.md) írja le.
+A fázis lezárult: mind a 10 elfogadási kritérium teljesült
+([`TR-F05`](docs/testing/TR-F05_batch.md)); 529 teszt, ebből 528 sikeres és 1
+kihagyott (TC-302, a `mitiq` nélkül). A hardveres H₂ PES (5.H) **nem** része a
+kiadásnak (lásd *Tervezett*).
 
 ### Hozzáadva
 - **Aktív tér:** `ActiveSpaceSpec`, `energy_offset` (magtaszítás + inaktív energia),
@@ -42,12 +48,12 @@ A fázis **nincs lezárva**; nincs `v0.8.0` címke. A hátralévő lépéseket �
 - **Hardveres védőkorlátok** (`vqebd.hardware`): explicit engedély és
   **kvóta-előellenőrzés beküldés előtt**. `IBMQpuEnergyEvaluator.evaluate_observables`:
   több PUB egy jobban. `scripts/run_hardware_pes.py` (H₂ PES, `--dry-run`).
-- **Ábrák:** `fig08_ismetles`. A `fig07`/`fig09` kódja kész, az adatuk a
-  determinisztikus batch-től függ. A generátor új kapcsolója: `--replot`.
-- `ADR-0007`, `phase_05.md`, `TP-F05`, `phase_05_allapot.md`; hivatkozásjegyzék
-  1.1.0 (+[student1908], +[wecker2015]).
+- **Ábrák:** `fig07_aktiv_ter`, `fig08_ismetles`, `fig09_hibakoltsegvetes`. A
+  generátor új kapcsolója: `--replot`.
+- `ADR-0007`, `phase_05.md`, `TP-F05`, **`TR-F05`**, **`docs/05_batch.md`**,
+  `phase_05_allapot.md`; hivatkozásjegyzék 1.1.0 (+[student1908], +[wecker2015]).
 
-### Mért (részeredmények)
+### Mért
 - **Statisztikai batch** (180 futás, `f5_statistical.json`): egyik zajos
   konfiguráció sem kémiailag pontos (mind `excluded`). A lövészajos H₂ hibája
   +11.6 ± 1.9 mHa, ez **optimalizálási** eredetű. A ZNE +38.2 → +11.5 mHa-re
@@ -56,6 +62,15 @@ A fázis **nincs lezárva**; nincs `v0.8.0` címke. A hátralévő lépéseket �
   N-től független.
 - **Valódi kiválasztási torzítás** (előzmény-minimum − friss átlag):
   −25.5 mHa (H₂), −30.8 mHa (LiH).
+- **Determinisztikus batch** (50 futás, `f5_deterministic.json`): minden futás
+  konvergált; a Qiskit és a Cirq frozen-core térben is 10⁻¹⁰–10⁻¹¹ Ha-ra egyezik.
+  BeH₂ (4e,6o): L2 − CASCI = +0.371 mHa (UCCSD ansatz-hiba), a Full CI-hez
+  +0.71 mHa, kémiai pontosságon belül.
+- **K5 lezárva:** az optimalizáló végértéke az utolsó kiértékelés, torzítatlan
+  minta θ_opt-ban. Független seeden a végérték − friss átlag −0.79 ± 0.62 mHa
+  (lövészaj, 300 seed) és −1.05 ± 1.02 mHa (zajos, 100 seed). A batch +2.51 ±
+  0.99 mHa-ja nem optimalizálói sajátosság; a cellák azonos seedkészletet
+  használnak, így a 100 futás nem független.
 
 ### Változott
 - `within_backend_tolerance` és `satisfies_variational_principle`: az L1-hez mér
@@ -73,10 +88,18 @@ A fázis **nincs lezárva**; nincs `v0.8.0` címke. A hátralévő lépéseket �
 - `scripts/gen_references.py`: álnévnél (Student) nincs „Student, .” alak; a
   változásnapló és az online források ellenőrzési dátuma nem íródik felül.
 
+### Ismert korlátok (nyitott)
+- **K8 — qsim platformtűrés:** a LiH (2e,5o) 1.595 Å-nél a qsim (`complex64` +
+  Powell) 2.8·10⁻⁵ Ha-val tér el a CASCI-tól, a névleges 10⁻⁵ Ha tűrés fölött
+  (a kémiai pontosság 1.8%-a). Egyik teszt sem fedi; a TC-503 csak a (2e,3o)
+  teret. Az ok (precízió vagy Powell-leállás) nincs szétmérve.
+- **K7 — kvótavédelem hiánya** a `run_vqe` hardveres útvonalán (ez fogyasztotta el
+  a 2026-09-23-i keretet).
+
 ### Elhalasztva
-- **5.H — hardveres H₂ PES:** jóváhagyva, de az IBM-kvóta kimerült (630/600 s,
-  újra elérhető 2026-10-21). A kvóta-előellenőrzés megtagadta a beküldést, **job
-  nem keletkezett**.
+- **5.H — hardveres H₂ PES:** jóváhagyva, de az IBM-kvóta kimerült (630/600 s) és a
+  kvóta-előellenőrzés megtagadta a beküldést, **job nem keletkezett**. A
+  kvóta-ablak 2026-10-21 óta nyitva van; a mérés még nem futott.
 
 ---
 
