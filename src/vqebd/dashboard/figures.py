@@ -18,9 +18,11 @@ import plotly.graph_objects as go
 from vqebd.dashboard.data import CHEMICAL_ACCURACY_MHA, METHOD_ORDER
 
 __all__ = [
+    "HEATMAP_METRICS",
     "METHOD_COLORS",
     "REFERENCE_LABEL",
     "dissociation_figure",
+    "heatmap_figure",
     "method_comparison_figure",
     "ordered_methods",
     "trace_points",
@@ -225,6 +227,83 @@ def method_comparison_figure(table: pd.DataFrame, title: str = "") -> go.Figure:
         yaxis_title="Hiba a Full CI-hez (mHa)",
         xaxis_title="Módszer",
         showlegend=False,
+        margin={"t": 90},
+    )
+    return fig
+
+
+HEATMAP_METRICS: Final[dict[str, tuple[str, str]]] = {
+    "success_rate": ("Kémiailag pontos futások aránya", "RdYlGn"),
+    "median_abs_error_mha": ("Medián |hiba| a Full CI-hez (mHa)", "RdYlGn_r"),
+}
+"""A hőtérkép mérőszámai: oszlopnév → (megjelenített név, színskála). A sikerességnél a magasabb
+a jobb (zöld), a hibánál az alacsonyabb (fordított skála), így a zöld mindig a jót jelzi."""
+
+
+def heatmap_figure(table: pd.DataFrame, metric: str = "success_rate", title: str = "") -> go.Figure:
+    """Hőtérkép: körméret (qubit, x) × módszer (y), a szín a kiválasztott mérőszám.
+
+    Args:
+        table: A ``vqebd.dashboard.data.size_success_table`` eredménye.
+        metric: A ``HEATMAP_METRICS`` egyik kulcsa.
+        title: Az ábra címe.
+
+    Raises:
+        ValueError: Ismeretlen mérőszámra.
+
+    Returns:
+        Egyetlen ``Heatmap``. A hiányzó (qubitszám, módszer) párok **üresen** maradnak (``None``),
+        nem nullát kapnak. Sikerességnél a skála rögzített 0–1, hibánál 0-tól a legnagyobb értékig.
+        A cellák szövege az érték, a súgó a futások számát is mutatja.
+    """
+    if metric not in HEATMAP_METRICS:
+        raise ValueError(f"ismeretlen mérőszám: {metric!r}; ismertek: {sorted(HEATMAP_METRICS)}")
+    if table.empty:
+        return _empty_figure("Nincs megjeleníthető adat a kijelölt szűrőkkel.", title)
+
+    label, colorscale = HEATMAP_METRICS[metric]
+    qubits = sorted(int(q) for q in table["n_qubits"].unique())
+    methods = ordered_methods(table["method"])
+    cell = {
+        (int(r["n_qubits"]), str(r["method"])): (float(r[metric]), int(r["n"]))
+        for _, r in table.iterrows()
+    }
+    z = [[cell[(q, m)][0] if (q, m) in cell else None for q in qubits] for m in methods]
+    runs = [[cell[(q, m)][1] if (q, m) in cell else None for q in qubits] for m in methods]
+    is_rate = metric == "success_rate"
+    text = [
+        ["" if v is None else (f"{100 * v:.0f}%" if is_rate else f"{v:.2f}") for v in row]
+        for row in z
+    ]
+    finite = [v for row in z for v in row if v is not None]
+    fig = go.Figure(
+        go.Heatmap(
+            z=z,
+            x=[str(q) for q in qubits],
+            y=methods,
+            colorscale=colorscale,
+            zmin=0.0,
+            zmax=1.0 if is_rate else max(max(finite), 1e-9),
+            text=text,
+            texttemplate="%{text}",
+            customdata=runs,
+            hoverongaps=False,
+            hovertemplate=(
+                "%{y}<br>%{x} qubit<br>" + label + ": %{text}<br>futások: %{customdata}"
+                "<extra></extra>"
+            ),
+            colorbar={"title": label},
+            xgap=2,
+            ygap=2,
+        )
+    )
+    fig.update_layout(
+        title=title,
+        template="plotly_white",
+        xaxis_title="Körméret (qubit)",
+        yaxis_title="Módszer",
+        yaxis={"autorange": "reversed"},
+        xaxis={"type": "category"},
         margin={"t": 90},
     )
     return fig

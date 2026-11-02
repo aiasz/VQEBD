@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any, Final
 
@@ -35,6 +35,7 @@ __all__ = [
     "DEFAULT_MAPPER",
     "FAILURE_COLUMNS",
     "METHOD_ORDER",
+    "SIZE_COLUMNS",
     "DataLoadError",
     "default_bond_length",
     "derive_columns",
@@ -43,6 +44,7 @@ __all__ = [
     "load_results",
     "method_comparison_table",
     "method_label",
+    "size_success_table",
 ]
 
 CHEMICAL_ACCURACY_MHA: Final[float] = 1.5936
@@ -409,3 +411,48 @@ def default_bond_length(
         for length, group in subset.groupby("bond_length")
     }
     return min(counts, key=lambda length: (-counts[length], length))
+
+
+# --- körméret × módszer (7.4) -----------------------------------------------------------------
+
+SIZE_COLUMNS: Final[tuple[str, ...]] = (
+    "n_qubits",
+    "method",
+    "n",
+    "success_rate",
+    "median_error_mha",
+    "median_abs_error_mha",
+)
+
+
+def size_success_table(frame: pd.DataFrame, molecules: Iterable[str] | None = None) -> pd.DataFrame:
+    """Körméret (qubitszám) és módszer szerint összesített sikeresség.
+
+    Oszlopok: ``SIZE_COLUMNS``. ``success_rate`` a kémiailag pontos **futások** aránya (0–1),
+    futásonként a Full CI-hez mért hibával (``|error_mha| < 1.5936``); ``median_error_mha`` az
+    előjeles, ``median_abs_error_mha`` az abszolút hiba mediánja. Az ismeretlen qubitszámú
+    (``NaN``) és a hiba nélküli sorok kimaradnak. Rendezés: qubitszám, majd a ``METHOD_ORDER``.
+    Adat nélkül üres tábla, teljes oszlopkészlettel.
+    """
+    subset = frame
+    if molecules is not None:
+        subset = subset[subset["molecule_name"].isin(set(molecules))]
+    subset = subset.dropna(subset=["n_qubits", "error_mha"])
+    if subset.empty:
+        return pd.DataFrame(columns=list(SIZE_COLUMNS))
+    order = {m: i for i, m in enumerate(METHOD_ORDER)}
+    rows: list[dict[str, Any]] = []
+    for (qubits, method), group in subset.groupby(["n_qubits", "method"], sort=False):
+        errors = group["error_mha"].to_numpy(dtype=float)
+        rows.append(
+            {
+                "n_qubits": int(qubits),
+                "method": str(method),
+                "n": int(errors.size),
+                "success_rate": float(np.mean(np.abs(errors) < CHEMICAL_ACCURACY_MHA)),
+                "median_error_mha": float(np.median(errors)),
+                "median_abs_error_mha": float(np.median(np.abs(errors))),
+            }
+        )
+    rows.sort(key=lambda r: (r["n_qubits"], order.get(r["method"], len(order)), r["method"]))
+    return pd.DataFrame(rows, columns=list(SIZE_COLUMNS))

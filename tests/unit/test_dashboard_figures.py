@@ -20,14 +20,18 @@ from vqebd.dashboard.data import (
     CHEMICAL_ACCURACY_MHA,
     COMPARISON_COLUMNS,
     METHOD_ORDER,
+    SIZE_COLUMNS,
     default_bond_length,
     load_results,
     method_comparison_table,
+    size_success_table,
 )
 from vqebd.dashboard.figures import (
+    HEATMAP_METRICS,
     METHOD_COLORS,
     REFERENCE_LABEL,
     dissociation_figure,
+    heatmap_figure,
     method_comparison_figure,
     ordered_methods,
     trace_points,
@@ -350,5 +354,102 @@ def test_comparison_figure_marks_the_chemical_accuracy_band(curve_frame: pd.Data
 def test_comparison_figure_without_data_is_an_explained_empty_figure() -> None:
     empty = pd.DataFrame(columns=list(COMPARISON_COLUMNS))
     fig = method_comparison_figure(empty, "x")
+    assert len(fig.data) == 0
+    assert "Nincs megjeleníthető adat" in fig.layout.annotations[0].text
+
+
+# =====================================================================================
+# 7.4 — körméret × módszer hőtérkép (AC-7.7)
+# =====================================================================================
+
+
+def test_size_table_has_known_success_rates(curve_frame: pd.DataFrame) -> None:
+    """H₂ (2 qubit): egzakt 3/3 pontos; zajos 0/3 (a 0.735 Å-es kettő +30/+40, az 1.0 Å-es +30)."""
+    table = size_success_table(curve_frame, ["H2"])
+    assert list(table.columns) == list(SIZE_COLUMNS)
+    assert table["n_qubits"].tolist() == [2, 2, 2]
+    assert table["method"].tolist() == ["egzakt", "zajos (nyers)", "ZNE Richardson"]
+    assert table["n"].tolist() == [3, 3, 1]
+    assert table["success_rate"].tolist() == [1.0, 0.0, 0.0]
+    assert table["median_error_mha"].tolist() == pytest.approx([0.0, 30.0, 10.0], abs=1e-6)
+    assert table["median_abs_error_mha"].tolist() == pytest.approx([0.0, 30.0, 10.0], abs=1e-6)
+
+
+def test_size_table_splits_by_qubit_count(curve_frame: pd.DataFrame) -> None:
+    """LiH: (2e,3o) = 4 qubit, (2e,5o) = 8 qubit: a két aktív tér két külön oszlop."""
+    table = size_success_table(curve_frame, ["LiH"])
+    assert table["n_qubits"].tolist() == [4, 8]
+    assert table["n"].tolist() == [2, 1]  # 4 qubit: 2 futás (1.2 és 1.6 Å), 8 qubit: 1
+
+
+def test_size_table_mixes_molecules_of_the_same_size(curve_frame: pd.DataFrame) -> None:
+    both = size_success_table(curve_frame)
+    assert sorted(set(both["n_qubits"])) == [2, 4, 8]
+
+
+def test_size_table_excludes_rows_without_a_known_size(
+    tmp_path: Path, record_factory: RecordFactory
+) -> None:
+    path = tmp_path / "unknown.sqlite"
+    with Database(path) as db:
+        db.insert_record(record_factory(run_id="ok"))
+        db.insert_record(record_factory(run_id="weird", basis="6-31g"))  # ismeretlen bázis
+    table = size_success_table(load_results(path))
+    assert table["n"].tolist() == [1]  # csak az ismert körméretű futás
+
+
+def test_size_table_of_nothing_is_empty_with_all_columns(curve_frame: pd.DataFrame) -> None:
+    table = size_success_table(curve_frame, ["N2"])
+    assert table.empty and list(table.columns) == list(SIZE_COLUMNS)
+
+
+def test_heatmap_cells_hold_the_known_values_and_gaps_stay_empty(
+    curve_frame: pd.DataFrame,
+) -> None:
+    """AC-7.7: a cellák a várt értéket kapják; a nem létező (qubit, módszer) pár üres, nem nulla."""
+    table = size_success_table(curve_frame)
+    fig = heatmap_figure(table, "success_rate", "teszt")
+    (heat,) = fig.data
+    assert list(heat.x) == ["2", "4", "8"]
+    assert list(heat.y) == ["egzakt", "zajos (nyers)", "ZNE Richardson"]
+    z = [list(row) for row in heat.z]
+    # egzakt: H₂ (2 qubit) pontos; a LiH fixture-rekordok +70 / +50 mHa-val térnek el a Full CI-től
+    assert z[0] == [1.0, 0.0, 0.0]
+    assert z[1] == [0.0, None, None]  # zajos csak 2 qubiten van
+    assert z[2] == [0.0, None, None]  # ZNE csak 2 qubiten van
+    assert (heat.zmin, heat.zmax) == (0.0, 1.0)
+    assert heat.colorscale[0][1] != heat.colorscale[-1][1]
+    assert fig.layout.title.text == "teszt"
+
+
+def test_heatmap_text_and_hover_carry_the_values(curve_frame: pd.DataFrame) -> None:
+    (heat,) = heatmap_figure(size_success_table(curve_frame, ["H2"]), "success_rate").data
+    assert [list(r) for r in heat.text] == [["100%"], ["0%"], ["0%"]]
+    assert [list(r) for r in heat.customdata] == [[3], [3], [1]]
+
+
+def test_heatmap_error_metric_scales_from_zero_to_the_largest_cell(
+    curve_frame: pd.DataFrame,
+) -> None:
+    table = size_success_table(curve_frame, ["H2"])
+    (heat,) = heatmap_figure(table, "median_abs_error_mha").data
+    assert [r[0] for r in heat.z] == pytest.approx([0.0, 30.0, 10.0], abs=1e-6)
+    assert heat.zmin == 0.0 and heat.zmax == pytest.approx(30.0, abs=1e-6)
+    assert [list(r) for r in heat.text] == [["0.00"], ["30.00"], ["10.00"]]
+
+
+def test_heatmap_color_direction_means_green_is_always_good() -> None:
+    """A sikerességnél a magas érték zöld, a hibánál az alacsony: a két skála egymás tükre."""
+    assert HEATMAP_METRICS["success_rate"][1] == "RdYlGn"
+    assert HEATMAP_METRICS["median_abs_error_mha"][1] == "RdYlGn_r"
+
+
+def test_heatmap_rejects_an_unknown_metric(curve_frame: pd.DataFrame) -> None:
+    with pytest.raises(ValueError, match="ismeretlen mérőszám"):
+        heatmap_figure(size_success_table(curve_frame), "valami")
+
+
+def test_heatmap_without_data_is_an_explained_empty_figure() -> None:
+    fig = heatmap_figure(pd.DataFrame(columns=list(SIZE_COLUMNS)))
     assert len(fig.data) == 0
     assert "Nincs megjeleníthető adat" in fig.layout.annotations[0].text

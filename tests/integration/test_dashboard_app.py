@@ -460,6 +460,117 @@ def test_comparison_view_with_no_molecules_shows_an_info_message(
     assert any("nem tartalmaz molekulát" in i.value for i in at.info)
 
 
+# =====================================================================================
+# 7.4 — körméret × módszer hőtérkép (AC-7.7)
+# =====================================================================================
+
+HEAT_VIEW = "Hőtérkép"
+
+
+def _heat(at: AppTest) -> tuple[list[str], list[str], list[list[float | None]]]:
+    """A hőtérkép (x, y, z) értékei a Streamlit-protóból."""
+    charts = at.get("plotly_chart")
+    assert len(charts) == 1, f"pontosan egy ábra várt, van: {len(charts)}"
+    (heat,) = json.loads(charts[0].proto.spec)["data"]
+    return list(heat["x"]), list(heat["y"]), [list(row) for row in heat["z"]]
+
+
+def test_heatmap_view_colors_a_known_fixture(
+    monkeypatch: pytest.MonkeyPatch, fixture_db: Path
+) -> None:
+    """AC-7.7: egy molekula (H₂, 2 qubit) ismert rekordjaira a cellaértékek helyesek."""
+    at = _run(monkeypatch, fixture_db)
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert not at.exception
+    x, y, z = _heat(at)
+    assert x == ["2"]
+    assert y == ["egzakt", "zajos (nyers)", "ZNE Richardson"]
+    # egzakt: hiba 0 -> pontos; zajos +38.1 mHa -> nem; ZNE +1.0 mHa -> pontos (az egyetlen futás)
+    assert z == [[1.0], [0.0], [1.0]]
+
+
+def test_heatmap_metric_radio_switches_to_the_median_error(
+    monkeypatch: pytest.MonkeyPatch, fixture_db: Path
+) -> None:
+    at = _run(monkeypatch, fixture_db)
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert at.radio(key="heat-metric").value == "success_rate"
+    at.radio(key="heat-metric").set_value("median_abs_error_mha").run()
+    assert not at.exception
+    z = _heat(at)[2]
+    assert z[0][0] == pytest.approx(0.0, abs=1e-6)
+    assert z[1][0] == pytest.approx(38.1, abs=1e-6)
+    assert z[2][0] == pytest.approx(1.0, abs=1e-6)
+
+
+def test_heatmap_molecule_filter_changes_the_columns(
+    monkeypatch: pytest.MonkeyPatch, curve_db: Path
+) -> None:
+    at = _run(monkeypatch, curve_db)
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert _heat(at)[0] == ["2", "4", "8"]  # H₂, LiH (2e,3o), LiH (2e,5o)
+    at.multiselect(key="heat-molecules").unselect("LiH").run()
+    assert not at.exception
+    assert _heat(at)[0] == ["2"]
+
+
+def test_heatmap_with_the_real_deterministic_batch(
+    monkeypatch: pytest.MonkeyPatch, repo_root: Path
+) -> None:
+    """Valódi adat, kereszt-validáció a TR-F05 / fig09 számaival.
+
+    Az egzakt futások Full CI-hez mért hibája a **csonkolás**: a minimális (2e,3o) terek
+    (4 qubit) 15–72 mHa-t veszítenek, így 0%-ban pontosak; a frozen-core terek (8 és 10 qubit)
+    0.23–0.71 mHa-val kémiai pontosságon belül vannak (100%); H₂ (2 qubit) teljes tér, 100%.
+    """
+    at = _run(monkeypatch, repo_root / "docs" / "figures" / "data" / "f5_deterministic.json")
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert not at.exception
+    x, y, z = _heat(at)
+    assert x == ["2", "4", "8", "10"] and y == ["egzakt"]
+    assert z == [[1.0, 0.0, 1.0, 1.0]]
+
+
+def test_heatmap_with_the_real_statistical_batch_shows_the_noise_floor(
+    monkeypatch: pytest.MonkeyPatch, repo_root: Path
+) -> None:
+    """Zajos szimulációban sehol nincs 50% feletti sikeresség; a LiH-fal (4 qubit) látszik."""
+    at = _run(monkeypatch, repo_root / "docs" / "figures" / "data" / "f5_statistical.json")
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert not at.exception
+    x, y, z = _heat(at)
+    assert x == ["2", "4"]
+    assert "zajos (nyers)" in y
+    noisy = z[y.index("zajos (nyers)")]
+    assert noisy[0] == 0.0 and noisy[1] == 0.0  # sem H₂ (2), sem LiH (4) zajos futás nem pontos
+    assert all(v is None or v <= 0.5 for row in z for v in row)
+    at.radio(key="heat-metric").set_value("median_abs_error_mha").run()
+    row = _heat(at)[2][y.index("zajos (nyers)")]
+    h2_error, lih_error = row
+    assert h2_error is not None and lih_error is not None
+    # LiH 4 qubiten a zajos medián hiba nagyságrenddel nagyobb, mint H₂-n (466 vs ~38 mHa)
+    assert lih_error > 10 * h2_error
+
+
+def test_heatmap_with_no_molecules_shows_an_info_message(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    empty = tmp_path / "ures.sqlite"
+    Database(empty).close()
+    at = _run(monkeypatch, empty)
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert not at.exception
+    assert any("nem tartalmaz molekulát" in i.value for i in at.info)
+
+
+def test_heatmap_notes_assumed_sizes_for_exports_without_a_mapper(
+    monkeypatch: pytest.MonkeyPatch, repo_root: Path
+) -> None:
+    at = _run(monkeypatch, repo_root / "docs" / "figures" / "data" / "f5_deterministic.json")
+    at.sidebar.radio(key="view").set_value(HEAT_VIEW).run()
+    assert any("alapértelmezése" in c.value for c in at.caption)
+
+
 # --- hiányzó, üres és sérült adat (AC-7.10) -----------------------------------------------
 
 

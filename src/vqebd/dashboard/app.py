@@ -29,16 +29,24 @@ from vqebd.dashboard.data import (
     load_failures,
     load_results,
     method_comparison_table,
+    size_success_table,
 )
 from vqebd.dashboard.figures import (
+    HEATMAP_METRICS,
     dissociation_figure,
+    heatmap_figure,
     method_comparison_figure,
     ordered_methods,
 )
 
 __all__ = ["DISPLAY_COLUMNS", "VIEWS", "discover_sources", "main"]
 
-VIEWS: Final[tuple[str, ...]] = ("Táblázat", "Disszociációs görbe", "Módszer-összehasonlítás")
+VIEWS: Final[tuple[str, ...]] = (
+    "Táblázat",
+    "Disszociációs görbe",
+    "Módszer-összehasonlítás",
+    "Hőtérkép",
+)
 """A nézetek (az oldalsáv „Nézet" kapcsolója). Az alapnézet az első; minden belső lépés egy
 újabb nézetet ad hozzá, a korábbiak változatlanok (AC-7.8)."""
 
@@ -128,6 +136,8 @@ def main() -> None:
         _render_dissociation(results)
     elif view == "Módszer-összehasonlítás":
         _render_comparison(results)
+    elif view == "Hőtérkép":
+        _render_heatmap(results)
 
 
 def _render_table(results: pd.DataFrame, failures: pd.DataFrame) -> None:
@@ -199,5 +209,35 @@ def _render_comparison(results: pd.DataFrame) -> None:
     table = method_comparison_table(results, molecule, bond_length, active_space=active_space)
     title = f"{molecule} {bond_length:g} Å — módszerek összehasonlítása"
     st.plotly_chart(method_comparison_figure(table, title), key="comparison")
+    if not table.empty:
+        st.dataframe(table, hide_index=True)
+
+
+def _render_heatmap(results: pd.DataFrame) -> None:
+    """7.4: körméret × módszer hőtérkép (sikeresség vagy medián hiba)."""
+    molecules = sorted(results["molecule_name"].dropna().unique())
+    if not molecules:
+        st.info("A forrás nem tartalmaz molekulát tartalmazó eredményt.")
+        return
+    chosen = st.multiselect("Molekulák", molecules, default=molecules, key="heat-molecules")
+    metric = st.radio(
+        "Mérőszám",
+        list(HEATMAP_METRICS),
+        format_func=lambda key: HEATMAP_METRICS[key][0],
+        key="heat-metric",
+    )
+    table = size_success_table(results, chosen)
+    st.plotly_chart(
+        heatmap_figure(table, metric, "Körméret és sikeresség"),
+        key="heatmap",
+    )
+    unknown = int(results[results["molecule_name"].isin(chosen)]["n_qubits"].isna().sum())
+    if unknown:
+        st.caption(f"{unknown} futás kimaradt: a körméret nem levezethető (ismeretlen bázis).")
+    if results[results["molecule_name"].isin(chosen)]["size_assumed"].any():
+        st.caption(
+            "A körméret egy részénél a leképezés/bázis hiányzott az adatból: a VQEBD "
+            "alapértelmezése (parity, kétqubites redukció, STO-3G) érvényes."
+        )
     if not table.empty:
         st.dataframe(table, hide_index=True)
