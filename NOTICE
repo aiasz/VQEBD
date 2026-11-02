@@ -1,0 +1,31 @@
+VQEBD — NOTICE (harmadik felek szoftverei / third-party software)
+=================================================================
+
+A VQEBD saját forráskódja MIT licenc alatt áll (lásd: LICENSE).
+VQEBD's own source code is licensed under the MIT License (see LICENSE).
+
+Ez a projekt harmadik felek szoftvereit használja, amelyek saját licenc alatt
+állnak. A teljes lista és a verziók: docs/references.md; a pontosan rögzített
+csomagverziók: requirements.txt és requirements.lock.
+
+This project uses third-party software licensed under their own terms. The full
+list with versions is in docs/references.md; the exactly pinned package versions
+are in requirements.txt and requirements.lock.
+
+FIGYELEM — Mitiq (GPL-3.0)
+--------------------------
+A Mitiq csomag GPL-3.0 licencű. A VQEBD NEM linkeli be és NEM terjeszti újra a
+Mitiq-et: opcionális, futásidőben betöltött komponensként használja, egyetlen
+modulba zárva (src/vqebd/mitigation/mitiq_zne.py). A Mitiq nélkül a rendszer
+teljes funkcionalitással működik. A Mitiq nem szerepel a requirements.txt-ben és
+a Docker-image-ben; külön, tudatos lépésben telepíthető (requirements-mitiq.txt).
+Részletek: docs/adr/ADR-0003-mitigacios-architektura.md
+
+NOTE — Mitiq (GPL-3.0)
+----------------------
+The Mitiq package is licensed under GPL-3.0. VQEBD does NOT link against or
+redistribute Mitiq; it is used as an optional, runtime-loaded component confined
+to a single module (src/vqebd/mitigation/mitiq_zne.py). VQEBD is fully functional
+without it. Mitiq is not listed in requirements.txt and is not part of the Docker
+image; it can be installed separately and deliberately (requirements-mitiq.txt).
+See docs/adr/ADR-0003-mitigacios-architektura.md

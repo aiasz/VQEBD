@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Biztonsági probléma / Security issue
+    url: https://github.com/aiasz/VQEBD/blob/main/SECURITY.md
+    about: Biztonsági problémát NE issue-ban jelents; lásd a SECURITY.md-t. / Please do not report security problems as issues.

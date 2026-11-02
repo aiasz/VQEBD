@@ -15,8 +15,55 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés.
 - Külön, kisebb dashboard-image; a körméret (és CX-szám) tárolása (séma v4); platformonkénti bontás a dashboardon;
-  böngészős képernyőképek; telepítés másik gépen vagy VM-en (a „tiszta gép" igazolásának teljessé tétele).
-- **Fázis 9** — dokumentáció, publikálás (Zenodo DOI); **Fázis 10** — közösségi visszacsatolás.
+  böngészős képernyőképek; telepítés másik gépen vagy VM-en; valódi, független külső telepítési próba.
+- **Fázis 10** — közösségi visszacsatolás (bejelentések, Metriq-beküldés, új ciklusok).
+
+---
+
+## [1.0.0] — 2026-11-02
+
+**Fázis 9 — dokumentáció, validálás, publikálás: az első publikált kiadás.**
+
+A Fázis 0–9 lezárult. A rendszer háromplatformos VQE-mag, öt referenciaszinttel (egzakt, véges lövésszám, zajmodell,
+valódi IBM QPU, ISA-szintű ZNE), sémaverziózott tárolással, batch-motorral és statisztikával, hibatárolással és
+ütemezővel, böngészős dashboarddal és konténeres rendszerrel. Terv: [`phase_09.md`](docs/plan/phase_09.md);
+útmutató a kiadáshoz: [`docs/09_publishing.md`](docs/09_publishing.md); jegyzőkönyv:
+[`TR-F09`](docs/testing/TR-F09_publikalas.md).
+
+**Mit jelent az 1.0?** A rendszer reprodukálható és dokumentált; nem azt, hogy minden fizikai kérdés lezárult. Az ismert
+korlátok nyíltan szerepelnek a jegyzőkönyvekben: zajos szimulációban egyik konfiguráció sem éri el a kémiai pontosságot
+(`TR-F05`); a hardveres görbén csak egy pont egyeztethető vele (`TR-F05` 7.); a dashboardhoz nincs böngészős vizuális
+ellenőrzés (`TR-F07`).
+
+### Hozzáadva
+- **Szabványos MIT `LICENSE`** és külön **`NOTICE`** a harmadik felekről és a Mitiq (GPL-3.0) megjegyzésről.
+- **`CONTRIBUTING.md`**, **`SECURITY.md`**, GitHub issue-sablonok (hiba, javaslat).
+- **README:** „Röviden" / „In short" bejárat (probléma, háromparancsos gyors indítás, példa kimenet), CI-jelvény,
+  a kulcsverziók táblázata (a lockkal teszttel egyeztetve), hivatkozási blokk BibTeX-szel, a licenc/biztonság/
+  közreműködés szakaszok frissítve.
+- **`CITATION.cff`:** kétnyelvű (angol és magyar) leírás.
+- **`docs/09_publishing.md`:** kiadási ellenőrzőlista, a Zenodo-integráció és a DOI beírásának lépései.
+- **`tests/repo/test_publication.py`** (védőtesztek): a licenc a szabványos MIT, a `NOTICE` tartalma, a közösségi fájlok,
+  a README bejárata és a verziótáblázat↔lock egyezése, minden relatív Markdown-hivatkozás létezik, a `CITATION.cff`
+  és a BibTeX a `VERSION`-nel és a `CHANGELOG` dátumával konzisztens.
+
+### Javítva
+- **A GitHub CI a v0.9.0 óta piros volt.** Az ok a Fázis 6-ban írt `test_compose_defines_a_simulator_only_scheduler_service`,
+  amely a `docker-compose.yml`-t a fájl helyéből számolt útvonalon olvasta; a szállított image-ben (mount nélkül) nincs
+  `docker/` mappa. Helyben mindig bind-mountolt repóval futottam, ezért nem tűnt fel. A teszt a `repo_root` fixture-t
+  használja (a szállított image-ben kihagyódik); mindkét CI-tesztlépés helyben reprodukálva és zöld.
+- **A GitHub nem ismerte fel a licencet** (`other`), mert a `LICENSE` a szabványos MIT-szöveg után harmadik-fél-függeléket
+  is tartalmazott. A függelék a `NOTICE`-ba költözött; a `LICENSE` szabványos MIT.
+
+### Mért
+- A `CITATION.cff` érvényes (`cffconvert --validate`, CFF 1.2.0).
+- A tiszta klónból, a README parancsait szó szerint követve a build, a példafuttatás és a dashboard működik (`TR-F09` 3.).
+
+### Ismert korlátok
+- A README-alapú telepítést az asszisztens próbálta egy tiszta klónon, **ugyanazon a gépen**; független külső személy
+  próbája nem volt.
+- A Zenodo-integrációt a felhasználónak kell bekapcsolnia a release előtt; a DOI a release után kerül a `CITATION.cff`-be
+  és a README-ba (`docs/09_publishing.md` 5.).
 
 ---
 

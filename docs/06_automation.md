@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/06_automation.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 0.11.0 |
+| **Projektverzió** | 1.0.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 6 — Automatizálás |
 | **Háttér** | [`phase_06.md`](plan/phase_06.md) · [`ADR-0008`](adr/ADR-0008-hibakezeles-es-utemezes.md) · [`TR-F06`](testing/TR-F06_automatizalas.md) |

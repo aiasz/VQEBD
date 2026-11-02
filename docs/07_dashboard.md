@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/07_dashboard.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 0.11.0 |
+| **Projektverzió** | 1.0.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 7 — Dashboard |
 | **Háttér** | [`phase_07.md`](plan/phase_07.md) · [`ADR-0009`](adr/ADR-0009-dashboard-architektura.md) · [`TR-F07`](testing/TR-F07_dashboard.md) |
@@ -39,7 +39,7 @@ dashboardnak nincs hitelesítése. Leállítás: `docker compose -f docker/docke
 
 ```bash
 docker run --rm -p 127.0.0.1:8501:8501 -v "$PWD:/repo" -w /repo \
-  -e PYTHONPATH=/repo/src -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.11.0 \
+  -e PYTHONPATH=/repo/src -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.0.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 

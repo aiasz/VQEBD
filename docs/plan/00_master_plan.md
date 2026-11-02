@@ -4,7 +4,7 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.7.0 |
+| **Dokumentum-verzió** | 1.8.0 |
 | **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
@@ -370,7 +370,7 @@ Az alapterv 10 fázisa megmarad. A változások:
 | **6** | Automatizálás | + strukturált hibatárolás, + újrapróbálkozási politika, + hardver alapértelmezésben nincs ütemezve ([`phase_06.md`](phase_06.md), ADR-0008) |
 | **7** | Dashboard | változatlan, 4 belső lépés; + reprodukálható build (a lock betartatása), + három adatforrás ([`phase_07.md`](phase_07.md), ADR-0009) |
 | **8** | Konténerizáció | a dashboard egyparancsos, loopback-kötésű indítása; tiszta klónból igazolva ([`phase_08.md`](phase_08.md)) |
-| **9** | Publikálás | + CITATION.cff, + Zenodo |
+| **9** | Publikálás | + CITATION.cff, + Zenodo; + a GitHub CI zöldje, szabványos MIT-licenc (a `NOTICE` a harmadik felekről), közösségi fájlok, README-alapú telepítés igazolása ([`phase_09.md`](phase_09.md)) |
 | **10** | Közösség | változatlan |
 
 Minden fázishoz **külön bővített tervdokumentum** készül (`docs/plan/phase_NN.md`)
@@ -528,6 +528,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | 1.5.0 | 2026-11-02 | Fázis 7 terve ([`phase_07.md`](phase_07.md), ADR-0009). Előmérés: a Streamlit rejtett `pyarrow`/NumPy-ütközése (`pyarrow==25.0.0`), a `requirements.lock` nincs betartatva a buildben (21/71 eltérés). |
 | 1.6.0 | 2026-11-02 | Fázis 7 lezárva (v0.10.0): négy nézetes dashboard, három adatforrás, a lock betartatása a buildben; ADR-0009 elfogadva. Terv-eltérés: a `pyarrow==25.0.0` pin hibásnak bizonyult, a helyes 24.0.0 ([`TR-F07`](../testing/TR-F07_dashboard.md) 3.). |
 | 1.7.0 | 2026-11-02 | Fázis 8 lezárva (v0.11.0): `dashboard` Compose-szolgáltatás (csak hurokcím), egyparancsos indítás, tiszta klónból és gyorsítótár nélkül igazolva; minden README és dokumentum átvilágítva ([`TR-F08`](../testing/TR-F08_konteneres_rendszer.md)). |
+| 1.8.0 | 2026-11-02 | Fázis 9 terve és megvalósítása (v1.0.0, [`phase_09.md`](phase_09.md)): a CI hibájának javítása, licenc/NOTICE szétválasztása, közösségi fájlok, kiadási útmutató. A kiadás és a DOI jóváhagyásra vár. |
 
 ---
 

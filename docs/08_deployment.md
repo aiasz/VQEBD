@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/08_deployment.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 0.11.0 |
+| **Projektverzió** | 1.0.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 8 — Konténerizáció összeszerelése |
 | **Háttér** | [`phase_08.md`](plan/phase_08.md) · [`TR-F08`](testing/TR-F08_konteneres_rendszer.md) |
@@ -123,7 +123,7 @@ Nem szükséges (a dashboard a saját gépen fut), de a követelmények:
 |---|---|---|
 | A konténerek leállítása és eltávolítása | `docker compose -f docker/docker-compose.yml down` | **megmarad** (`vqebd-data`) |
 | A konténerek **és az adat** törlése | `docker compose -f docker/docker-compose.yml down -v` | **TÖRLŐDIK** az ütemező adatbázisa és naplója |
-| Az image törlése | `docker rmi vqebd:0.11.0` | — |
+| Az image törlése | `docker rmi vqebd:1.0.0` | — |
 
 ## 9. Hibaelhárítás
 

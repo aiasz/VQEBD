@@ -1,8 +1,9 @@
 # VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard
 
+[![CI](https://github.com/aiasz/VQEBD/actions/workflows/ci.yml/badge.svg)](https://github.com/aiasz/VQEBD/actions/workflows/ci.yml)
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.11.0-blue.svg)](CHANGELOG.md)
+[![Verzió](https://img.shields.io/badge/verzió-1.0.0-blue.svg)](CHANGELOG.md)
 [![Fázis](https://img.shields.io/badge/fázis-8%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
 [![Tesztek](https://img.shields.io/badge/tesztek-771%20zöld-brightgreen.svg)](docs/testing/TR-F08_konteneres_rendszer.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
@@ -19,14 +20,75 @@
 
 **Készítők:** Kormos Attila · Claude AI (Anthropic, Claude Opus 5)
 
+### Röviden
+
+**Mit csinál?** Ugyanazt a kvantumkémiai számítást (H₂, LiH, BeH₂ alapállapoti energiája VQE-vel) futtatja
+klasszikus egzakt, zajmentes, véges lövésszámú, zajos szimulátoros és valódi IBM-hardveres szinten, és a hibát
+forrásaira bontja (leképezés, ansatz, statisztika, hardverzaj). Hibaenyhítési módszereket (ZNE, TREX) hasonlít össze
+azonos feltételek mellett. Minden eredmény sémaverziózott adatbázisba és exportba kerül, és böngészős dashboardon
+nézhető meg.
+
+**Gyors kipróbálás** (Docker és Git kell, ~3 GB szabad lemez, x86-64 gép):
+
+```bash
+git clone https://github.com/aiasz/VQEBD.git
+cd VQEBD
+docker compose -f docker/docker-compose.yml build app                      # image építése (az első alkalommal több perc)
+docker compose -f docker/docker-compose.yml run --rm app python -m vqebd   # első VQE-számítás (H₂), pár másodperc
+docker compose -f docker/docker-compose.yml up -d dashboard                # böngészőben: http://localhost:8501
+```
+
+Példa kimenet (H₂, 0.735 Å, a második parancstól):
+
+```text
+Energiák (Hartree):
+  Hartree–Fock ...... -1.1169989968
+  L0  Full CI ....... -1.1373060358
+  L2  VQE ........... -1.1373060358
+Kémiai pontosságon belül (|Δ| < 1.6 mHa): IGEN
+Variációs elv (E_VQE ≥ E_egzakt): teljesül
+```
+
+> **Windows:** a parancsok Git Bashben és PowerShellben is futnak (Windows PowerShell 5-ben a parancsokat külön
+> sorokba írd). A `make` nem kötelező. Részletek és hibaelhárítás: [`docs/08_deployment.md`](docs/08_deployment.md).
+
+**Reprodukálhatóság.** A rendszer Python 3.11-en, az alábbi **rögzített verziókkal** fut (a teljes, 101 csomagos fa:
+[`requirements.lock`](requirements.lock); a Docker-build betartatja, és teszt őrzi, hogy a táblázat egyezzen a lockkal):
+
+<!-- versions:start -->
+| Csomag | Verzió |
+|---|---|
+| `numpy` | 1.26.4 |
+| `scipy` | 1.13.1 |
+| `qiskit` | 1.4.6 |
+| `qiskit-aer` | 0.17.2 |
+| `qiskit-nature` | 0.7.2 |
+| `qiskit-ibm-runtime` | 0.41.1 |
+| `pyscf` | 2.14.0 |
+| `cirq-core` | 1.4.1 |
+| `qsimcirq` | 0.22.1 |
+| `matplotlib` | 3.11.2 |
+| `pandas` | 3.0.6 |
+| `streamlit` | 1.59.1 |
+| `plotly` | 7.1.0 |
+| `pyarrow` | 24.0.0 |
+<!-- versions:end -->
+
+A Mitiq (GPL-3.0) opcionális, a Docker-image nem tartalmazza ([`NOTICE`](NOTICE)).
+
 ### ⚠️ A projekt állapota
 
-Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 8 lezárva (`v0.11.0`)** — a VQE-mag működik
-három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
+A projekt **`v1.0.0`**, az első publikált kiadás: a Fázis 0–9 lezárult, hátra a Fázis 10 (közösségi visszacsatolás).
+A VQE-mag működik három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
-Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.storage`).
+Mitiq-kel keresztvalidálva); strukturált SQLite adattárolással, batch-motorral és ismétlésen alapuló
+statisztikával, hibatárolással és ütemezővel, böngészős dashboarddal és konténeres rendszerrel.
+
+**Mit jelent az 1.0?** A rendszer reprodukálható és dokumentált, nem azt, hogy minden fizikai kérdés lezárult. Az ismert
+korlátok nyíltan szerepelnek a jegyzőkönyvekben, pl.: zajos szimulációban egyik konfiguráció sem éri el a kémiai
+pontosságot (`TR-F05`), a hardveres görbén csak egy pont egyeztethető vele (`TR-F05` 7.), a dashboardhoz nincs vizuális
+(böngészős) ellenőrzés (`TR-F07`).
 
 > **Fázis 5 — lezárva (2026-11-02).** Elkészült az aktív tér (LiH, BeH₂;
 > CASCI-keresztvalidáció ≤ 4·10⁻¹⁴ Ha), a batch-motor, az ismétlésen alapuló
@@ -58,7 +120,7 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 | **6** | **Automatizálás, hibatárolás, ütemezés** | ✅ **Lezárva** (`v0.9.0`) |
 | **7** | **Streamlit dashboard** | ✅ **Lezárva** (`v0.10.0`) |
 | **8** | **Konténeres rendszer, a dashboard egyparancsos indítása** | ✅ **Lezárva** (`v0.11.0`) |
-| 9 | Dokumentáció és publikálás (Zenodo DOI) | ⬜ Tervezett |
+| **9** | **Dokumentáció, validálás, publikálás (Zenodo DOI)** | 🔄 **Kiadásra kész** (`v1.0.0`) — a release és a DOI jóváhagyásra, ill. a Zenodo-kapcsolóra vár |
 | 10 | Közösségi visszacsatolás | ⬜ Tervezett |
 
 ### Mit old meg ez a projekt?
@@ -275,7 +337,7 @@ ezért egy tiszta klónon a verziózott JSON-okból is megjeleníti az adatot.
 
 ```bash
 docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
-  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.11.0 \
+  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.0.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 
@@ -314,14 +376,14 @@ make test       # teljes tesztkészlet (772 teszt, 1 kihagyott)
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.11.0 python -m vqebd
+docker run --rm vqebd:1.0.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.11.0 .
-docker run --rm vqebd:0.11.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:1.0.0 .
+docker run --rm vqebd:1.0.0 python -m vqebd
 ```
 
 A **dashboard** indítása (egyparancsos, a saját gépen): lásd a *Fázis 8* szakaszt fent, vagy `make dashboard`.
@@ -344,6 +406,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 | [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | A Fázis 6 részletes terve |
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | A Fázis 7 részletes terve |
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | A Fázis 8 részletes terve |
+| [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | A Fázis 9 részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
@@ -353,6 +416,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 | [`docs/06_automation.md`](docs/06_automation.md) | **Automatizálás, hibatárolás, újrapróbálkozás, ütemezés** |
 | [`docs/07_dashboard.md`](docs/07_dashboard.md) | **A dashboard: nézetek, adatforrások, indítás** |
 | [`docs/08_deployment.md`](docs/08_deployment.md) | **Konténeres rendszer, a dashboard egyparancsos indítása, biztonság** |
+| [`docs/09_publishing.md`](docs/09_publishing.md) | **Kiadás, GitHub Release, Zenodo, DOI** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
@@ -383,7 +447,8 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 
 ### Licenc és harmadik felek szoftverei
 
-A VQEBD **MIT** licencű — lásd [`LICENSE`](LICENSE).
+A VQEBD saját kódja **MIT** licencű — lásd [`LICENSE`](LICENSE). A harmadik felek szoftvereit és a Mitiq
+(GPL-3.0) megjegyzést a [`NOTICE`](NOTICE) tartalmazza.
 
 > **⚠️ Mitiq (GPL-3.0).** A Mitiq csomag GPL-3.0 licencű. A VQEBD **nem linkeli be
 > és nem terjeszti újra**: opcionális, futásidőben betöltött komponensként
@@ -405,18 +470,30 @@ A felhasznált szoftverek teljes listája licencekkel és hivatkozásokkal:
 3. tartalmi ellenőrzés — tokennek látszó string keresése a verziózott fájlokban.
 
 A tokent a `.env` fájlba tedd (`cp .env.example .env`). A valódi hardverre küldést
-külön biztonsági kapcsoló védi: `VQEBD_ALLOW_HARDWARE=false` az alapértelmezés.
+külön biztonsági kapcsoló védi: `VQEBD_ALLOW_HARDWARE=false` az alapértelmezés. Sebezhetőség jelentése:
+[`SECURITY.md`](SECURITY.md).
 
 ### Hivatkozás
 
-Ha a projektet használod, hivatkozz rá a [`CITATION.cff`](CITATION.cff) szerint.
-A Zenodo DOI a Fázis 9-ben kerül ide.
+Ha a projektet használod, hivatkozz rá a [`CITATION.cff`](CITATION.cff) szerint (GitHub: *Cite this repository*).
+A **Zenodo DOI** a `v1.0.0` kiadás után kerül ide ([`docs/09_publishing.md`](docs/09_publishing.md)).
+
+```bibtex
+@software{vqebd,
+  author  = {Kormos, Attila and {Claude AI (Anthropic)}},
+  title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
+  year    = {2026},
+  version = {1.0.0},
+  url     = {https://github.com/aiasz/VQEBD},
+  license = {MIT}
+}
+```
 
 ### Közreműködés
 
-A projekt jelenleg korai fázisban van. Hibajelzés és javaslat: GitHub Issues.
-A commit-üzenetek a [Conventional Commits](https://www.conventionalcommits.org/)
-konvenciót követik.
+Hibajelzést és javaslatot a [GitHub Issues](https://github.com/aiasz/VQEBD/issues) között várunk (sablonokkal).
+A szabályokat, a fejlesztői környezetet és a minőségi kapukat a [`CONTRIBUTING.md`](CONTRIBUTING.md) írja le.
+A commit-üzenetek a [Conventional Commits](https://www.conventionalcommits.org/) konvenciót követik.
 
 ---
 
@@ -428,15 +505,74 @@ konvenciót követik.
 
 **Authors:** Attila Kormos · Claude AI (Anthropic, Claude Opus 5)
 
+### In short
+
+**What does it do?** It runs the same quantum-chemistry calculation (ground-state energy of H₂, LiH, BeH₂ with VQE) at
+classical-exact, noiseless, finite-shot, noisy-simulator and real IBM-hardware levels, and decomposes the error into its
+sources (mapping, ansatz, statistics, hardware noise). It compares error-mitigation methods (ZNE, TREX) under identical
+conditions. Every result goes into a schema-versioned database and export, and can be inspected in a browser dashboard.
+
+**Quick try** (needs Docker and Git, ~3 GB free disk, an x86-64 machine):
+
+```bash
+git clone https://github.com/aiasz/VQEBD.git
+cd VQEBD
+docker compose -f docker/docker-compose.yml build app                      # build the image (several minutes the first time)
+docker compose -f docker/docker-compose.yml run --rm app python -m vqebd   # first VQE calculation (H₂), a few seconds
+docker compose -f docker/docker-compose.yml up -d dashboard                # in your browser: http://localhost:8501
+```
+
+Example output (H₂, 0.735 Å, from the second command; the program prints in Hungarian):
+
+```text
+Energiák (Hartree):
+  Hartree–Fock ...... -1.1169989968
+  L0  Full CI ....... -1.1373060358
+  L2  VQE ........... -1.1373060358
+Kémiai pontosságon belül (|Δ| < 1.6 mHa): IGEN
+Variációs elv (E_VQE ≥ E_egzakt): teljesül
+```
+
+> **Windows:** the commands work in Git Bash and PowerShell (in Windows PowerShell 5, put them on separate lines).
+> `make` is optional. Details and troubleshooting: [`docs/08_deployment.md`](docs/08_deployment.md) (in Hungarian).
+
+**Reproducibility.** The system runs on Python 3.11 with the following **pinned versions** (the full 101-package tree is
+in [`requirements.lock`](requirements.lock); the Docker build enforces it, and a test keeps this table equal to the lock):
+
+<!-- versions:start -->
+| Package | Version |
+|---|---|
+| `numpy` | 1.26.4 |
+| `scipy` | 1.13.1 |
+| `qiskit` | 1.4.6 |
+| `qiskit-aer` | 0.17.2 |
+| `qiskit-nature` | 0.7.2 |
+| `qiskit-ibm-runtime` | 0.41.1 |
+| `pyscf` | 2.14.0 |
+| `cirq-core` | 1.4.1 |
+| `qsimcirq` | 0.22.1 |
+| `matplotlib` | 3.11.2 |
+| `pandas` | 3.0.6 |
+| `streamlit` | 1.59.1 |
+| `plotly` | 7.1.0 |
+| `pyarrow` | 24.0.0 |
+<!-- versions:end -->
+
+Mitiq (GPL-3.0) is optional and not part of the Docker image ([`NOTICE`](NOTICE)).
+
 ### ⚠️ Project Status
 
-This project is **under active development**, in staged phases.
-Current status: **Phase 8 completed (`v0.11.0`)** — the VQE core
-works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
+The project is **`v1.0.0`**, the first published release: Phases 0–9 are complete; Phase 10 (community feedback) remains.
+The VQE core works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
-Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
-mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
-(`vqebd.storage`).
+Heron QPU (`ibm_kingston`, L5) and ISA-level Zero-Noise Extrapolation error
+mitigation (L4, cross-validated against Mitiq); with structured SQLite storage, a batch engine and
+repetition-based statistics, failure storage and a scheduler, a browser dashboard and a container system.
+
+**What does 1.0 mean?** The system is reproducible and documented, not that every physical question is settled. The known
+limitations are stated openly in the test reports, e.g.: no noisy-simulation configuration reaches chemical accuracy
+(`TR-F05`), only one point of the hardware curve is compatible with it (`TR-F05` §7), and the dashboard has no visual
+(browser) verification (`TR-F07`).
 
 > **Phase 5 — completed (2026-11-02).** Active-space support (LiH, BeH₂; CASCI
 > cross-validation ≤ 4·10⁻¹⁴ Ha), the batch engine, the repetition-based
@@ -469,7 +605,7 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 | **6** | **Automation, failure storage, scheduling** | ✅ **Completed** (`v0.9.0`) |
 | **7** | **Streamlit dashboard** | ✅ **Completed** (`v0.10.0`) |
 | **8** | **Container system, one-command dashboard launch** | ✅ **Completed** (`v0.11.0`) |
-| 9 | Documentation and publication (Zenodo DOI) | ⬜ Planned |
+| **9** | **Documentation, validation, publication (Zenodo DOI)** | 🔄 **Ready to release** (`v1.0.0`) — the release and the DOI await approval and the Zenodo switch |
 | 10 | Community feedback | ⬜ Planned |
 
 ### What Does This Project Solve?
@@ -690,7 +826,7 @@ record list), so on a clean clone it also shows the versioned JSON data.
 
 ```bash
 docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
-  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.11.0 \
+  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.0.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 
@@ -731,14 +867,14 @@ make test       # full test suite (772 tests, 1 skipped)
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.11.0 python -m vqebd
+docker run --rm vqebd:1.0.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.11.0 .
-docker run --rm vqebd:0.11.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:1.0.0 .
+docker run --rm vqebd:1.0.0 python -m vqebd
 ```
 
 To start the **dashboard** (one command, on your own machine): see the *Phase 8* section above, or `make dashboard`.
@@ -761,6 +897,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 | [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | Detailed Phase 6 plan |
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | Detailed Phase 7 plan |
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | Detailed Phase 8 plan |
+| [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | Detailed Phase 9 plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
@@ -770,6 +907,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 | [`docs/06_automation.md`](docs/06_automation.md) | **Automation, failure storage, retry, scheduling** |
 | [`docs/07_dashboard.md`](docs/07_dashboard.md) | **The dashboard: views, data sources, launching** |
 | [`docs/08_deployment.md`](docs/08_deployment.md) | **Container system, one-command dashboard launch, security** |
+| [`docs/09_publishing.md`](docs/09_publishing.md) | **Release, GitHub Release, Zenodo, DOI** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |
@@ -800,7 +938,8 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 
 ### License and Third-Party Software
 
-VQEBD is licensed under **MIT** — see [`LICENSE`](LICENSE).
+VQEBD's own code is licensed under **MIT** — see [`LICENSE`](LICENSE). Third-party software and the Mitiq
+(GPL-3.0) note are in the [`NOTICE`](NOTICE) file.
 
 > **⚠️ Mitiq (GPL-3.0).** The Mitiq package is GPL-3.0 licensed. VQEBD does
 > **not link or redistribute** it: it is used as an optional, runtime-loaded
@@ -823,18 +962,29 @@ test enforces it (`tests/repo/test_secrets_hygiene.py`):
 
 Put the token in a `.env` file (`cp .env.example .env`). Sending jobs to real
 hardware is protected by a separate safety switch: `VQEBD_ALLOW_HARDWARE=false`
-by default.
+by default. Reporting a vulnerability: [`SECURITY.md`](SECURITY.md).
 
 ### Citation
 
-If you use this project, please cite it according to [`CITATION.cff`](CITATION.cff).
-The Zenodo DOI will be added in Phase 9.
+If you use this project, please cite it according to [`CITATION.cff`](CITATION.cff) (GitHub: *Cite this repository*).
+The **Zenodo DOI** will be added here after the `v1.0.0` release ([`docs/09_publishing.md`](docs/09_publishing.md), in Hungarian).
+
+```bibtex
+@software{vqebd,
+  author  = {Kormos, Attila and {Claude AI (Anthropic)}},
+  title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
+  year    = {2026},
+  version = {1.0.0},
+  url     = {https://github.com/aiasz/VQEBD},
+  license = {MIT}
+}
+```
 
 ### Contributing
 
-The project is currently in an early phase. Bug reports and suggestions: GitHub
-Issues. Commit messages follow the
-[Conventional Commits](https://www.conventionalcommits.org/) convention.
+Bug reports and suggestions are welcome in [GitHub Issues](https://github.com/aiasz/VQEBD/issues) (with templates).
+The rules, the development environment and the quality gates are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) convention.
 
 ---
 

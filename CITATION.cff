@@ -1,11 +1,12 @@
 # Citation File Format 1.2.0 — https://citation-file-format.github.io/
 # Ez a fájl teszi géppel idézhetővé a projektet (GitHub "Cite this repository",
-# Zenodo, Zotero). A Fázis 9-ben ide kerül a Zenodo által generált DOI is.
+# Zenodo, Zotero). A Zenodo által a v1.0.0 kiadás után generált DOI ide kerül
+# (docs/09_publishing.md).
 cff-version: 1.2.0
 title: "VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard"
 message: "Ha ezt a szoftvert használod, kérjük, az alábbiak szerint hivatkozz rá."
 type: software
-version: 0.11.0
+version: 1.0.0
 date-released: "2026-11-02"
 license: MIT
 repository-code: "https://github.com/aiasz/VQEBD"
@@ -19,18 +20,21 @@ authors:
     alias: "Claude Opus 5"
 
 abstract: >-
-  Konténerizált, reprodukálható benchmark-rendszer kis molekulák (H2, LiH, BeH2)
-  elektronszerkezeti alapállapoti energiájának Variational Quantum Eigensolver
-  (VQE) alapú számítására. A rendszer ugyanazt a számítást öt referenciaszinten
-  futtatja — klasszikus egzakt (FCI), a qubit-Hamilton-operátor egzakt
-  diagonalizációja, zajmentes állapotvektor, véges lövésszám, valamint zajos
-  szimulátor vagy valódi IBM QPU —, így a leképezési, ansatz-, statisztikus és
-  hardverzajból származó hibákat külön-külön számszerűsíti. Több hibaenyhítési
-  stratégiát (zero-noise extrapoláció saját ISA-biztos implementációval, Mitiq
-  referencia-implementációval és az IBM Runtime beépített változatával, valamint
-  mérési hibaenyhítéssel) hasonlít össze azonos feltételek mellett. Minden
-  eredményt sémaverziózott, a teljes szoftverkörnyezetet rögzítő adatbázisban
-  tárol, és interaktív dashboardon jelenít meg.
+  A containerised, reproducible benchmark for computing the electronic ground-state
+  energy of small molecules (H2, LiH, BeH2) with the Variational Quantum Eigensolver
+  (VQE). The same calculation is run at several reference levels (classical exact FCI,
+  exact diagonalisation of the qubit Hamiltonian, noiseless statevector, finite-shot
+  sampling, and a noisy simulator or a real IBM QPU), so that mapping, ansatz,
+  statistical and hardware-noise errors are quantified separately. Error-mitigation
+  strategies (zero-noise extrapolation with an own ISA-safe implementation, the Mitiq
+  reference implementation and the IBM Runtime built-in variant, plus measurement
+  mitigation) are compared under identical conditions. Results are stored in a
+  schema-versioned database that records the full software environment, produced by an
+  automated, failure-tolerant pipeline, and shown in an interactive dashboard.
+  (Magyarul: konténerizált, reprodukálható benchmark-rendszer kis molekulák VQE-alapú
+  alapállapoti energiájának számítására, hibaenyhítési stratégiák összehasonlításával,
+  szimulátoron és valódi IBM-hardveren; az eredményeket sémaverziózott adatbázisban
+  tárolja és interaktív dashboardon jeleníti meg.)
 
 keywords:
   - quantum computing

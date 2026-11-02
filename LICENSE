@@ -19,25 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
---------------------------------------------------------------------------------
-HARMADIK FELEK SZOFTVEREI / THIRD-PARTY SOFTWARE
-
-Ez a projekt harmadik felek szoftvereit használja, amelyek saját licenc alatt
-állnak. A teljes lista és a verziók: docs/references.md.
-
-This project uses third-party software licensed under their own terms. The full
-list with versions is in docs/references.md.
-
-FIGYELEM — Mitiq (GPL-3.0):
-A Mitiq csomag GPL-3.0 licencű. A VQEBD NEM linkeli be és NEM terjeszti újra a
-Mitiq-et: opcionális, futásidőben betöltött komponensként használja, egyetlen
-modulba zárva (src/vqebd/mitigation/mitiq_zne.py). A Mitiq nélkül a rendszer
-teljes funkcionalitással működik. Részletek:
-docs/adr/ADR-0003-mitigacios-architektura.md
-
-NOTE — Mitiq (GPL-3.0):
-The Mitiq package is licensed under GPL-3.0. VQEBD does NOT link against or
-redistribute Mitiq; it is used as an optional, runtime-loaded component confined
-to a single module (src/vqebd/mitigation/mitiq_zne.py). VQEBD is fully functional
-without it. See docs/adr/ADR-0003-mitigacios-architektura.md
