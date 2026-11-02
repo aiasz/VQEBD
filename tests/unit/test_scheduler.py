@@ -19,8 +19,6 @@ from vqebd.scheduler import LockHeldError, PipelineLock, parse_interval, run_sch
 
 pytestmark = pytest.mark.unit
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-
 
 @pytest.mark.parametrize(
     ("text", "seconds"),
@@ -191,9 +189,12 @@ def test_invalid_interval_is_a_usage_error() -> None:
     assert info.value.code == 2
 
 
-def test_compose_defines_a_simulator_only_scheduler_service() -> None:
-    """AC-6.11: van `scheduler` szolgáltatás, az ütemezőt hívja, hardvert nem engedélyez."""
-    text = (REPO_ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+def test_compose_defines_a_simulator_only_scheduler_service(repo_root: Path) -> None:
+    """AC-6.11: van `scheduler` szolgáltatás, az ütemezőt hívja, hardvert nem engedélyez.
+
+    A repó-checkoutot igényli (a `repo_root` fixture a szállított image-ben kihagyja).
+    """
+    text = (repo_root / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
     assert re.search(r"^  scheduler:\s*$", text, re.MULTILINE)
     # A scheduler blokkja a Fázis 8 megjegyzéssel induló dashboard-szakaszig tart.
     block = text[text.index("  scheduler:") : text.index("  # --- Fázis 8")]
