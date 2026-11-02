@@ -19,11 +19,12 @@
 > alapállapoti-energia számítására, hibaenyhítési stratégiák összehasonlításával —
 > szimulátoron és valódi IBM-kvantumhardveren.
 
-**Készítők:** Kormos Attila · Claude AI (Anthropic, Claude Opus 5)
+**Szerző:** Kormos Attila · **Megvalósítás MI-eszközzel:** Claude (Anthropic)
 
-> 🤖 **MI-vel készített kísérlet.** A kódot, a kísérlettervezést, a mérések lefuttatását, az elemzést és a dokumentációt
-> lényegében teljes egészében az Anthropic Claude modelljei készítették Kormos Attila irányításával. **Független szakmai
-> lektorálás és külső replikáció nem történt.** Részletek: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
+> 🤖 **MI-vel készített kísérlet — Kormos Attila kezdeményezésével és irányításával.** Az ötletet, a célokat és a
+> döntéseket, az IBM-hozzáférést és az MI-használat költségét a szerző adta; a kódot és a szövegeket az Anthropic Claude
+> modelljei írták meg az ő kérésére és utasításai szerint. **Független szakmai lektorálás és külső replikáció nem történt.**
+> Részletek: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
 ### Röviden
 
@@ -501,9 +502,10 @@ A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
 
 ### MI-felhasználás
 
-A projekt **MI-vel készített kísérlet**: a kód, a tervek, a futtatások, az elemzés és a szöveg szerzője lényegében a Claude
-(Sonnet 5.5, Opus 5, Opus 5.5; Claude Code), a célokat, a jóváhagyásokat, az IBM-hozzáférést és a kiadási döntéseket Kormos
-Attila adta. Ami **nem** történt meg: független szakértői lektorálás, külső replikáció, a hivatkozott művek teljes szövegének
+A projekt **MI-vel készített kísérlet**, amelyet Kormos Attila kezdeményezett és irányított: ő adta az ötletet, a célokat, a
+döntéseket, az IBM-hozzáférést és az MI-használat költségét, jóváhagyta a lépéseket (a hardveres futtatásokat blokkonként
+külön), és hozta a kiadási döntéseket. A kódot, a terveket és a szöveget a Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code)
+írta meg az ő kérésére és utasításai szerint; a futtatásokat és az elemzést is a Claude végezte el, a szerző engedélyével. Ami **nem** történt meg: független szakértői lektorálás, külső replikáció, a hivatkozott művek teljes szövegének
 emberi átolvasása; a hardveres eredmények pontonként egyetlen futásúak. A tudományos újdonságot nem állítjuk
 ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)). A teljes, pontos nyilatkozat, a dokumentált MI-hibákkal
 és egy cikkbe szánt szövegjavaslattal: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
@@ -522,11 +524,12 @@ A commit-üzenetek a [Conventional Commits](https://www.conventionalcommits.org/
 > calculations of small molecules, comparing error-mitigation strategies —
 > on simulators and on real IBM quantum hardware.
 
-**Authors:** Attila Kormos · Claude AI (Anthropic, Claude Opus 5)
+**Author:** Attila Kormos · **Implemented with an AI tool:** Claude (Anthropic)
 
-> 🤖 **AI-assisted experiment.** The code, experimental design, execution of the measurements, analysis and documentation were
-> produced almost entirely by Anthropic's Claude models under the direction of Attila Kormos. **No independent expert review
-> or external replication has taken place.** Details: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
+> 🤖 **AI-assisted experiment — initiated and directed by Attila Kormos.** The idea, goals and decisions, the IBM access and
+> the cost of the AI use came from the author; the code and text were written by Anthropic's Claude models at the author's
+> request and following the author's instructions. **No independent expert review or external replication has taken place.**
+> Details: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
 ### In short
 
@@ -1010,9 +1013,11 @@ snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). T
 
 ### AI Use
 
-The project is an **AI-assisted experiment**: the code, plans, runs, analysis and text were produced essentially by Claude
-(Sonnet 5.5, Opus 5, Opus 5.5; Claude Code), while Attila Kormos provided the goals, approvals, IBM access and release
-decisions. What has **not** happened: independent expert review, external replication, human reading of the cited works in
+The project is an **AI-assisted experiment**, initiated and directed by Attila Kormos: the author provided the idea, goals,
+decisions, IBM access and the cost of the AI use, approved the steps (hardware runs block by block, separately) and made the
+release decisions. The code, plans and text were written by Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code) at the author's
+request and following the author's instructions; the runs and the analysis were carried out by Claude with the author's
+permission. What has **not** happened: independent expert review, external replication, human reading of the cited works in
 full; the hardware results are single runs per point. No scientific novelty is claimed
 ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md), in Hungarian). The full, exact statement, with the documented AI errors
 and a suggested text for a paper: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).

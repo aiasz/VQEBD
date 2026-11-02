@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
-| **Nyilatkozat verziója** | 1.0.0 (2026-11-02) |
+| **Nyilatkozat verziója** | 1.1.0 (2026-11-02) |
 | **Vonatkozik** | a `v1.0.0` kiadásra (Zenodo DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002)) és minden későbbi verzióra, amíg ez a fájl módosítatlan |
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -14,23 +14,31 @@
 
 ### Röviden
 
-**Ez a projekt és minden eredménye mesterséges intelligenciával (MI) készített kísérlet.** A kódot, a kísérletek tervezését és
-lefuttatását, az elemzést és a dokumentációt lényegében teljes egészében az Anthropic **Claude** nyelvi modelljei
-(a Claude Code ügynökön keresztül) készítették, **Kormos Attila** irányításával és jóváhagyásaival. Az eredmények
-**nem estek át független szakmai lektoráláson, és független replikáció sem történt.** A projekt eszköz- és
-adatműtermék, nem lektorált tudományos eredmény.
+**Ez a projekt Kormos Attila kezdeményezése és irányítása alatt, mesterséges intelligenciával (MI) készített kísérlet.** Az
+ötletet, a kérdést, az irányt és minden érdemi döntést a szerző adta; az IBM-hozzáférést, a kvótát és az MI-használat
+költségét ő biztosította és viselte. A kódot, valamint a tervek és a dokumentáció szövegét az Anthropic **Claude** nyelvi
+modelljei írták meg (a Claude Code ügynökön keresztül) — a szerző kérésére, az ő utasításai szerint és jóváhagyásával. Az MI
+önállóan nem kezdeményezett semmit, és a szerző külön engedélye nélkül egyetlen hardveres futtatás sem indult. A végeredményért
+a szerző felel. Az eredmények **nem estek át független szakmai lektoráláson, és független replikáció sem történt.** A projekt
+eszköz- és adatműtermék, nem lektorált tudományos eredmény.
 
 ### Ki mit végzett
 
-| Feladat | MI (Claude) | Kormos Attila |
+| Feladat | Kormos Attila (szerző) | MI (Claude) |
 |---|---|---|
-| Célkitűzés, az irány kiválasztása, a fázisok jóváhagyása | javaslatokat tett | **döntött** és jóváhagyott |
-| Kód (`src/`, `scripts/`, `tests/`, `docker/`) | **megírta** | irányította, jóváhagyta a fázisokat |
-| Kísérlettervezés (fázisterv, tesztterv, hipotézisek, elfogadási kritériumok) | **megírta** | jóváhagyta |
-| Kísérletek lefuttatása szimulátoron és az IBM-hardveren | **lefuttatta** (a felhasználó engedélyével) | **biztosította az IBM-hozzáférést és a kvótát**, jóváhagyta a hardveres futtatást, és figyelmeztette a kvóta betartására |
-| Elemzés, statisztika, értelmezés, ábrák | **elvégezte** | jóváhagyta |
-| Dokumentáció, jegyzőkönyvek, README, hivatkozásjegyzék, szakirodalmi áttekintés | **megírta** | jóváhagyta |
-| Kiadás (GitHub Release, Zenodo-fiók és -integráció), a szerzői lista | előkészítette | **elvégezte / eldöntötte** (a Zenodo-rekord szerzője csak Kormos Attila) |
+| Ötlet, kutatási kérdés, célkitűzés, irány | **kezdeményezte és kitűzte** | alternatívákat és javaslatokat adott |
+| Döntések (fázisok, küszöbök, geometriák, kvótahatár, qubitpár, mit publikálunk, szerzői lista) | **döntött** | lehetőségeket, kockázatokat és számításokat adott a döntéshez |
+| Erőforrások: IBM-fiók és -kvóta, az MI-használat költsége | **biztosította és viselte** | — |
+| Kód (`src/`, `scripts/`, `tests/`, `docker/`) | **kérte, irányította, jóváhagyta**; közlése szerint kb. 80%-át soronként átnézte (önbevallás, lásd lent, 3. pont) | **megírta**, a szerző kérésére |
+| Kísérlettervezés (fázisterv, tesztterv, hipotézisek, elfogadási kritériumok) | megadta a feladatot, **jóváhagyta, módosította** | megfogalmazta |
+| Kísérletek lefuttatása szimulátoron és az IBM-hardveren | **blokkonként engedélyezte**, és előírta a kvóta betartását | lefuttatta az engedély és a kódba épített védelmek keretein belül |
+| Elemzés, statisztika, ábrák, dokumentáció, jegyzőkönyvek, szakirodalmi áttekintés | jóváhagyta, ellenőrizte, javíttatta | **megírta** |
+| Kiadás (GitHub Release, Zenodo-fiók és -integráció), a szerzői lista | **elvégezte / eldöntötte** (a Zenodo-rekord szerzője csak Kormos Attila) | előkészítette |
+| Felelősség az eredményekért és a kiadásért | **a szerző** | — (eszközként nem vállalhat felelősséget) |
+
+Az MI-t a szakmai kiadói gyakorlat (pl. COPE, ICMJE) szerint nem tekintjük szerzőnek, mert felelősséget nem vállalhat; ezért
+nem szerepel a Zenodo szerzői listán. Mivel a kód és a szöveg nagy részét ő írta meg, a megvalósítót névvel és modellel
+jelöljük.
 
 ### Milyen MI-modellek
 
@@ -81,11 +89,12 @@ Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat
 
 ### Javasolt szöveg cikkbe / ajánlott hivatkozásmód
 
-> *Az itt bemutatott szoftvert, kísérlettervet, számításokat és dokumentációt lényegében teljes egészében az Anthropic
-> Claude nyelvi modelljei (Claude Sonnet 5.5, Claude Opus 5, Claude Opus 5.5; Claude Code ügynök) állították elő a
-> szerző irányításával. A szerző határozta meg a célokat, jóváhagyta a lépéseket, biztosította az IBM Quantum
-> hozzáférést és hozta a kiadási döntéseket. Független szakértői lektorálás és külső replikáció nem történt; az eredmények
-> kis rendszerekre vonatkozó, nem lektorált mérések. A szakirodalmi áttekintés nem szisztematikus.*
+> *A kísérletet Kormos Attila kezdeményezte és irányította: ő határozta meg a kérdést, a célokat és a döntéseket, biztosította
+> az IBM Quantum hozzáférést és az MI-használat költségét, jóváhagyta az egyes lépéseket és hozta a kiadási döntéseket. A
+> szoftvert, a számításokat és a dokumentáció szövegét az Anthropic Claude nyelvi modelljei (Claude Sonnet 5.5, Claude Opus 5,
+> Claude Opus 5.5; Claude Code ügynök) írták meg a szerző kérésére és utasításai szerint. Független szakértői lektorálás és
+> külső replikáció nem történt; az eredmények kis rendszerekre vonatkozó, nem lektorált mérések. A szakirodalmi áttekintés
+> nem szisztematikus.*
 
 ---
 
@@ -93,22 +102,31 @@ Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat
 
 ### In short
 
-**This project and all of its results are an AI-assisted experiment.** The code, the design and execution of the experiments,
-the analysis and the documentation were produced almost entirely by Anthropic's **Claude** language models (through the
-Claude Code agent), under the direction and approval of **Attila Kormos**. The results have **not been independently
-peer-reviewed or independently replicated.** The project is a tool and data artifact, not a peer-reviewed scientific result.
+**This project is an AI-assisted experiment, initiated and directed by Attila Kormos.** The idea, the question, the direction
+and every substantive decision came from the author; the IBM access, the quota and the cost of the AI use were provided and
+borne by the author. The code, and the text of the plans and documentation, were written by Anthropic's **Claude** language
+models (through the Claude Code agent) — at the author's request, following the author's instructions and with the author's
+approval. The AI initiated nothing on its own, and no hardware run started without the author's separate permission. The author
+is responsible for the final result. The results have **not been independently peer-reviewed or independently replicated.**
+The project is a tool and data artifact, not a peer-reviewed scientific result.
 
 ### Who did what
 
-| Task | AI (Claude) | Attila Kormos |
+| Task | Attila Kormos (author) | AI (Claude) |
 |---|---|---|
-| Goals, direction, approval of each phase | made proposals | **decided** and approved |
-| Code (`src/`, `scripts/`, `tests/`, `docker/`) | **wrote it** | directed it; approved phases |
-| Experimental design (phase plans, test plans, hypotheses, acceptance criteria) | **wrote it** | approved |
-| Running experiments on simulators and IBM hardware | **ran them** (with the user's permission) | **provided IBM access and quota**, approved hardware runs, and instructed staying within the free quota |
-| Analysis, statistics, interpretation, figures | **performed** | approved |
-| Documentation, test reports, README, reference list, literature review | **wrote it** | approved |
-| Release (GitHub Release, Zenodo account and integration), author list | prepared | **performed / decided** (the Zenodo record lists only Attila Kormos as author) |
+| Idea, research question, goals, direction | **initiated and set them** | offered alternatives and proposals |
+| Decisions (phases, thresholds, geometries, quota limit, qubit pair, what to publish, author list) | **decided** | supplied options, risks and calculations for the decision |
+| Resources: IBM account and quota, the cost of the AI use | **provided and bore them** | — |
+| Code (`src/`, `scripts/`, `tests/`, `docker/`) | **requested, directed, approved**; per the author, ~80% was reviewed line by line (self-reported, see item 3 below) | **wrote it**, at the author's request |
+| Experimental design (phase plans, test plans, hypotheses, acceptance criteria) | gave the task, **approved and amended** | drafted it |
+| Running experiments on simulators and IBM hardware | **permitted each block**, and required staying within the quota | ran them within the permission and the guards built into the code |
+| Analysis, statistics, figures, documentation, test reports, literature review | approved, checked, had errors fixed | **wrote it** |
+| Release (GitHub Release, Zenodo account and integration), author list | **performed / decided** (the Zenodo record lists only Attila Kormos) | prepared |
+| Responsibility for the results and the release | **the author** | — (as a tool it cannot take responsibility) |
+
+By professional publishing practice (e.g. COPE, ICMJE) the AI is not treated as an author because it cannot take
+responsibility; hence it is not on the Zenodo author list. Since it wrote most of the code and text, the implementer is named,
+with the model.
 
 ### Which AI models
 
@@ -157,11 +175,12 @@ AI-generated text may contain further errors not uncovered here.
 
 ### Suggested text for a paper / how to cite
 
-> *The software, experimental design, computations and documentation presented here were produced almost entirely by
-> Anthropic's Claude language models (Claude Sonnet 5.5, Claude Opus 5, Claude Opus 5.5; the Claude Code agent) under the
-> author's direction. The author set the goals, approved the steps, provided the IBM Quantum access and made the release
-> decisions. No independent expert review or external replication has taken place; the results are non-peer-reviewed
-> measurements on small systems. The literature review is not systematic.*
+> *The experiment was initiated and directed by Attila Kormos, who set the question, the goals and the decisions, provided the
+> IBM Quantum access and the cost of the AI use, approved each step and made the release decisions. The software, the
+> computations and the text of the documentation were written by Anthropic's Claude language models (Claude Sonnet 5.5,
+> Claude Opus 5, Claude Opus 5.5; the Claude Code agent) at the author's request and following the author's instructions. No
+> independent expert review or external replication has taken place; the results are non-peer-reviewed measurements on small
+> systems. The literature review is not systematic.*
 
 ---
 
