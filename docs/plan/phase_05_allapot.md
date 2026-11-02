@@ -131,7 +131,7 @@ a pontossághoz?”) mért válasza, a `phase_05.md` 3. fejezetének táblázat�
 > **Frissítés (2026-11-02):** T1–T7 elkészült. A determinisztikus batch 50/50,
 > fig07 és fig09 kész, a [`TR-F05`](../testing/TR-F05_batch.md), a
 > [`docs/05_batch.md`](../05_batch.md), a README (HU és EN) és a CHANGELOG lezárva.
-> K5 lezárva (TR-F05 6. pont). **Új: K8** (qsim tűrés, TR-F05 3.2). Hátra: a
+> K5 lezárva (TR-F05 6. pont). **Új: K8** (qsim tűrés, TR-F05 3.2) — oka megmérve (`complex64`), a tűrés száma változatlan. Hátra: a
 > `v0.8.0` commit és címke (felhasználói jóváhagyással), valamint T8 (5.H).
 > Az alábbi táblázat az eredeti állapotot rögzíti.
 

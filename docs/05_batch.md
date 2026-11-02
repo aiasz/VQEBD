@@ -187,7 +187,7 @@ A VQE-útvonalra (`run_vqe`, `python -m vqebd --backend ibm_qpu`) ugyanez
 |---|---|
 | K4 | UCCSD mélységi fal: LiH (2e,3o) zajos szimulációban +466 mHa |
 | K7 | ~~A hardveres VQE-útvonal kvótavédelem nélkül~~ — **javítva** (6. pont) |
-| K8 | A qsim (`complex64`) a LiH (2e,5o) 1.595 Å-nél 2.8·10⁻⁵ Ha-val tér el, a névleges tűrés (10⁻⁵ Ha) fölött; a kémiai pontosság 1.8%-a ([TR-F05](testing/TR-F05_batch.md) 3.2) |
+| K8 | A qsim (`complex64`) a LiH (2e,5o) 1.595 Å-nél 2.8·10⁻⁵ Ha-val tér el, a névleges tűrés (10⁻⁵ Ha) fölött; a kémiai pontosság 1.8%-a. Az ok megmérve: a `complex64` aritmetika, nem a Powell (a Powell `complex128`-on 9·10⁻¹² Ha-ra konvergál). A tűrés a (2e,3o) terekre igaz, 24 paraméteren nem ([TR-F05](testing/TR-F05_batch.md) 3.2) |
 | 5.H | Hardveres H₂ disszociációs görbe: még nem futott le |
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

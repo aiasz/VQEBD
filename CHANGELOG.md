@@ -11,6 +11,13 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Mért
+- **K8 — a qsim-eltérés oka (LiH (2e,5o), 1.595 Å):** a Powell `complex128`
+  Qiskit-en 4309 kiértékelés után 9·10⁻¹² Ha-ra konvergál, a qsim (`complex64`)
+  7178 kiértékelés után 2.8·10⁻⁵ Ha-nál áll meg. Az ok tehát a `complex64`
+  aritmetika, nem az optimalizáló. Egyetlen mérési pont: a 10⁻⁵ Ha tűrést nem
+  módosítottuk (TR-F05 3.2).
+
 ### Javítva
 - **K7 — kvótavédelem a hardveres VQE-útvonalon.** A `run_vqe` (és a
   `python -m vqebd --backend ibm_qpu`) korábban engedély és kvótaellenőrzés nélkül,
@@ -33,8 +40,7 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 - **Fázis 5.H** — H₂ disszociációs görbe valódi QPU-n (`scripts/run_hardware_pes.py`).
   A kvóta-ablak 2026-10-21 óta nyitva van; a mérés `--dry-run` és külön jóváhagyás
   után indítható. Nem elfogadási kritérium, `v0.8.1` kiegészítés lehet.
-- **K8** — a qsim platformtűrés (10⁻⁵ Ha) és a LiH (2e,5o) qsim-eltérés (2.8·10⁻⁵ Ha)
-  rendezése: tűrés a tér méretéhez kötve, vagy a cella kivétele a platformegyezésből.
+- **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
 
 ---

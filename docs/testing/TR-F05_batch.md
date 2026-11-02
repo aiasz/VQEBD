@@ -84,13 +84,28 @@ az eltérés **2.8·10⁻⁵ Ha, a tűrés 2.8-szorosa**. Ez nem hibás eredmén
 kémiai pontosság 1.6·10⁻³ Ha, és az eltérés ennek 1.8%-a. A tűrést viszont
 nem teljesíti, és erre egyik teszt sem figyel: a TC-503 csak a LiH (2e,3o)-t fedi.
 
-**Ok (valószínű, nem bizonyított):** `complex64` aritmetika + Powell 24 paraméteren
-(7178 kiértékelés, 623 s). A Qiskit és Cirq SLSQP-vel 226 kiértékelésből ugyanazt
-a minimumot 10⁻¹¹ Ha-ra találja meg, tehát nem a feladat nehéz. **Nyitott:** nem
-mértük szét, hogy az eltérés a `complex64` pontosságból vagy a Powell leállási
-feltételéből ered. **Teendő:** (a) a tűrést a tér méretéhez kötni, vagy (b) a
-qsim + frozen-core cellát kivenni a platformegyezési állításból. A döntés a
-felhasználóé; nincs kódváltoztatás ebben a kiadásban.
+**Ok (mérve, 2026-11-02).** Ugyanaz a feladat (LiH (2e,5o), 1.595 Å, 24 paraméter),
+ugyanaz a Powell (`maxiter=2000`, seed 20260922), `complex128` Qiskit-en:
+
+| Futás | Optimalizáló | Kiértékelés | E − CASCI |
+|---|---|---|---|
+| Qiskit `complex128` | SLSQP | 226 | 2.1·10⁻¹¹ Ha |
+| Qiskit `complex128` | **Powell** | 4309 | **9·10⁻¹² Ha** |
+| qsim `complex64` | **Powell** | 7178 | **2.8·10⁻⁵ Ha** |
+
+A Powell tehát `complex128`-on 10⁻¹¹ Ha-ra konvergál, így **nem az optimalizáló
+az ok**: az eltérés a `complex64` aritmetikából ered (közvetlenül, vagy úgy, hogy a
+Powell vonalkeresése a ~10⁻⁷ nagyságrendű energiazajon korábban megáll; a kettőt
+nem választottuk szét). **Korlát:** egyetlen mérési pont, egyetlen seed.
+
+**Döntés:** a névleges `1·10⁻⁵ Ha` tűrést **nem módosítjuk** egyetlen pont alapján.
+A tűrés a qsim-re a (2e,3o) terekben igaz (legnagyobb eltérés 2.1·10⁻⁶ Ha), a
+24 paraméteres frozen-core térben nem. Ez a tűrés érvényességi tartományának
+korlátja, nem hibás eredmény: a 2.8·10⁻⁵ Ha a kémiai pontosság 1.8%-a. A
+`within_backend_tolerance` nincs az adatbázisban tárolva, így a rekord nem jelzi a
+túllépést; az erre vonatkozó állítás ebből a jegyzőkönyvből olvasható ki.
+**Nyitott:** a tűrés mérete-függő pontosítása több pont (pl. a BeH₂ qsim-cellái,
+több seed) mérése után indokolt.
 
 ### 3.3 BeH₂ (4e,6o): az ansatz-hiba
 
@@ -225,7 +240,7 @@ készült, a repóban nincs; az eredmény a fenti értékekkel reprodukálható,
   után** (CHANGELOG, Unreleased): engedély, kvóta-előellenőrzés és kemény
   kiértékelési keret; 7 új egységteszt. Ez a jegyzőkönyv a v0.8.0 állapotát
   rögzíti, a javítás nem része a 10 elfogadási kritérium bizonyítékának.
-- **K8 — qsim platformtűrés** (3.2 pont).
+- **K8 — qsim platformtűrés** (3.2 pont): az ok megmérve (`complex64`, nem a Powell); a tűrés számát nem módosítottuk.
 
 ---
 
