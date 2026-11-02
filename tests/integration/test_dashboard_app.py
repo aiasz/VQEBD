@@ -178,6 +178,156 @@ def test_discovery_finds_sqlite_and_known_exports(tmp_path: Path) -> None:
     assert discover_sources(tmp_path) == wanted
 
 
+# =====================================================================================
+# 7.2 — disszociációs görbe molekulaválasztóval (AC-7.5)
+# =====================================================================================
+
+CURVE_VIEW = "Disszociációs görbe"
+
+
+def _chart_traces(at: AppTest) -> dict[str, tuple[list[float], list[float]]]:
+    """A kirajzolt Plotly-ábra trace-ei (név → (x, y)), a Streamlit-protóból kiolvasva."""
+    charts = at.get("plotly_chart")
+    assert len(charts) == 1, f"pontosan egy ábra várt, van: {len(charts)}"
+    spec = json.loads(charts[0].proto.spec)
+    return {t["name"]: (list(t["x"]), list(t["y"])) for t in spec["data"]}
+
+
+@pytest.fixture
+def curve_db(tmp_path: Path, record_factory: RecordFactory) -> Path:
+    """H₂ három geometrián (egzakt + zajos), LiH két aktív térrel."""
+    path = tmp_path / "curve.sqlite"
+    full_ci = {0.5: -1.0552, 0.735: -1.1373, 1.0: -1.1012}
+    with Database(path) as db:
+        for r, fci in full_ci.items():
+            db.insert_record(
+                record_factory(run_id=f"h2-e-{r}", bond_length=r, energy_ha=fci, full_ci_ha=fci)
+            )
+            db.insert_record(
+                record_factory(
+                    run_id=f"h2-n-{r}",
+                    bond_length=r,
+                    backend="qiskit_aer_noisy",
+                    energy_ha=fci + 0.03,
+                    full_ci_ha=fci,
+                )
+            )
+        for run_id, r, orbitals in (("lih-a", 1.2, 3), ("lih-b", 1.6, 3), ("lih-c", 1.6, 5)):
+            db.insert_record(
+                record_factory(
+                    run_id=run_id,
+                    molecule_name="LiH",
+                    bond_length=r,
+                    active_electrons=2,
+                    active_orbitals=orbitals,
+                    energy_ha=-7.80 - r / 100,
+                    full_ci_ha=-7.90 - r / 100,
+                )
+            )
+    return path
+
+
+def test_default_view_is_still_the_table(monkeypatch: pytest.MonkeyPatch, curve_db: Path) -> None:
+    """AC-7.8: a 7.2 lépés után az alapnézet a 7.1 táblázata."""
+    at = _run(monkeypatch, curve_db)
+    assert at.sidebar.radio(key="view").value == "Táblázat"
+    assert len(at.dataframe) >= 1 and not at.get("plotly_chart")
+
+
+def test_curve_view_renders_the_first_molecule(
+    monkeypatch: pytest.MonkeyPatch, curve_db: Path
+) -> None:
+    at = _run(monkeypatch, curve_db)
+    at.sidebar.radio(key="view").set_value(CURVE_VIEW).run()
+    assert not at.exception
+    assert at.selectbox(key="molecule").options == ["H2", "LiH"]
+    traces = _chart_traces(at)
+    assert list(traces) == ["Full CI", "Hartree–Fock", "egzakt", "zajos (nyers)"]
+    assert traces["Full CI"][0] == [0.5, 0.735, 1.0]
+
+
+def test_switching_molecule_updates_the_chart(
+    monkeypatch: pytest.MonkeyPatch, curve_db: Path
+) -> None:
+    """AC-7.5: molekulát váltva az ábra pontjai a másik molekuláéra változnak."""
+    at = _run(monkeypatch, curve_db)
+    at.sidebar.radio(key="view").set_value(CURVE_VIEW).run()
+    h2 = _chart_traces(at)
+
+    at.selectbox(key="molecule").select("LiH").run()
+    assert not at.exception
+    lih = _chart_traces(at)
+
+    assert h2["Full CI"][0] == [0.5, 0.735, 1.0]
+    assert lih["Full CI"][0] == [1.2, 1.6]
+    assert "zajos (nyers)" in h2 and "zajos (nyers)" not in lih
+    assert lih["egzakt"][0] == [1.2, 1.6, 1.6]
+    assert all(e < -7.0 for e in lih["egzakt"][1])
+    assert "LiH" in at.get("plotly_chart")[0].proto.spec  # a cím is frissült
+
+
+def test_active_space_selector_filters_the_chart(
+    monkeypatch: pytest.MonkeyPatch, curve_db: Path
+) -> None:
+    at = _run(monkeypatch, curve_db)
+    at.sidebar.radio(key="view").set_value(CURVE_VIEW).run()
+    at.selectbox(key="molecule").select("LiH").run()
+    assert at.selectbox(key="space").options == ["összes", "(2e,3o)", "(2e,5o)"]
+    at.selectbox(key="space").select("(2e,5o)").run()
+    assert not at.exception
+    assert _chart_traces(at)["egzakt"][0] == [1.6]
+    assert "1 futás" in at.caption[-1].value
+
+
+def test_method_multiselect_removes_a_trace_and_resets_on_molecule_change(
+    monkeypatch: pytest.MonkeyPatch, curve_db: Path
+) -> None:
+    at = _run(monkeypatch, curve_db)
+    at.sidebar.radio(key="view").set_value(CURVE_VIEW).run()
+    selector = at.multiselect(key="methods-H2-összes")
+    assert selector.value == ["egzakt", "zajos (nyers)"]
+    selector.unselect("zajos (nyers)").run()
+    assert "zajos (nyers)" not in _chart_traces(at)
+
+    # Molekulaváltás: az új molekula módszerlistája alapértelmezésben teljes.
+    at.selectbox(key="molecule").select("LiH").run()
+    assert at.multiselect(key="methods-LiH-összes").value == ["egzakt"]
+    # Visszaváltva a választás NEM marad meg (a Streamlit a nem kirajzolt widget állapotát
+    # eldobja): a H₂ módszerlistája újra alapértelmezett, azaz teljes.
+    at.selectbox(key="molecule").select("H2").run()
+    assert at.multiselect(key="methods-H2-összes").value == ["egzakt", "zajos (nyers)"]
+    assert "zajos (nyers)" in _chart_traces(at)
+
+
+def test_curve_view_with_real_batch_data_switches_molecules(
+    monkeypatch: pytest.MonkeyPatch, repo_root: Path
+) -> None:
+    """Valódi adat: a verziózott batch-export három molekulája között váltva az ábra változik."""
+    at = _run(monkeypatch, repo_root / "docs" / "figures" / "data" / "f5_deterministic.json")
+    at.sidebar.radio(key="view").set_value(CURVE_VIEW).run()
+    assert not at.exception
+    assert at.selectbox(key="molecule").options == ["BeH2", "H2", "LiH"]
+    seen: dict[str, list[float]] = {}
+    for molecule in ("BeH2", "H2", "LiH"):
+        at.selectbox(key="molecule").select(molecule).run()
+        assert not at.exception
+        seen[molecule] = _chart_traces(at)["Full CI"][0]
+    assert seen["H2"] == [0.5, 0.735, 1.0, 1.5, 2.0, 2.5]
+    assert seen["LiH"] == [1.2, 1.595, 2.2, 3.0]
+    assert seen["BeH2"] == [1.0, 1.33, 1.8]
+
+
+def test_curve_view_with_no_molecules_shows_an_info_message(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    empty = tmp_path / "ures.sqlite"
+    Database(empty).close()
+    at = _run(monkeypatch, empty)
+    at.sidebar.radio(key="view").set_value(CURVE_VIEW).run()
+    assert not at.exception
+    assert any("nem tartalmaz molekulát" in i.value for i in at.info)
+
+
 # --- hiányzó, üres és sérült adat (AC-7.10) -----------------------------------------------
 
 

@@ -28,8 +28,13 @@ from vqebd.dashboard.data import (
     load_failures,
     load_results,
 )
+from vqebd.dashboard.figures import dissociation_figure, ordered_methods
 
-__all__ = ["DISPLAY_COLUMNS", "discover_sources", "main"]
+__all__ = ["DISPLAY_COLUMNS", "VIEWS", "discover_sources", "main"]
+
+VIEWS: Final[tuple[str, ...]] = ("Táblázat", "Disszociációs görbe")
+"""A nézetek (az oldalsáv „Nézet" kapcsolója). Az alapnézet az első; minden belső lépés egy
+újabb nézetet ad hozzá, a korábbiak változatlanok (AC-7.8)."""
 
 DISPLAY_COLUMNS: Final[tuple[str, ...]] = (
     "run_id",
@@ -110,6 +115,15 @@ def main() -> None:
     columns[1].metric("Kémiailag pontos", int(results["chemically_accurate"].sum()))
     columns[2].metric("Hibás próbálkozások", len(failures))
 
+    view = st.sidebar.radio("Nézet", VIEWS, key="view")
+    if view == "Táblázat":
+        _render_table(results, failures)
+    elif view == "Disszociációs görbe":
+        _render_dissociation(results)
+
+
+def _render_table(results: pd.DataFrame, failures: pd.DataFrame) -> None:
+    """7.1: az eredménytábla és a hibák."""
     tab_results, tab_failures = st.tabs(["Eredmények", "Hibák"])
     with tab_results:
         if results.empty:
@@ -121,3 +135,32 @@ def main() -> None:
             st.info("Nincs tárolt hiba (a hibatábla csak SQLite-forrásban van).")
         else:
             st.dataframe(failures, hide_index=True)
+
+
+def _render_dissociation(results: pd.DataFrame) -> None:
+    """7.2: disszociációs görbe molekula-, aktívtér- és módszerválasztóval."""
+    molecules = sorted(results["molecule_name"].dropna().unique())
+    if not molecules:
+        st.info("A forrás nem tartalmaz molekulát tartalmazó eredményt.")
+        return
+    molecule = st.selectbox("Molekula", molecules, key="molecule")
+    of_molecule = results[results["molecule_name"] == molecule]
+    spaces = ["összes", *sorted(of_molecule["active_space"].dropna().unique())]
+    space = st.selectbox("Aktív tér", spaces, key="space")
+    if space != "összes":
+        of_molecule = of_molecule[of_molecule["active_space"] == space]
+    available = ordered_methods(of_molecule["method"].dropna())
+    # A kulcs a molekulától és az aktív tértől függ: váltáskor az alapértelmezett (mind) érvényesül.
+    methods = st.multiselect(
+        "Módszerek", available, default=available, key=f"methods-{molecule}-{space}"
+    )
+    st.plotly_chart(
+        dissociation_figure(
+            results,
+            str(molecule),
+            active_space=None if space == "összes" else str(space),
+            methods=methods,
+        ),
+        key="dissociation",
+    )
+    st.caption(f"{len(of_molecule)} futás a kijelölt molekulára és aktív térre.")
