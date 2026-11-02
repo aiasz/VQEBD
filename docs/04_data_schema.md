@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/04_data_schema.md` |
 | **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-09-23 · 2026-09-25 (séma v2) |
-| **Projektverzió** | 0.9.0 |
+| **Projektverzió** | 0.10.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 4 — Adatséma és tárolás |
 
@@ -137,5 +137,5 @@ for r in records:
 ### Exportálás CSV / JSON formátumba
 
 ```bash
-docker run --rm -v "${PWD}:/repo" vqebd:0.9.0 python scripts/export_results.py
+docker run --rm -v "${PWD}:/repo" vqebd:0.10.0 python scripts/export_results.py
 ```

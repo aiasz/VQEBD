@@ -4,7 +4,7 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.5.0 |
+| **Dokumentum-verzió** | 1.6.0 |
 | **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
@@ -526,6 +526,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | 1.3.0 | 2026-11-02 | Fázis 5 lezárva (v0.8.0/v0.8.1). Fázis 6 terve ([`phase_06.md`](phase_06.md), ADR-0008): hibatárolás, osztályozott újrapróbálás, hardver alapértelmezésben nem ütemezett (K7 tanulsága). |
 | 1.4.0 | 2026-11-02 | Fázis 6 lezárva (v0.9.0): hibatárolás (séma v3), osztályozott újrapróbálás, ütemező; ADR-0008 elfogadva. Terv-eltérés: a batch szintű kvótakapu a megvalósítás során pótolva ([`TR-F06`](../testing/TR-F06_automatizalas.md) 3.). |
 | 1.5.0 | 2026-11-02 | Fázis 7 terve ([`phase_07.md`](phase_07.md), ADR-0009). Előmérés: a Streamlit rejtett `pyarrow`/NumPy-ütközése (`pyarrow==25.0.0`), a `requirements.lock` nincs betartatva a buildben (21/71 eltérés). |
+| 1.6.0 | 2026-11-02 | Fázis 7 lezárva (v0.10.0): négy nézetes dashboard, három adatforrás, a lock betartatása a buildben; ADR-0009 elfogadva. Terv-eltérés: a `pyarrow==25.0.0` pin hibásnak bizonyult, a helyes 24.0.0 ([`TR-F07`](../testing/TR-F07_dashboard.md) 3.). |
 
 ---
 

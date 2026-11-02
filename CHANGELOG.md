@@ -11,14 +11,60 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
-### Javítva
-- `docs/05_batch.md`: a minimális (2e,3o) terek qubitszáma **4**, nem 6 (a táblázatban a pályaszám
-  kétszerese szerepelt; mérve parity leképezéssel, kétqubites redukcióval).
-
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés (a repó pusholása után).
-- **Fázis 7** — Streamlit dashboard.
+- **Fázis 8** — teljes konténerizáció: `dashboard` Compose-szolgáltatás, egyparancsos indítás.
+- A körméret (és CX-szám) tárolása (séma v4), platformonkénti bontás a dashboardon, böngészős képernyőképek.
+
+---
+
+## [0.10.0] — 2026-11-02
+
+**Fázis 7 — dashboard, és a `requirements.lock` betartatása a buildben.**
+
+A fázis lezárult: mind a 12 elfogadási kritérium teljesült ([`TR-F07`](docs/testing/TR-F07_dashboard.md));
+763 teszt, ebből 762 sikeres és 1 kihagyott (TC-302, `mitiq` nélkül). Terv: [`phase_07.md`](docs/plan/phase_07.md),
+döntés: ADR-0009.
+
+### Hozzáadva
+- **`vqebd.dashboard`:** `data` (három forrás — SQLite, batch-export, teljes rekordlista — egy normalizált
+  táblába; levezetett `error_mha`, `method`, `chemically_accurate`, `active_space`, `n_qubits`;
+  `method_comparison_table`, `size_success_table`), `figures` (`dissociation_figure`,
+  `method_comparison_figure`, `heatmap_figure`), `app` (Streamlit, vékony) és a `dashboard/app.py` belépő.
+- **Négy nézet:** táblázat és hibák (7.1), disszociációs görbe molekulaválasztóval (7.2), módszer-
+  összehasonlító sávdiagram (7.3), körméret × módszer hőtérkép (7.4); mindegyik külön commit.
+- `requirements-dashboard.txt`: `streamlit` 1.59.1, `plotly` 7.1.0, `pyarrow` 24.0.0.
+- 121 új teszt (köztük a TR-F05 közölt értékeivel való keresztvalidáció és a `pyarrow`-őr).
+- Dokumentumok: `phase_07.md`, `ADR-0009`, `TP-F07`, `TR-F07`, `docs/07_dashboard.md`.
+
+### Változott
+- **A Docker-build a `requirements.lock`-ot kényszerként használja** (`pip install … -c requirements.lock`,
+  a `pip`/`setuptools`/`wheel` is a lockból). Mért: a korábbi build a 71 lockolt csomagból 21-ben eltért;
+  mostantól 101 / 101, 0 eltérés. A 71 régi csomag bitre változatlan, +30 dashboard-csomag.
+- `docker/Dockerfile`: a `dashboard/` mappa is bekerül az image-be.
+- `mypy`: a `pandas` és a `plotly` hiányzó típusstubját a konfiguráció kezeli.
+
+### Mért
+- **Rejtett függőségi ütközés:** a Streamlit `pyarrow 26.0.0`-t húz, amely NumPy ≥ 2-t követel; az
+  `st.dataframe` a `numpy 1.26.4` mellett futásidőben elbukik, a pip feloldója nem jelzi.
+- **A `pyarrow 25.0.0` szegmentációs hibával omlik össze** (exit 139), ha egy script-futásban `st.dataframe`
+  fut, és a következő futás `pyarrow.compute`-ot hív (a Streamlit minden futást új szálban végez). A 16.1.0 …
+  24.0.0 rendben van; a pin 24.0.0. Valószínű ok (nem bizonyított): a `mimalloc` memóriakezelő.
+- A (2e,3o) terek **4 qubitesek** (H₂ 2, LiH (2e,5o) 8, BeH₂ (4e,6o) 10; parity, kétqubites redukció).
+- Az adatbázis **nem tárolja a körméretet** (`metadata_json` üres); a dashboard levezeti.
+
+### Javítva
+- **A `pyarrow==25.0.0` pin (d237885) hibás volt:** az első próba csak táblát hozott létre, a szálváltást nem
+  tesztelte. A 7.2 lépés `AppTest`-je tárta fel; javítva 24.0.0-ra (`55b6f87`), negatív kontrollal igazolt
+  védőtesztel (`test_dashboard_pyarrow_guard.py`: 25.0.0 mellett elbukik, 24.0.0 mellett átmegy).
+- `docs/05_batch.md`: a minimális (2e,3o) terek qubitszáma **4**, nem 6 (a pályaszám kétszerese szerepelt).
+
+### Ismert korlátok
+- **Nincs vizuális ellenőrzés:** az `AppTest` a JS-ben renderelt Plotly-t nem futtatja; képernyőkép nincs.
+- A három egzakt platform (Qiskit, Cirq, qsim) a dashboardon egy `egzakt` címke alatt átlagolódik.
+- A batch-exportokon a körméret mindig feltételezett (nincs `mapper`/`basis`), ezt a felület jelzi.
+- A `dashboard` Compose-szolgáltatás a Fázis 8 feladata.
 
 ---
 

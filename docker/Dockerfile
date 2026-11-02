@@ -85,6 +85,7 @@ COPY --chown=vqebd:vqebd VERSION pyproject.toml ./
 COPY --chown=vqebd:vqebd src/ ./src/
 COPY --chown=vqebd:vqebd tests/ ./tests/
 COPY --chown=vqebd:vqebd scripts/ ./scripts/
+COPY --chown=vqebd:vqebd dashboard/ ./dashboard/
 
 # --- Futásidejű adatkönyvtárak (a compose volume ide csatol) -----------------
 RUN mkdir -p /app/data/db /app/data/raw /app/data/exports \

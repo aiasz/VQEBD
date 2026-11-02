@@ -4,7 +4,7 @@
 |---|---|
 | **Azonosító** | ADR-0009 |
 | **Cím** | A bemutatási réteg: a logika a `src`-ben, a UI vékony, az adat csak olvasható |
-| **Státusz** | **Javasolt** — a D1–D4 kérdések jóváhagyásra várnak |
+| **Státusz** | **Elfogadott** (2026-11-02, a D1–D4 alapértelmezések jóváhagyásával; megvalósítva a v0.10.0-ban) |
 | **Dátum** | 2026-11-02 |
 | **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Érinti** | Fázis 7, 8 (konténerizáció), 9 (publikálás) |
