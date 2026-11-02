@@ -4,7 +4,7 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.2.0 |
+| **Dokumentum-verzió** | 1.3.0 |
 | **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
@@ -367,7 +367,7 @@ Az alapterv 10 fázisa megmarad. A változások:
 | **3** | Mitiq ZNE | + saját ISA-biztos ZNE, + measurement mitigation (M5), + extrapolátor-összehasonlítás, + Mitiq-keresztvalidáció (M4) |
 | **4** | Adatséma | + sémaverzió, + környezet-ujjlenyomat, + provenance-mezők, + FAIR-elvek |
 | **5** | Batch futtatás | + aktív tér (active space) redukció LiH/BeH2-re (mért indoklás: 4. fejezet táblázata), + **platform a kombinációs mátrix dimenziója**, + **ismétlésen alapuló statisztika** (N seed, t-CI, újramintavételezés, hibaköltségvetés — ADR-0007, [`phase_05.md`](phase_05.md)) |
-| **6** | Automatizálás | + strukturált hibatárolás, + újrapróbálkozási politika |
+| **6** | Automatizálás | + strukturált hibatárolás, + újrapróbálkozási politika, + hardver alapértelmezésben nincs ütemezve ([`phase_06.md`](phase_06.md), ADR-0008) |
 | **7** | Dashboard | változatlan, 4 belső lépés |
 | **8** | Konténerizáció | változatlan |
 | **9** | Publikálás | + CITATION.cff, + Zenodo |
@@ -523,6 +523,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | 1.0.0 | 2026-09-22 | Első kiadás. Alapterv bővítése a TR-000 spike mérései alapján. |
 | 1.1.0 | 2026-09-22 | **Platform-dimenzió bevezetése** (3.3. fejezet, ADR-0006): Qiskit ↔ Cirq ↔ qsim. Új Fázis 1M. Stack bővítve `cirq-core 1.4.1` és `qsimcirq 0.22.1` csomagokkal. R9–R12 kockázatok felvéve. |
 | 1.2.0 | 2026-09-25 | v0.7.1 javítókör (M6-jegyzet); Fázis 5: ismétlésen alapuló statisztika (ADR-0007), Q3 megválaszolva (frozen-core aktív tér, `phase_05.md` 2.). R13–R16 kockázatok felvéve. |
+| 1.3.0 | 2026-11-02 | Fázis 5 lezárva (v0.8.0/v0.8.1). Fázis 6 terve ([`phase_06.md`](phase_06.md), ADR-0008): hibatárolás, osztályozott újrapróbálás, hardver alapértelmezésben nem ütemezett (K7 tanulsága). |
 
 ---
 
