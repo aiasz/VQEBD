@@ -18,8 +18,11 @@ Licenc: MIT
 
 from __future__ import annotations
 
+import itertools
 import os
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -94,3 +97,58 @@ def in_container() -> bool:
     ``VQEBD_IN_CONTAINER`` változó explicit beállítása.
     """
     return Path("/.dockerenv").exists() or os.environ.get("VQEBD_IN_CONTAINER") == "1"
+
+
+@pytest.fixture
+def record_factory() -> Callable[..., dict[str, Any]]:
+    """Teljes, érvényes ``results``-rekordot gyártó függvény (a dashboard- és tárolótesztekhez).
+
+    Az alapértelmezett rekord egy egzakt H₂-futás 0.735 Å-nél; a ``run_id`` automatikusan
+    egyedi, az ``overrides`` bármely mezőt felülír. Az időbélyegek növekvők, így a
+    ``query_results`` (timestamp szerint csökkenő) sorrendje determinisztikus.
+    """
+    counter = itertools.count(1)
+
+    def make(**overrides: Any) -> dict[str, Any]:
+        n = next(counter)
+        record: dict[str, Any] = {
+            "run_id": f"rec-{n:03d}",
+            "timestamp": f"2026-11-02T10:{n:02d}:00Z",
+            "schema_version": 3,
+            "molecule_name": "H2",
+            "geometry": "H 0 0 0; H 0 0 0.735",
+            "bond_length": 0.735,
+            "basis": "sto3g",
+            "mapper": "parity",
+            "two_qubit_reduction": 1,
+            "ansatz_kind": "uccsd",
+            "initial_point": "zeros",
+            "optimizer_method": "SLSQP",
+            "optimizer_maxiter": 300,
+            "n_iterations": 5,
+            "n_function_evaluations": 20,
+            "converged": 1,
+            "optimizer_message": "ok",
+            "backend": "qiskit_statevector",
+            "platform": "qiskit",
+            "precision": "complex128",
+            "mitigation_strategy": "none",
+            "energy_ha": -1.1373060358,
+            "electronic_energy_ha": -1.8572750302,
+            "nuclear_repulsion_ha": 0.7199689944,
+            "hartree_fock_ha": -1.1169989968,
+            "full_ci_ha": -1.1373060358,
+            "within_chemical_accuracy": 1,
+            "satisfies_variational_principle": 1,
+            "master_seed": 20260922,
+            "seeds_json": "{}",
+            "config_hash": "0" * 64,
+            "environment_fingerprint": "0" * 64,
+            "versions_json": "{}",
+            "wall_time_s": 0.5,
+            "optimal_parameters_json": "[0.0, 0.0, -0.1117]",
+        }
+        record.update(overrides)
+        return record
+
+    return make
