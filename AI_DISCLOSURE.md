@@ -70,13 +70,12 @@ Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat
 
 - [`README.md`](README.md): „Készítők" sor és az „MI-felhasználás" szakasz (HU/EN)
 - [`CITATION.cff`](CITATION.cff): az `abstract` és a `message` mondata
-- GitHub Release `v1.0.0` jegyzete
+- GitHub Release `v1.0.0` jegyzete és a Zenodo-rekord leírása
 - [`docs/09_publishing.md`](docs/09_publishing.md): kötelező ellenőrzőpont a kiadásoknál
 - a LICENSE szerzői sora az MI-t is nevesíti (jogi jelentősége nincs eldöntve)
 
-> **A Zenodo-rekord leírása** csak a szerző Zenodo-fiókjában szerkeszthető (vagy új kiadással frissíthető); a rekord
-> szerzőlistája a szerző döntése szerint csak Kormos Attila. Ezért a rekordnál az MI-használat a leírásban (és a
-> kiadás jegyzetében) szerepeljen. Állapota: lásd a CHANGELOG-ot.
+> **A Zenodo-rekord** (`10.5281/zenodo.23886003`) leírásának elején ugyanez a jelölés szerepel (a szerző vezette be a Zenodo
+> felületén, 2026-11-02). A rekord szerzőlistája a szerző döntése szerint csak Kormos Attila.
 
 ### Javasolt szöveg cikkbe / ajánlott hivatkozásmód
 
@@ -145,13 +144,12 @@ AI-generated text may contain further errors not uncovered here.
 
 - [`README.md`](README.md): the "Authors" line and the "AI use" section (HU/EN)
 - [`CITATION.cff`](CITATION.cff): a sentence in `abstract` and `message`
-- the GitHub Release `v1.0.0` notes
+- the GitHub Release `v1.0.0` notes and the Zenodo record description
 - [`docs/09_publishing.md`](docs/09_publishing.md): a mandatory checkpoint for releases
 - the LICENSE copyright line names the AI as well (its legal significance has not been decided)
 
-> **The Zenodo record description** can only be edited in the author's Zenodo account (or updated with a new release); per the
-> author's decision the record's author list contains only Attila Kormos. The AI use should therefore be stated in the
-> record's description (and in the release notes). Status: see the CHANGELOG.
+> **The Zenodo record** (`10.5281/zenodo.23886003`) carries the same marking at the start of its description (added by the
+> author in the Zenodo interface, 2026-11-02). Per the author's decision the record's author list contains only Attila Kormos.
 
 ### Suggested text for a paper / how to cite
 
