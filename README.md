@@ -9,6 +9,8 @@
 [![Tesztek](https://img.shields.io/badge/tesztek-838%20zöld-brightgreen.svg)](docs/testing/TR-F09_publikalas.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
+**Hivatkozás / Cite as:** Kormos, A. (2026). *VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard* (v1.0.0) [szoftver / software]. Zenodo. <https://doi.org/10.5281/zenodo.23886002> · [`CITATION.cff`](CITATION.cff) · BibTeX: [HU](#hivatkozás) / [EN](#citation)
+
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
 ---
@@ -495,6 +497,7 @@ A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
   title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
   year    = {2026},
   version = {1.0.0},
+  doi     = {10.5281/zenodo.23886002},
   url     = {https://github.com/aiasz/VQEBD},
   license = {MIT}
 }
@@ -1006,6 +1009,7 @@ snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). T
   title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
   year    = {2026},
   version = {1.0.0},
+  doi     = {10.5281/zenodo.23886002},
   url     = {https://github.com/aiasz/VQEBD},
   license = {MIT}
 }
