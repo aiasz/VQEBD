@@ -100,7 +100,7 @@ Ez a fázis az eddigiektől két ponton tér el:
 | D1 | A kiadás verziója | **`v1.0.0`** (a mesterterv 8.1 szerint) | `v0.12.0`: a „1.0” később; de az eltérés a saját tervtől |
 | D2 | Zenodo-integráció | a felhasználó kapcsolja be, **mielőtt** a release elkészül | a DOI utólag is kérhető, de egy release-t a Zenodo csak a kapcsoló bekapcsolása **után** archivál |
 | D3 | GitHub-témakörök (topics) és repóleírás | beállítás: `quantum-computing`, `vqe`, `quantum-chemistry`, `error-mitigation`, `qiskit`, `benchmark`, `reproducibility`, `streamlit` | a repó láthatósága javul; bármikor visszavonható |
-| D4 | „Claude Opus 5” mint **Zenodo-szerző** | marad (a projekt eddig is így hivatkozik rá: `LICENSE`, `CITATION.cff`) | a Zenodo-rekord szerzői listáján megjelenik; **utólag nehezen javítható**, ezért kell a döntés |
+| D4 | „Claude Opus 5” mint **Zenodo-szerző** | **Eldöntve (2026-11-02): csak Kormos Attila** a `CITATION.cff` szerzői között; az AI a README/dokumentumok „Készítők” soraiban és a `LICENSE` szerzői sorában marad | a Zenodo-rekord szerzői listáján csak Kormos Attila; **utólag nehezen javítható**, ezért kellett a döntés a kiadás előtt |
 | D5 | ORCID a szerzőhöz | a felhasználó megadja, ha van | nélküle a rekord ORCID-azonosító nélkül készül |
 | D6 | `CODE_OF_CONDUCT.md` | **kimarad** most (a Contributor Covenant szövege hosszú és külső); a `CONTRIBUTING.md` rövid viselkedési elvet ad | a Fázis 10-ben pótolható |
 

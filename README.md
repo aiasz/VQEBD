@@ -480,7 +480,7 @@ A **Zenodo DOI** a `v1.0.0` kiadás után kerül ide ([`docs/09_publishing.md`](
 
 ```bibtex
 @software{vqebd,
-  author  = {Kormos, Attila and {Claude AI (Anthropic)}},
+  author  = {Kormos, Attila},
   title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
   year    = {2026},
   version = {1.0.0},
@@ -971,7 +971,7 @@ The **Zenodo DOI** will be added here after the `v1.0.0` release ([`docs/09_publ
 
 ```bibtex
 @software{vqebd,
-  author  = {Kormos, Attila and {Claude AI (Anthropic)}},
+  author  = {Kormos, Attila},
   title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
   year    = {2026},
   version = {1.0.0},

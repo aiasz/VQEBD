@@ -46,9 +46,10 @@ A repó gyökerében lévő [`CITATION.cff`](../CITATION.cff)-et (érvényes CFF
 A belőle képzett rekord: cím, szerzők, kétnyelvű leírás, kulcsszavak, MIT licenc, a verzió és a kiadás dátuma. A két
 döntés, amelyet **a kiadás előtt** el kell dönteni, mert a rekordban utólag nehezen javítható:
 
-- **Szerzők.** A `CITATION.cff` két szerzőt sorol fel: *Kormos Attila* és *Claude AI (Anthropic, Claude Opus 5)*. A Zenodo
-  ezeket a rekord szerzői listájaként jeleníti meg. Ha az AI nem szerepeljen szerzőként, a `CITATION.cff` `authors`
-  listáját kell módosítani a kiadás **előtt** (és a `LICENSE` szerzői sorát külön mérlegelni).
+- **Szerzők.** A `CITATION.cff` egyetlen szerzőt sorol fel: *Kormos Attila* (**a felhasználó döntése, 2026-11-02**: az AI nem
+  szerepel a Zenodo-rekord szerzői között). A Zenodo ezt a listát a rekord szerzőiként jeleníti meg. Az AI közreműködése
+  a README és a dokumentumok „Készítők" soraiban, valamint a `LICENSE` szerzői sorában továbbra is szerepel; ha ezt is
+  egységesíteni kell, az külön döntés.
 - **ORCID.** Ha van ORCID-azonosítód, a `CITATION.cff`-ben a szerzőhöz add meg (`orcid: "https://orcid.org/…"`), hogy a
   rekord hozzád kapcsolódjon.
 

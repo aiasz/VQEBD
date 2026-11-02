@@ -16,8 +16,6 @@ authors:
   - family-names: Kormos
     given-names: Attila
     email: kormosa@gmail.com
-  - name: "Claude AI (Anthropic, Claude Opus 5)"
-    alias: "Claude Opus 5"
 
 abstract: >-
   A containerised, reproducible benchmark for computing the electronic ground-state

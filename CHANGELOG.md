@@ -41,7 +41,8 @@ ellenőrzés (`TR-F07`).
 - **README:** „Röviden" / „In short" bejárat (probléma, háromparancsos gyors indítás, példa kimenet), CI-jelvény,
   a kulcsverziók táblázata (a lockkal teszttel egyeztetve), hivatkozási blokk BibTeX-szel, a licenc/biztonság/
   közreműködés szakaszok frissítve.
-- **`CITATION.cff`:** kétnyelvű (angol és magyar) leírás.
+- **`CITATION.cff`:** kétnyelvű (angol és magyar) leírás; egyetlen szerző (Kormos Attila), ez lesz a Zenodo-rekord szerzői
+  listája (felhasználói döntés). A BibTeX-bejegyzés ezzel egyezik.
 - **`docs/09_publishing.md`:** kiadási ellenőrzőlista, a Zenodo-integráció és a DOI beírásának lépései.
 - **`tests/repo/test_publication.py`** (védőtesztek): a licenc a szabványos MIT, a `NOTICE` tartalma, a közösségi fájlok,
   a README bejárata és a verziótáblázat↔lock egyezése, minden relatív Markdown-hivatkozás létezik, a `CITATION.cff`

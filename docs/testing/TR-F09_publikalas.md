@@ -76,7 +76,7 @@ A README „Gyors kipróbálás" parancsait **szó szerint** futtattuk egy tiszt
 | L1 | **A „külső személy" az asszisztens volt, ugyanazon a gépen** (TC-908) | független személy próbája nem volt; a Fázis 10 első lépése lehet |
 | L2 | A Zenodo felülete és a DOI-kiosztás nem volt ellenőrizhető | a `09_publishing.md` 2. pontja emlékezetből készült, ezt jelöli |
 | L3 | A GitHub-oldali licenc-felismerés és a zöld CI csak a push után igazolható | AC-9.1, AC-9.2 |
-| L4 | A „Claude Opus 5" mint Zenodo-szerző a felhasználó döntése (D4) | a rekordban utólag nehezen javítható |
+| L4 | **Eldöntve (D4):** a Zenodo-rekord szerzője csak Kormos Attila; az AI a README/dokumentumok „Készítők" soraiban és a `LICENSE` szerzői sorában marad | a `LICENSE` szerzői sorának egységesítése külön döntés |
 | L5 | A README példa kimenete a program magyar nyelvű kimenete | az angol szakasz ezt jelzi |
 | L6 | Nincs böngészős képernyőkép a README-ban | TR-F07 L1 |
 
