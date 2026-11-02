@@ -2,8 +2,16 @@
 # VQEBD — docker-compose (Fázis 0)
 # Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
 # =============================================================================
-# Fázis 0-ban SZÁNDÉKOSAN csak egyetlen szolgáltatás volt. A `scheduler` a
-# Fázis 6-tól van itt (a `dashboard` és az opcionális `db` a Fázis 7–8-ban jön).
+# Fázis 0-ban SZÁNDÉKOSAN csak egyetlen szolgáltatás volt. A `scheduler` a Fázis 6-tól,
+# a `dashboard` a Fázis 8-tól van itt.
+#
+# EGYPARANCSOS INDÍTÁS a saját gépen (a repó gyökeréből):
+#     docker compose -f docker/docker-compose.yml up -d --build dashboard
+# Utána: http://localhost:8501
+#
+# A `dashboard` NINCS hitelesítéssel védve, ezért a port csak a gazdagép saját hurokcímére
+# (127.0.0.1) van kötve: a hálózaton kívülről nem érhető el. Ne nyisd ki a 0.0.0.0-ra
+# hitelesítő reverse proxy vagy VPN nélkül (docs/07_dashboard.md, 6. pont).
 #
 # A `scheduler` CSAK szimulátort indít: az `--allow-hardware` kapcsolót az ütemező
 # az `--every` mellett elutasítja (ADR-0008). Valódi QPU-t kézi, egyszeri futás indít.
@@ -74,6 +82,56 @@ services:
         "--log-dir", "/app/data/logs",
         "--lock", "/app/data/scheduler.lock",
       ]
+
+  # --- Fázis 8: a dashboard (csak olvasó nézegető) ----------------------------------
+  # Indítás:   docker compose -f docker/docker-compose.yml up -d --build dashboard
+  # Leállítás: docker compose -f docker/docker-compose.yml stop dashboard
+  # Naplók:    docker compose -f docker/docker-compose.yml logs -f dashboard
+  #
+  # Adatforrások (a dashboard automatikusan felderíti őket):
+  #   - /app/data/db/*.sqlite   a `vqebd-data` volume (itt ír a `scheduler` és az `app`);
+  #                             a dashboard csak olvasásra nyitja (read_only=True). A volume
+  #                             szándékosan nem `:ro`, mert a WAL módú SQLite olvasóinak is
+  #                             szükségük lehet a -shm fájlra.
+  #   - /app/docs/figures/data  a verziózott JSON-exportok (a repóból, csak olvasásra).
+  # Nincs token, nincs env_file: a dashboard sosem ér el hálózatot vagy QPU-t.
+  dashboard:
+    image: vqebd:0.10.0
+    container_name: vqebd-dashboard
+    init: true
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      PYTHONHASHSEED: "0"
+      PYTHONPATH: /app/src
+      TZ: Europe/Budapest
+      VQEBD_DASHBOARD_ROOT: /app
+    ports:
+      # Csak a gazdagép hurokcíméről érhető el. Más port: VQEBD_DASHBOARD_PORT=8600
+      - "127.0.0.1:${VQEBD_DASHBOARD_PORT:-8501}:8501"
+    volumes:
+      - ../src:/app/src:ro
+      - ../dashboard:/app/dashboard:ro
+      - ../docs/figures/data:/app/docs/figures/data:ro
+      - vqebd-data:/app/data
+    command:
+      [
+        "python", "-m", "streamlit", "run", "dashboard/app.py",
+        "--server.address", "0.0.0.0",
+        "--server.port", "8501",
+        "--server.headless", "true",
+        "--browser.gatherUsageStats", "false",
+      ]
+    healthcheck:
+      test:
+        [
+          "CMD", "python", "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=3).read() == b'ok' else 1)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
 volumes:
   vqebd-data:

@@ -27,7 +27,7 @@ RUN_IN_REPO := docker run --rm \
 
 .DEFAULT_GOAL := help
 .PHONY: help build rebuild test verify lint format typecheck check shell clean \
-        compose-build compose-run docs-refs ci
+        compose-build compose-run docs-refs ci dashboard dashboard-stop dashboard-logs
 
 help:  ## Az elérhető parancsok listája
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -88,6 +88,16 @@ compose-build:  ## Építés docker compose-zal (a compose útvonal tesztelése)
 
 compose-run:  ## Futtatás docker compose-zal
 	$(COMPOSE) run --rm app python --version
+
+dashboard:  ## A dashboard indítása konténerben: http://localhost:8501 (Fázis 8)
+	$(COMPOSE) up -d --build dashboard
+	@echo "Dashboard: http://localhost:$${VQEBD_DASHBOARD_PORT:-8501}"
+
+dashboard-stop:  ## A dashboard leállítása
+	$(COMPOSE) stop dashboard
+
+dashboard-logs:  ## A dashboard naplója (Ctrl+C kilép; a konténer fut tovább)
+	$(COMPOSE) logs -f dashboard
 
 docs-refs:  ## A hivatkozásjegyzék újragenerálása (hálózatot igényel)
 	docker run --rm -v "$(CURDIR)":/repo -w /repo $(IMAGE) \

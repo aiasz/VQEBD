@@ -195,7 +195,8 @@ def test_compose_defines_a_simulator_only_scheduler_service() -> None:
     """AC-6.11: van `scheduler` szolgáltatás, az ütemezőt hívja, hardvert nem engedélyez."""
     text = (REPO_ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
     assert re.search(r"^  scheduler:\s*$", text, re.MULTILINE)
-    block = text[text.index("  scheduler:") : text.index("volumes:\n  vqebd-data:")]
+    # A scheduler blokkja a Fázis 8 megjegyzéssel induló dashboard-szakaszig tart.
+    block = text[text.index("  scheduler:") : text.index("  # --- Fázis 8")]
     assert "vqebd.scheduler" in block
     assert "--every" in block
     assert "allow-hardware" not in block
