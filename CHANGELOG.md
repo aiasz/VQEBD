@@ -20,6 +20,9 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 - **Fázis 11 terve** ([`docs/plan/phase_11.md`](docs/plan/phase_11.md)): a kalibrációból épített Heron-zajmodell validálása; előzetes (felderítő) mérés kvóta nélkül (a kiolvasást modellező becslő mind az 5 meglévő hardveres nyers ponttal \|z\| < 2 egyezést ad); előre kimondott hipotézisek és döntési szabályok; a hardveres mérések blokkokra darabolva a 600 s / 28 napos keretbe (az 1. ablakban ~388 s ≤ 480 s). **Jóváhagyásra vár, hardveres futtatás nem történt.**
 
+### Módosítva
+- A **GitHub Release `v1.0.0` jegyzete** (2026-11-02) az MI-jelölést a legelső bekezdésben tartalmazza (HU/EN, az `AI_DISCLOSURE.md`-re hivatkozva). A **Zenodo-rekord leírásában** a jelölést a szerzőnek kell pótolnia a Zenodo felületén (a rekord szerzőlistája változatlanul csak Kormos Attila) — **még nem történt meg**.
+
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés.
