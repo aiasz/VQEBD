@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/06_automation.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 0.10.0 |
+| **Projektverzió** | 0.11.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 6 — Automatizálás |
 | **Háttér** | [`phase_06.md`](plan/phase_06.md) · [`ADR-0008`](adr/ADR-0008-hibakezeles-es-utemezes.md) · [`TR-F06`](testing/TR-F06_automatizalas.md) |
@@ -144,7 +144,9 @@ docker compose -f docker/docker-compose.yml logs -f scheduler   # napló
 docker compose -f docker/docker-compose.yml stop scheduler      # leállítás
 ```
 
-A napló és az adatbázis a `vqebd-data` volume-ban él (`logs/`, `db/scheduler.sqlite`). A forrást
+A napló és az adatbázis a `vqebd-data` volume-ban él (`logs/`, `db/scheduler.sqlite`). A `dashboard`
+szolgáltatás ugyanezt a volume-ot csak olvasásra nyitja, ezért az ütemező eredményei a böngészőben
+(<http://localhost:8501>) is megjelennek ([`08_deployment.md`](08_deployment.md)). A forrást
 (`src`, `scripts`) a szolgáltatás a gazdagépről csatolja, ezért kódváltozás újraépítés nélkül
 érvényesül; verzióváltás (`VERSION`, `pyproject.toml`) után `docker compose build` kell.
 

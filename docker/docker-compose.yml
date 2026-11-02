@@ -33,7 +33,7 @@ services:
       args:
         APP_UID: "1000"
         APP_GID: "1000"
-    image: vqebd:0.10.0
+    image: vqebd:0.11.0
     container_name: vqebd-app
     init: true                    # helyes jelkezelés (Ctrl+C), zombie-folyamatok elkerülése
     working_dir: /app
@@ -59,7 +59,7 @@ services:
   # Napló:    a vqebd-data volume `logs/` mappájában (JSON-soros), a hibák az
   #           adatbázis `run_failures` táblájában. Leállítás: `docker compose stop scheduler`.
   scheduler:
-    image: vqebd:0.10.0
+    image: vqebd:0.11.0
     container_name: vqebd-scheduler
     init: true
     restart: unless-stopped
@@ -96,7 +96,7 @@ services:
   #   - /app/docs/figures/data  a verziózott JSON-exportok (a repóból, csak olvasásra).
   # Nincs token, nincs env_file: a dashboard sosem ér el hálózatot vagy QPU-t.
   dashboard:
-    image: vqebd:0.10.0
+    image: vqebd:0.11.0
     container_name: vqebd-dashboard
     init: true
     restart: unless-stopped

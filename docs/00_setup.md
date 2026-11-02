@@ -9,6 +9,11 @@
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 0 — Alapinfrastruktúra |
 
+> **Történeti dokumentum.** Ez az állomány a Fázis 0 (alapinfrastruktúra) állapotát írja le. A naprakész
+> használathoz: [`README.md`](../README.md) (gyors indítás), [`08_deployment.md`](08_deployment.md) (konténeres
+> rendszer és a dashboard indítása), [`05_batch.md`](05_batch.md), [`06_automation.md`](06_automation.md),
+> [`07_dashboard.md`](07_dashboard.md).
+
 ---
 
 ## 1. Mit tartalmaz ez a fázis

@@ -103,7 +103,7 @@ módszer-összehasonlítás, hőtérkép), három adatforrással (SQLite, batch-
 | L3 | A körméret levezetett; a batch-exportokon mindig feltételezett | a séma v4 (tárolás) külön döntés |
 | L4 | Valódi böngészős munkamenetet (WebSocket) nem futtattunk; a szálváltás-összeomlást az `AppTest` reprodukálja | az első valódi használat az éles bizonyíték |
 | L5 | A betöltés gyorsítótára (`st.cache_data`) a fájl módosítási idejével kulcsolt; nagy adatbázis betöltési idejét nem mértük | a verziózott exportokon (≤ 180 sor) nem észlelhető |
-| L6 | A `dashboard` Compose-szolgáltatás nincs (Fázis 8) | a docker run parancs a `07_dashboard.md`-ben |
+| L6 | A `dashboard` Compose-szolgáltatás nincs (Fázis 8) | **megoldva a Fázis 8-ban** ([`TR-F08`](TR-F08_konteneres_rendszer.md)); az akkori jegyzőkönyv állapota változatlan |
 
 ## 6. Reprodukálás
 

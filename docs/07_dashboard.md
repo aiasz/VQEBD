@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/07_dashboard.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 0.10.0 |
+| **Projektverzió** | 0.11.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 7 — Dashboard |
 | **Háttér** | [`phase_07.md`](plan/phase_07.md) · [`ADR-0009`](adr/ADR-0009-dashboard-architektura.md) · [`TR-F07`](testing/TR-F07_dashboard.md) |
@@ -26,24 +26,33 @@ egymás után, külön commitban készültek:
 
 ## 2. Indítás
 
-**Docker** (a repó gyökeréből; Windows / Git Bash alatt `MSYS_NO_PATHCONV=1` előtaggal):
+**Ajánlott: Docker Compose** (a repó gyökeréből; részletek: [`08_deployment.md`](08_deployment.md)):
 
 ```bash
-docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo \
-  -e PYTHONPATH=/repo/src -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.10.0 \
-  python -m streamlit run dashboard/app.py --server.address 0.0.0.0
+docker compose -f docker/docker-compose.yml up -d --build dashboard    # vagy: make dashboard
 ```
 
-Utána: <http://localhost:8501>. A `--server.address 0.0.0.0` a konténeren kívüli eléréshez kell.
+Utána: <http://localhost:8501>. A szolgáltatás csak a gazdagép hurokcímén (`127.0.0.1`) érhető el, mert a
+dashboardnak nincs hitelesítése. Leállítás: `docker compose -f docker/docker-compose.yml stop dashboard`.
+
+**Egyedi `docker run`** (ha saját mappát szeretnél megnyitni; Windows / Git Bash alatt `MSYS_NO_PATHCONV=1` előtaggal):
+
+```bash
+docker run --rm -p 127.0.0.1:8501:8501 -v "$PWD:/repo" -w /repo \
+  -e PYTHONPATH=/repo/src -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.11.0 \
+  python -m streamlit run dashboard/app.py --server.address 0.0.0.0
+```
 
 **Helyben** (ha a rögzített stack telepítve van): `streamlit run dashboard/app.py`.
 
 | Környezeti változó | Jelentés |
 |---|---|
 | `VQEBD_DASHBOARD_SOURCE` | az alapértelmezett adatforrás útvonala (felülírja a felderítést) |
-| `VQEBD_DASHBOARD_ROOT` | a felderítés gyökere (alapértelmezés: az aktuális könyvtár) |
+| `VQEBD_DASHBOARD_ROOT` | a felderítés gyökere (alapértelmezés: az aktuális könyvtár; a Compose-ban `/app`) |
 
-A dashboard **csak olvas**: az adatbázist `read_only=True`-val nyitja, nem ír, hálózatot és QPU-t nem ér el.
+A dashboard **az adatot nem módosítja**: az adatbázist `read_only=True`-val nyitja, nem ír, hálózatot és QPU-t nem
+ér el. Egy WAL módú adatbázis olvasásához az SQLite azonban `-shm` / `-wal` **segédfájlt** hozhat létre a mappában
+([`TR-F08`](testing/TR-F08_konteneres_rendszer.md) 4.).
 
 ## 3. Adatforrások
 
@@ -131,6 +140,6 @@ A pin emelésekor a `tests/integration/test_dashboard_pyarrow_guard.py` jelzi az
 | L2 | **A három egzakt platform egy címke** (`egzakt`): a Qiskit, Cirq és qsim futásai együtt átlagolódnak, a platformdimenzió nem látszik |
 | L3 | A körméret levezetett, nem tárolt (4.5); a batch-exportokon mindig feltételezett |
 | L4 | Nincs hitelesítés, többfelhasználós működés és élő frissítés; az adat a betöltéskor, a fájl módosítási idejével kulcsolt gyorsítótárból jön |
-| L5 | A `dashboard` Compose-szolgáltatás és az egyparancsos indítás a Fázis 8 feladata |
+| L5 | ~~A `dashboard` Compose-szolgáltatás hiánya~~ — **megoldva a Fázis 8-ban** ([`08_deployment.md`](08_deployment.md)) |
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

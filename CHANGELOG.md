@@ -13,9 +13,48 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
-- **D3** — szimulátoros GitHub Actions ütemezés (a repó pusholása után).
-- **Fázis 8** — teljes konténerizáció: `dashboard` Compose-szolgáltatás, egyparancsos indítás.
-- A körméret (és CX-szám) tárolása (séma v4), platformonkénti bontás a dashboardon, böngészős képernyőképek.
+- **D3** — szimulátoros GitHub Actions ütemezés.
+- Külön, kisebb dashboard-image; a körméret (és CX-szám) tárolása (séma v4); platformonkénti bontás a dashboardon;
+  böngészős képernyőképek; telepítés másik gépen vagy VM-en (a „tiszta gép" igazolásának teljessé tétele).
+- **Fázis 9** — dokumentáció, publikálás (Zenodo DOI); **Fázis 10** — közösségi visszacsatolás.
+
+---
+
+## [0.11.0] — 2026-11-02
+
+**Fázis 8 — konténeres rendszer, a dashboard egyparancsos indítása a saját gépen.**
+
+A fázis lezárult: mind a 10 elfogadási kritérium teljesült ([`TR-F08`](docs/testing/TR-F08_konteneres_rendszer.md));
+772 teszt, ebből 771 sikeres és 1 kihagyott (TC-302, `mitiq` nélkül). Terv: [`phase_08.md`](docs/plan/phase_08.md).
+
+### Hozzáadva
+- **`dashboard` Compose-szolgáltatás:** `docker compose -f docker/docker-compose.yml up -d --build dashboard`
+  (vagy `make dashboard`), utána <http://localhost:8501>. A port **csak a gazdagép hurokcímére** (`127.0.0.1`) kötött,
+  mert a dashboardnak nincs hitelesítése (`VQEBD_DASHBOARD_PORT`-tal módosítható); healthcheck; csak olvasható kód- és
+  export-mount; token, `env_file` és hardverengedély nélkül.
+- `make dashboard`, `make dashboard-stop`, `make dashboard-logs`.
+- `tests/repo/test_compose.py` (9 teszt): a Compose-fájl épsége, loopback-port, titok- és hardvermentesség, csak olvasó mountok.
+- Dokumentumok: `phase_08.md`, `TP-F08`, `TR-F08`, `docs/08_deployment.md` (indítás, adatbetöltés, biztonság, eltávolítás,
+  hibaelhárítás, a távoli hoszt követelményei).
+
+### Változott
+- **Minden README és dokumentum átvilágítva** (TR-F08 3.): Fázis 8 állapot, `Gyors indítás`, dokumentumtáblák, verziók,
+  tesztszámok; a `00_setup.md` és a `phase_05_allapot.md` történetiként/archívként jelölve; a `07_dashboard.md` indítása
+  Compose-szal; a `06_automation.md` kiegészítve a közös volume-mal.
+- Mindhárom Compose-szolgáltatás image-címkéje `vqebd:0.11.0`.
+
+### Mért
+- **Tiszta klónból, gyorsítótár nélkül** épített image `pip freeze`-e a lockkal **0 eltérés** (101 / 101).
+- A futó dashboard-konténer **~66 MiB RAM**, 0.6% CPU üresjáratban; az image 2.19 GB.
+- A konténerben a dashboard 4 adatforrást talál (az ütemező adatbázisa és a verziózott exportok: 5 / 50 / 180 / 8 sor), mind a
+  négy nézet kivétel nélkül fut; a kód- és export-mountok csak olvashatók.
+- **Pontosítás:** a dashboard az adatot nem módosítja, de egy WAL módú adatbázis olvasásakor az SQLite `-shm` / `-wal`
+  segédfájlt hozhat létre; ezért a `vqebd-data` volume nem `:ro`. A korábbi „nem ír" ezzel a megkötéssel értendő.
+
+### Ismert korlátok
+- A „tiszta gép" ugyanaz a gép volt (másik gépen vagy VM-en nem próbáltuk); külön Linux/macOS-teszt nincs.
+- Hosszú távú futást és a `restart: unless-stopped` Docker-újraindítás utáni viselkedését nem mértük.
+- Egy image mindhárom szolgáltatáshoz (2.19 GB); nincs hitelesítés, a védelem a hurokcím-kötés.
 
 ---
 

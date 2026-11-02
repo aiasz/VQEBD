@@ -2,9 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.10.0-blue.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-7%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-762%20zöld-brightgreen.svg)](docs/testing/TR-F07_dashboard.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.11.0-blue.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-8%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-771%20zöld-brightgreen.svg)](docs/testing/TR-F08_konteneres_rendszer.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -22,7 +22,7 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 7 lezárva (`v0.10.0`)** — a VQE-mag működik
+Jelenlegi állapot: **Fázis 8 lezárva (`v0.11.0`)** — a VQE-mag működik
 három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
@@ -57,7 +57,7 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 | **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | ✅ **Lezárva** (`v0.8.1`) |
 | **6** | **Automatizálás, hibatárolás, ütemezés** | ✅ **Lezárva** (`v0.9.0`) |
 | **7** | **Streamlit dashboard** | ✅ **Lezárva** (`v0.10.0`) |
-| 8 | Teljes konténerizáció | ⬜ Tervezett |
+| **8** | **Konténeres rendszer, a dashboard egyparancsos indítása** | ✅ **Lezárva** (`v0.11.0`) |
 | 9 | Dokumentáció és publikálás (Zenodo DOI) | ⬜ Tervezett |
 | 10 | Közösségi visszacsatolás | ⬜ Tervezett |
 
@@ -275,11 +275,32 @@ ezért egy tiszta klónon a verziózott JSON-okból is megjeleníti az adatot.
 
 ```bash
 docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
-  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.10.0 \
+  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.11.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 
 Részletek: [`docs/07_dashboard.md`](docs/07_dashboard.md), [`TR-F07`](docs/testing/TR-F07_dashboard.md).
+
+### Fázis 8 — konténeres rendszer, a dashboard egyparancsos indítása
+
+A Compose-rendszer három szolgáltatásból áll (`app`, `scheduler`, `dashboard`), egy image-ből és egy közös adat-volume-ból.
+**A dashboard a saját gépeden, konténerben fut, egyetlen paranccsal:**
+
+```bash
+git clone https://github.com/aiasz/VQEBD.git && cd VQEBD
+docker compose -f docker/docker-compose.yml up -d --build dashboard     # vagy: make dashboard
+```
+
+Utána: **<http://localhost:8501>**. Leállítás: `docker compose -f docker/docker-compose.yml stop dashboard`.
+
+- **Biztonságos alapbeállítás:** a dashboardnak nincs hitelesítése, ezért a port csak a gazdagép hurokcímére
+  (`127.0.0.1`) kötött; a szolgáltatás nem kap tokent és hardverengedélyt, a kód- és export-mountok csak olvashatók.
+- **Kevés erőforrás:** üresjáratban ~66 MiB RAM, egy munkamenet ~170 MB; az image 2.19 GB.
+- **Tiszta klónból igazolt:** gyorsítótár nélküli build, `pip freeze` ↔ lock 0 eltérés, a dashboard `healthy`, és a
+  konténerben megtalálja az ütemező adatbázisát és a verziózott exportokat.
+- **Korlát:** a „tiszta gép" ugyanaz a gép volt (másik gépen vagy VM-en nem próbáltuk).
+
+Részletek: [`docs/08_deployment.md`](docs/08_deployment.md), [`TR-F08`](docs/testing/TR-F08_konteneres_rendszer.md).
 
 ### Gyors indítás
 
@@ -287,23 +308,25 @@ Részletek: [`docs/07_dashboard.md`](docs/07_dashboard.md), [`TR-F07`](docs/test
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (763 teszt, 1 kihagyott)
+make test       # teljes tesztkészlet (772 teszt, 1 kihagyott)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.10.0 python -m vqebd
+docker run --rm vqebd:0.11.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.10.0 .
-docker run --rm vqebd:0.10.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.11.0 .
+docker run --rm vqebd:0.11.0 python -m vqebd
 ```
 
-Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
+A **dashboard** indítása (egyparancsos, a saját gépen): lásd a *Fázis 8* szakaszt fent, vagy `make dashboard`.
+
+Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a konténeres rendszerhez: **[`docs/08_deployment.md`](docs/08_deployment.md)**
 
 ### Dokumentáció
 
@@ -320,6 +343,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | A Fázis 5 részletes terve |
 | [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | A Fázis 6 részletes terve |
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | A Fázis 7 részletes terve |
+| [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | A Fázis 8 részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
@@ -328,6 +352,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/05_batch.md`](docs/05_batch.md) | **Batch-futtatás, aktív tér és statisztika** |
 | [`docs/06_automation.md`](docs/06_automation.md) | **Automatizálás, hibatárolás, újrapróbálkozás, ütemezés** |
 | [`docs/07_dashboard.md`](docs/07_dashboard.md) | **A dashboard: nézetek, adatforrások, indítás** |
+| [`docs/08_deployment.md`](docs/08_deployment.md) | **Konténeres rendszer, a dashboard egyparancsos indítása, biztonság** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
@@ -406,7 +431,7 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 7 completed (`v0.10.0`)** — the VQE core
+Current status: **Phase 8 completed (`v0.11.0`)** — the VQE core
 works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
@@ -443,7 +468,7 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 | **5** | **Batch runs, active space (LiH, BeH2), statistics** | ✅ **Completed** (`v0.8.1`) |
 | **6** | **Automation, failure storage, scheduling** | ✅ **Completed** (`v0.9.0`) |
 | **7** | **Streamlit dashboard** | ✅ **Completed** (`v0.10.0`) |
-| 8 | Full containerization | ⬜ Planned |
+| **8** | **Container system, one-command dashboard launch** | ✅ **Completed** (`v0.11.0`) |
 | 9 | Documentation and publication (Zenodo DOI) | ⬜ Planned |
 | 10 | Community feedback | ⬜ Planned |
 
@@ -665,11 +690,33 @@ record list), so on a clean clone it also shows the versioned JSON data.
 
 ```bash
 docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
-  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.10.0 \
+  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:0.11.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 
 Details: [`docs/07_dashboard.md`](docs/07_dashboard.md), [`TR-F07`](docs/testing/TR-F07_dashboard.md)
+(both in Hungarian).
+
+### Phase 8 — Container System, One-Command Dashboard Launch
+
+The Compose system has three services (`app`, `scheduler`, `dashboard`), one image and one shared data volume.
+**The dashboard runs on your own machine, in a container, with a single command:**
+
+```bash
+git clone https://github.com/aiasz/VQEBD.git && cd VQEBD
+docker compose -f docker/docker-compose.yml up -d --build dashboard     # or: make dashboard
+```
+
+Then open **<http://localhost:8501>**. Stop it with `docker compose -f docker/docker-compose.yml stop dashboard`.
+
+- **Safe defaults:** the dashboard has no authentication, so its port is bound to the host loopback
+  (`127.0.0.1`) only; the service gets no token and no hardware permission, and the code and export mounts are read-only.
+- **Few resources:** ~66 MiB RAM idle, ~170 MB per session; the image is 2.19 GB.
+- **Verified from a clean clone:** cache-free build, `pip freeze` ↔ lock with 0 differences, the dashboard is
+  `healthy`, and inside the container it finds the scheduler database and the versioned exports.
+- **Limitation:** the "clean machine" was the same machine (not tried on another machine or a VM).
+
+Details: [`docs/08_deployment.md`](docs/08_deployment.md), [`TR-F08`](docs/testing/TR-F08_konteneres_rendszer.md)
 (both in Hungarian).
 
 ### Quick Start
@@ -678,23 +725,25 @@ Details: [`docs/07_dashboard.md`](docs/07_dashboard.md), [`TR-F07`](docs/testing
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (763 tests, 1 skipped)
+make test       # full test suite (772 tests, 1 skipped)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.10.0 python -m vqebd
+docker run --rm vqebd:0.11.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.10.0 .
-docker run --rm vqebd:0.10.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.11.0 .
+docker run --rm vqebd:0.11.0 python -m vqebd
 ```
 
-Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
+To start the **dashboard** (one command, on your own machine): see the *Phase 8* section above, or `make dashboard`.
+
+Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the container system: **[`docs/08_deployment.md`](docs/08_deployment.md)**
 
 ### Documentation
 
@@ -711,6 +760,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | Detailed Phase 5 plan |
 | [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | Detailed Phase 6 plan |
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | Detailed Phase 7 plan |
+| [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | Detailed Phase 8 plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
@@ -719,6 +769,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/05_batch.md`](docs/05_batch.md) | **Batch runs, active space and statistics** |
 | [`docs/06_automation.md`](docs/06_automation.md) | **Automation, failure storage, retry, scheduling** |
 | [`docs/07_dashboard.md`](docs/07_dashboard.md) | **The dashboard: views, data sources, launching** |
+| [`docs/08_deployment.md`](docs/08_deployment.md) | **Container system, one-command dashboard launch, security** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |

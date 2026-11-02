@@ -52,7 +52,8 @@ találgat.
 ### 4. Csak olvasás
 
 Az adatbázis `read_only=True`-val nyílik; a dashboard nem ír, nem ér el hálózatot vagy QPU-t. Ezt
-teszt őrzi (az adatbázisfájl bitre változatlan).
+teszt őrzi (az adatbázis főfájlja bitre változatlan). *Pontosítás (Fázis 8):* egy WAL módú adatbázis
+olvasásához az SQLite `-shm` / `-wal` segédfájlt hozhat létre; az adat nem módosul ([`TR-F08`](../testing/TR-F08_konteneres_rendszer.md) 4.).
 
 ### 5. A függőségek a lockkal együtt, a `pyarrow` pinelve
 

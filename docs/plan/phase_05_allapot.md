@@ -1,5 +1,10 @@
 # Fázis 5 — állapotjegyzet és folytatási útmutató
 
+> **ARCHÍV (2026-11-02).** A Fázis 5 lezárult (`v0.8.0`, `v0.8.1`), az itt „hátralévő" teendők mind
+> elkészültek (T1–T8, K5, K7, K8). A jegyzet **történeti**: a naprakész állapot a
+> [`TR-F05`](../testing/TR-F05_batch.md), a [`CHANGELOG`](../../CHANGELOG.md) és a
+> [`05_batch.md`](../05_batch.md).
+
 | | |
 |---|---|
 | **Dokumentum** | `docs/plan/phase_05_allapot.md` |

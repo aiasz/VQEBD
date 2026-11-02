@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/05_batch.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 0.10.0 |
+| **Projektverzió** | 0.11.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 5 — Batch-futtatás, aktív tér, statisztikai módszertan |
 | **Háttér** | [`phase_05.md`](plan/phase_05.md) · [`ADR-0007`](adr/ADR-0007-batch-statisztika.md) · [`TR-F05`](testing/TR-F05_batch.md) |
