@@ -26,7 +26,10 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from vqebd.config import VQEConfig
 
 __all__ = [
     "QPU_SECONDS_PER_EVALUATION",
@@ -37,6 +40,7 @@ __all__ = [
     "assert_quota_available",
     "connect_service",
     "guard_hardware_vqe",
+    "hardware_evaluation_budget",
     "quota_summary",
 ]
 
@@ -122,7 +126,21 @@ def connect_service() -> Any:
     return QiskitRuntimeService(**kwargs)
 
 
-def guard_hardware_vqe(max_evaluations: int, *, service: Any | None = None) -> float:
+def hardware_evaluation_budget(config: VQEConfig) -> int:
+    """Egy hardveres VQE-futás kiértékeléseinek felső korlátja.
+
+    Az optimalizáló ``maxiter`` kiértékelése, plusz a végső (újra)becslések: ``K``
+    (``reestimate``, legalább 1), ZNE-nél a zajszorzók számával szorozva.
+    """
+    final_estimates = max(config.reestimate, 1)
+    if config.mitigation.strategy != "none":
+        final_estimates *= len(config.mitigation.scale_factors)
+    return config.optimizer.maxiter + final_estimates
+
+
+def guard_hardware_vqe(
+    max_evaluations: int, *, service: Any | None = None, reserve: float = 1.0
+) -> float:
     """Beküldés előtti védelem egy hardveres VQE-futásra.
 
     Sorrend: (1) engedély — hálózati hívás nélkül; (2) kvóta lekérdezése; (3) a
@@ -133,6 +151,7 @@ def guard_hardware_vqe(max_evaluations: int, *, service: Any | None = None) -> f
         max_evaluations: A futás kiértékeléseinek felső korlátja (optimalizáló +
             újramintavételezés, ZNE-nél a zajszorzókkal szorozva).
         service: Opcionális, már csatlakozott szolgáltatás (tesztekhez).
+        reserve: A becsült igény szorzója tartalékként (pl. ``1.2`` = +20%).
 
     Returns:
         A kvótához mért becsült QPU-igény (mp).
@@ -145,7 +164,7 @@ def guard_hardware_vqe(max_evaluations: int, *, service: Any | None = None) -> f
     if max_evaluations < 1:
         raise ValueError(f"a kiértékelési keret legalább 1: {max_evaluations}")
     assert_hardware_allowed()
-    required = max_evaluations * QPU_SECONDS_PER_EVALUATION
+    required = max_evaluations * QPU_SECONDS_PER_EVALUATION * reserve
     usage = quota_summary((service or connect_service()).usage())
     try:
         assert_quota_available(usage, required)

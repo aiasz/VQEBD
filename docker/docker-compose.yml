@@ -2,9 +2,11 @@
 # VQEBD — docker-compose (Fázis 0)
 # Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
 # =============================================================================
-# Fázis 0-ban SZÁNDÉKOSAN csak egyetlen szolgáltatás van. Célja, hogy a
-# `docker compose` útvonal már most teszteltessen — a `scheduler`, `dashboard`
-# és opcionális `db` szolgáltatások a Fázis 6–8-ban kerülnek ide.
+# Fázis 0-ban SZÁNDÉKOSAN csak egyetlen szolgáltatás volt. A `scheduler` a
+# Fázis 6-tól van itt (a `dashboard` és az opcionális `db` a Fázis 7–8-ban jön).
+#
+# A `scheduler` CSAK szimulátort indít: az `--allow-hardware` kapcsolót az ütemező
+# az `--every` mellett elutasítja (ADR-0008). Valódi QPU-t kézi, egyszeri futás indít.
 #
 # Futtatás a repó gyökeréből:
 #   docker compose -f docker/docker-compose.yml build
@@ -23,7 +25,7 @@ services:
       args:
         APP_UID: "1000"
         APP_GID: "1000"
-    image: vqebd:0.8.1
+    image: vqebd:0.9.0
     container_name: vqebd-app
     init: true                    # helyes jelkezelés (Ctrl+C), zombie-folyamatok elkerülése
     working_dir: /app
@@ -43,6 +45,35 @@ services:
       - ../scripts:/app/scripts:ro
       - vqebd-data:/app/data
     command: ["python", "--version"]
+
+  # --- Fázis 6: ütemezett szimulátoros pipeline (ADR-0008) -----------------------
+  # Indítás:  docker compose -f docker/docker-compose.yml up -d scheduler
+  # Napló:    a vqebd-data volume `logs/` mappájában (JSON-soros), a hibák az
+  #           adatbázis `run_failures` táblájában. Leállítás: `docker compose stop scheduler`.
+  scheduler:
+    image: vqebd:0.9.0
+    container_name: vqebd-scheduler
+    init: true
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      PYTHONHASHSEED: "0"
+      PYTHONPATH: /app/src
+      TZ: Europe/Budapest
+    volumes:
+      - ../src:/app/src:ro
+      - ../scripts:/app/scripts:ro
+      - vqebd-data:/app/data
+    command:
+      [
+        "python", "-m", "vqebd.scheduler",
+        "--preset", "f5-smoke",
+        "--every", "24h",
+        "--db", "/app/data/db/scheduler.sqlite",
+        "--export", "/app/data/exports/scheduler_f5_smoke.json",
+        "--log-dir", "/app/data/logs",
+        "--lock", "/app/data/scheduler.lock",
+      ]
 
 volumes:
   vqebd-data:

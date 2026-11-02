@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | **Fázis** | 6 |
-| **Dokumentum-verzió** | 1.0.0 |
+| **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **Terv — a megvalósítás nem kezdődött el.** A 6. fejezet döntései felhasználói jóváhagyásra várnak |
+| **Státusz** | **Megvalósítva és lezárva (2026-11-02)** — mind a 11 elfogadási kritérium teljesült: [`TR-F06`](../testing/TR-F06_automatizalas.md). A 6. fejezet döntései az alapértelmezésekkel jóváhagyva |
 | **Célverzió** | `v0.9.0` |
 | **Előzmény** | [`phase_05.md`](phase_05.md), [`00_master_plan.md`](00_master_plan.md) 7. fejezet, v0.8.1 ([`CHANGELOG`](../../CHANGELOG.md)) |
 | **Új ADR** | [`ADR-0008`](../adr/ADR-0008-hibakezeles-es-utemezes.md) — hibamodell, újrapróbálkozás, hardveres ütemezés |
@@ -249,5 +249,6 @@ tesztkészlet) zöldek.
 | Verzió | Dátum | Változás |
 |---|---|---|
 | 1.0.0 | 2026-11-02 | Első változat, a jelenlegi hibakezelés előmérése (2. fejezet) alapján |
+| 1.1.0 | 2026-11-02 | Megvalósítva; a D1–D4 jóváhagyva az alapértelmezésekkel. A batch szintű kvótakapu (4.6) a megvalósítás során pótolva (TR-F06 3.) |
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

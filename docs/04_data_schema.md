@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/04_data_schema.md` |
 | **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-09-23 · 2026-09-25 (séma v2) |
-| **Projektverzió** | 0.8.1 |
+| **Projektverzió** | 0.9.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 4 — Adatséma és tárolás |
 
@@ -93,6 +93,31 @@ létre, ezért a friss és a migrált séma konstrukció szerint azonos. Ezt a T
 teszt ellenőrzi. Ismeretlen (újabb) verziójú adatbázist a kód nem migrál, hanem
 hibát ad.
 
+## 2c. Séma v3 (Fázis 6, `v0.9.0`)
+
+A v3 egy **új táblát** (`run_failures`) ad hozzá; a `results` tábla és rekordjai nem változnak, ezért a
+v2 → v3 migráció csak táblát hoz létre ([`phase_06.md`](plan/phase_06.md) 4.1, ADR-0008). A v1 adatbázis
+v1 → v2 → v3 láncon migrál.
+
+| Oszlop | Típus | Jelentés |
+|---|---|---|
+| `id` | INTEGER PK | automatikus azonosító |
+| `run_id` | TEXT | a futás azonosítója (nincs idegen kulcs: sikertelen futásnak nincs `results` sora) |
+| `batch_id` | TEXT | a batch azonosítója |
+| `attempt` | INTEGER ≥ 1 | a próbálkozás sorszáma a futáson belül, folyamatos; `UNIQUE (run_id, attempt)` |
+| `timestamp` | TEXT | UTC, ISO-8601 |
+| `error_type` | TEXT | kivételtípus |
+| `error_class` | TEXT | `transient` / `permanent` / `quota` (`CHECK`) |
+| `error_message` | TEXT | titoktalanított, legfeljebb 2000 karakter |
+| `wall_time_s` | REAL | a próbálkozás ideje |
+| `will_retry` | INTEGER | 0/1: lesz-e újabb próbálkozás |
+| `forgiven` | INTEGER | 0/1: megbocsátott (a `--retry-abandoned` állítja), a korlátba nem számít |
+
+Append-only; az egyetlen módosítható mező a `forgiven`. Egy futás tényleges próbálkozásszáma a
+`forgiven = 0` sorok száma. Használat: [`06_automation.md`](06_automation.md).
+
+---
+
 ## 3. Használat
 
 ### Adatbázis elérése Pythonból
@@ -112,5 +137,5 @@ for r in records:
 ### Exportálás CSV / JSON formátumba
 
 ```bash
-docker run --rm -v "${PWD}:/repo" vqebd:0.8.1 python scripts/export_results.py
+docker run --rm -v "${PWD}:/repo" vqebd:0.9.0 python scripts/export_results.py
 ```

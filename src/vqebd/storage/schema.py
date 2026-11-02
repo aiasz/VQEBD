@@ -7,10 +7,20 @@ from __future__ import annotations
 
 from typing import Final
 
-__all__ = ["CURRENT_SCHEMA_VERSION", "SCHEMA_V1_DDL", "SCHEMA_V2_COLUMNS", "SCHEMA_V2_INDEXES"]
+__all__ = [
+    "CURRENT_SCHEMA_VERSION",
+    "SCHEMA_V1_DDL",
+    "SCHEMA_V2_COLUMNS",
+    "SCHEMA_V2_INDEXES",
+    "SCHEMA_V3_DDL",
+]
 
-CURRENT_SCHEMA_VERSION: Final[int] = 2
-"""A jelenlegi sémaverzió. v1 → v2: Fázis 5 (aktív tér, batch, újramintavételezés)."""
+CURRENT_SCHEMA_VERSION: Final[int] = 3
+"""A jelenlegi sémaverzió.
+
+v1 → v2: Fázis 5 (aktív tér, batch, újramintavételezés).
+v2 → v3: Fázis 6 (``run_failures`` tábla: strukturált hibatárolás).
+"""
 
 SCHEMA_V1_DDL: Final[str] = """
 CREATE TABLE IF NOT EXISTS meta (
@@ -121,4 +131,32 @@ SCHEMA_V2_INDEXES: Final[str] = """
 CREATE INDEX IF NOT EXISTS idx_results_batch ON results(batch_id, repeat_index);
 CREATE INDEX IF NOT EXISTS idx_results_active
     ON results(molecule_name, active_electrons, active_orbitals);
+"""
+
+
+SCHEMA_V3_DDL: Final[str] = """
+CREATE TABLE IF NOT EXISTS run_failures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id TEXT NOT NULL,
+    batch_id TEXT,
+    attempt INTEGER NOT NULL CHECK (attempt >= 1),
+    timestamp TEXT NOT NULL,
+    error_type TEXT NOT NULL,
+    error_class TEXT NOT NULL CHECK (error_class IN ('transient', 'permanent', 'quota')),
+    error_message TEXT NOT NULL,
+    wall_time_s REAL,
+    will_retry INTEGER NOT NULL CHECK (will_retry IN (0, 1)),
+    forgiven INTEGER NOT NULL DEFAULT 0 CHECK (forgiven IN (0, 1)),
+    UNIQUE (run_id, attempt)
+);
+CREATE INDEX IF NOT EXISTS idx_failures_run ON run_failures(run_id);
+CREATE INDEX IF NOT EXISTS idx_failures_batch ON run_failures(batch_id);
+"""
+"""A v3-ban bevezetett tábla (``docs/plan/phase_06.md`` 4.1, ADR-0008).
+
+Append-only: egy sikertelen próbálkozás egy sor. A ``results`` tábla nem változik, ezért
+a v2 → v3 migráció csak táblát ad hozzá. Az egyetlen módosítható mező a ``forgiven``:
+a ``--retry-abandoned`` ezt állítja 1-re, így a hibatörténet megmarad, de a próbálkozás
+nem számít bele a korlátba. Egy futás tényleges próbálkozásszáma a ``forgiven = 0``
+sorok száma; a ``attempt`` sorszám a ``forgiven`` értékétől függetlenül folyamatos.
 """

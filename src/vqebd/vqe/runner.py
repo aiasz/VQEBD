@@ -36,7 +36,7 @@ from vqebd.chemistry.mapping import map_to_qubits
 from vqebd.chemistry.problem import build_electronic_structure
 from vqebd.chemistry.reference import collect_references
 from vqebd.config import VQEConfig
-from vqebd.hardware import guard_hardware_vqe
+from vqebd.hardware import guard_hardware_vqe, hardware_evaluation_budget
 from vqebd.platforms import check_optimizer_compatibility, platform_of
 from vqebd.seeds import SeedSet
 from vqebd.versions import environment_fingerprint, package_versions
@@ -79,10 +79,7 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     eval_budget: int | None = None
     if config.backend == "ibm_qpu":
         eval_budget = config.optimizer.maxiter
-        final_estimates = max(config.reestimate, 1)
-        if config.mitigation.strategy != "none":
-            final_estimates *= len(config.mitigation.scale_factors)
-        guard_hardware_vqe(eval_budget + final_estimates)
+        guard_hardware_vqe(hardware_evaluation_budget(config))
 
     structure = build_electronic_structure(config.molecule, config.active_space)
     hamiltonian = map_to_qubits(

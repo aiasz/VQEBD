@@ -4,7 +4,7 @@
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
-| **Dokumentum-verzió** | 1.3.0 |
+| **Dokumentum-verzió** | 1.4.0 |
 | **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
@@ -524,6 +524,7 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 | 1.1.0 | 2026-09-22 | **Platform-dimenzió bevezetése** (3.3. fejezet, ADR-0006): Qiskit ↔ Cirq ↔ qsim. Új Fázis 1M. Stack bővítve `cirq-core 1.4.1` és `qsimcirq 0.22.1` csomagokkal. R9–R12 kockázatok felvéve. |
 | 1.2.0 | 2026-09-25 | v0.7.1 javítókör (M6-jegyzet); Fázis 5: ismétlésen alapuló statisztika (ADR-0007), Q3 megválaszolva (frozen-core aktív tér, `phase_05.md` 2.). R13–R16 kockázatok felvéve. |
 | 1.3.0 | 2026-11-02 | Fázis 5 lezárva (v0.8.0/v0.8.1). Fázis 6 terve ([`phase_06.md`](phase_06.md), ADR-0008): hibatárolás, osztályozott újrapróbálás, hardver alapértelmezésben nem ütemezett (K7 tanulsága). |
+| 1.4.0 | 2026-11-02 | Fázis 6 lezárva (v0.9.0): hibatárolás (séma v3), osztályozott újrapróbálás, ütemező; ADR-0008 elfogadva. Terv-eltérés: a batch szintű kvótakapu a megvalósítás során pótolva ([`TR-F06`](../testing/TR-F06_automatizalas.md) 3.). |
 
 ---
 

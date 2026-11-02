@@ -23,6 +23,7 @@ from vqebd.hardware import (
     assert_hardware_allowed,
     assert_quota_available,
     guard_hardware_vqe,
+    hardware_evaluation_budget,
     quota_summary,
 )
 from vqebd.seeds import SeedSet
@@ -273,3 +274,35 @@ def test_run_vqe_on_qpu_budget_includes_reestimate_and_mitigation() -> None:
     ):
         run_vqe(config, compute_fci=False)
     guard.assert_called_once_with(10 + 4 * 3)
+
+
+def test_reserve_scales_the_requirement(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VQEBD_ALLOW_HARDWARE", "true")
+    service = _service_with({"usage_remaining_seconds": 600, "usage_limit_reached": False})
+    assert guard_hardware_vqe(10, service=service, reserve=1.2) == pytest.approx(
+        10 * QPU_SECONDS_PER_EVALUATION * 1.2
+    )
+    # 600 / 15 = 40 kiértékelés fér a keretbe; tartalékkal már 34 sem
+    with pytest.raises(QuotaExhaustedError):
+        guard_hardware_vqe(34, service=service, reserve=1.2)
+    guard_hardware_vqe(33, service=service, reserve=1.2)
+
+
+def test_hardware_evaluation_budget_counts_reestimates_and_zne_factors() -> None:
+    from vqebd.chemistry.molecule import h2
+    from vqebd.config import MitigationSpec, OptimizerSpec, VQEConfig
+
+    base = VQEConfig(molecule=h2(), backend="ibm_qpu", optimizer=OptimizerSpec(maxiter=10))
+    assert hardware_evaluation_budget(base) == 10 + 1  # újramintavétel nélkül 1 végső becslés
+    resampled = VQEConfig(
+        molecule=h2(), backend="ibm_qpu", optimizer=OptimizerSpec(maxiter=10), reestimate=4
+    )
+    assert hardware_evaluation_budget(resampled) == 10 + 4
+    zne = VQEConfig(
+        molecule=h2(),
+        backend="ibm_qpu",
+        optimizer=OptimizerSpec(maxiter=10),
+        mitigation=MitigationSpec(strategy="zne_local", scale_factors=(1, 3, 5)),
+        reestimate=4,
+    )
+    assert hardware_evaluation_budget(zne) == 10 + 4 * 3

@@ -17,6 +17,7 @@ from vqebd.storage.schema import (
     SCHEMA_V1_DDL,
     SCHEMA_V2_COLUMNS,
     SCHEMA_V2_INDEXES,
+    SCHEMA_V3_DDL,
 )
 from vqebd.vqe.result import VQEResult
 
@@ -67,11 +68,11 @@ class Database:
         self._conn.close()
 
     def _init_schema(self) -> None:
-        """Séma inicializálása, verzióellenőrzés és szükség esetén v1 → v2 migráció.
+        """Séma inicializálása, verzióellenőrzés és szükség esetén v1 → v2 → v3 migráció.
 
-        Friss adatbázis: v1 DDL + v2 oszlopok, ugyanazon az úton, mint egy migráció
-        (így a kettő szerkezete konstrukció szerint azonos). Ismeretlen (újabb vagy
-        értelmetlen) verziónál hibát ad — egy régebbi kód nem írhat újabb sémába.
+        Friss adatbázis: v1 DDL + v2 oszlopok + v3 tábla, ugyanazon az úton, mint egy
+        migráció (így a kettő szerkezete konstrukció szerint azonos). Ismeretlen (újabb
+        vagy értelmetlen) verziónál hibát ad — egy régebbi kód nem írhat újabb sémába.
         """
         now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         with self._conn:
@@ -81,6 +82,7 @@ class Database:
             row = cur.fetchone()
             if row is None:
                 self._add_v2_columns()
+                self._conn.executescript(SCHEMA_V3_DDL)
                 cur.execute(
                     "INSERT INTO meta (key, value) VALUES ('schema_version', ?)",
                     (str(CURRENT_SCHEMA_VERSION),),
@@ -93,6 +95,14 @@ class Database:
                 cur.execute("UPDATE meta SET value = '2' WHERE key = 'schema_version'")
                 cur.execute(
                     "INSERT OR REPLACE INTO meta (key, value) VALUES ('migrated_v1_to_v2_at', ?)",
+                    (now,),
+                )
+                db_ver = 2
+            if db_ver == 2:
+                self._conn.executescript(SCHEMA_V3_DDL)
+                cur.execute("UPDATE meta SET value = '3' WHERE key = 'schema_version'")
+                cur.execute(
+                    "INSERT OR REPLACE INTO meta (key, value) VALUES ('migrated_v2_to_v3_at', ?)",
                     (now,),
                 )
             elif db_ver != CURRENT_SCHEMA_VERSION:
@@ -264,3 +274,107 @@ class Database:
         cur = self._conn.cursor()
         cur.execute("SELECT COUNT(*) AS total FROM results")
         return int(cur.fetchone()["total"])
+
+    # --- hibatárolás (séma v3, Fázis 6) -------------------------------------------
+
+    def record_failure(
+        self,
+        run_id: str,
+        *,
+        batch_id: str | None,
+        error_type: str,
+        error_class: str,
+        error_message: str,
+        wall_time_s: float | None,
+        will_retry: bool,
+    ) -> int:
+        """Egy sikertelen próbálkozás tárolása (append-only).
+
+        Az ``error_message``-t a hívó titoktalanítja (``vqebd.pipeline.errors``); itt
+        csak a hossz korlátozott.
+
+        Returns:
+            A próbálkozás sorszáma (a futás összes korábbi sorát számolva, 1-től).
+        """
+        now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        with self._conn:
+            row = self._conn.execute(
+                "SELECT COALESCE(MAX(attempt), 0) AS last FROM run_failures WHERE run_id = ?",
+                (run_id,),
+            ).fetchone()
+            attempt = int(row["last"]) + 1
+            self._conn.execute(
+                "INSERT INTO run_failures (run_id, batch_id, attempt, timestamp, error_type, "
+                "error_class, error_message, wall_time_s, will_retry) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    run_id,
+                    batch_id,
+                    attempt,
+                    now,
+                    error_type,
+                    error_class,
+                    error_message[:2000],
+                    wall_time_s,
+                    1 if will_retry else 0,
+                ),
+            )
+        return attempt
+
+    def failure_history(self, run_id: str) -> list[dict[str, Any]]:
+        """Egy futás összes hibasora (a ``forgiven`` is), próbálkozás szerint rendezve."""
+        cur = self._conn.execute(
+            "SELECT * FROM run_failures WHERE run_id = ? ORDER BY attempt", (run_id,)
+        )
+        return [dict(r) for r in cur.fetchall()]
+
+    def failures(self, batch_id: str | None = None) -> list[dict[str, Any]]:
+        """Hibasorok (opcionálisan egy batchre szűrve), ``run_id``, ``attempt`` szerint."""
+        if batch_id is None:
+            cur = self._conn.execute("SELECT * FROM run_failures ORDER BY run_id, attempt")
+        else:
+            cur = self._conn.execute(
+                "SELECT * FROM run_failures WHERE batch_id = ? ORDER BY run_id, attempt",
+                (batch_id,),
+            )
+        return [dict(r) for r in cur.fetchall()]
+
+    def effective_attempts(self, run_id: str) -> int:
+        """A korlátba számító (nem megbocsátott) sikertelen próbálkozások száma."""
+        row = self._conn.execute(
+            "SELECT COUNT(*) AS n FROM run_failures WHERE run_id = ? AND forgiven = 0",
+            (run_id,),
+        ).fetchone()
+        return int(row["n"])
+
+    def is_abandoned(self, run_id: str) -> bool:
+        """Feladott-e a futás: nincs eredménye, és az utolsó aktív hibája nem újrapróbálható.
+
+        Az ``abandoned`` állapot a ``will_retry`` jelzőből levezetett (nincs külön oszlop):
+        a ``will_retry = 0`` hibát a politika nem próbálja újra (tartós / kvótahiba, vagy a
+        próbálkozási korlát elfogyott).
+        """
+        if self.get_result(run_id) is not None:
+            return False
+        row = self._conn.execute(
+            "SELECT will_retry FROM run_failures WHERE run_id = ? AND forgiven = 0 "
+            "ORDER BY attempt DESC LIMIT 1",
+            (run_id,),
+        ).fetchone()
+        return row is not None and int(row["will_retry"]) == 0
+
+    def forgive_failures(self, *, batch_id: str | None = None, run_id: str | None = None) -> int:
+        """A hibák megbocsátása (``--retry-abandoned``): a sorok megmaradnak, de nem számítanak.
+
+        Returns:
+            A megbocsátott sorok száma.
+        """
+        if (batch_id is None) == (run_id is None):
+            raise ValueError("pontosan az egyik kell: batch_id vagy run_id")
+        column, value = ("batch_id", batch_id) if batch_id is not None else ("run_id", run_id)
+        with self._conn:
+            cur = self._conn.execute(
+                f"UPDATE run_failures SET forgiven = 1 WHERE {column} = ? AND forgiven = 0",
+                (value,),
+            )
+        return int(cur.rowcount)

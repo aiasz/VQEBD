@@ -11,7 +11,9 @@ Használat::
     python scripts/run_batch.py --preset f5-deterministic --db data/db/f5.sqlite \\
         --export docs/figures/data/f5_deterministic.json
 
-A futás folytatható: újraindítva a már tárolt futásokat kihagyja.
+A futás folytatható: újraindítva a már tárolt futásokat kihagyja. A sikertelen
+futások a ``run_failures`` táblába kerülnek (Fázis 6); újrapróbálkozáshoz és
+ütemezéshez a ``scripts/run_pipeline.py`` való.
 
 Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
 """
@@ -19,48 +21,13 @@ Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
 from __future__ import annotations
 
 import argparse
-import json
 import sys
-import time
 from pathlib import Path
 
-from vqebd import __version__
 from vqebd.batch import aggregate_rows, get_preset, run_batch
+from vqebd.batch.export import write_export
 from vqebd.batch.spec import PRESETS
 from vqebd.storage import DEFAULT_DB_PATH, Database
-
-# A JSON-exportba kerülő rekordmezők (a teljes rekord a DB-ben marad).
-EXPORT_FIELDS = (
-    "run_id",
-    "molecule_name",
-    "bond_length",
-    "active_electrons",
-    "active_orbitals",
-    "backend",
-    "platform",
-    "precision",
-    "optimizer_method",
-    "mitigation_strategy",
-    "mitigation_extrapolator",
-    "repeat_index",
-    "master_seed",
-    "energy_ha",
-    "optimizer_final_ha",
-    "optimizer_history_min_ha",
-    "optimal_parameters_json",
-    "reestimate_mean_ha",
-    "reestimate_sem_ha",
-    "reestimate_n",
-    "hartree_fock_ha",
-    "full_ci_ha",
-    "casci_ha",
-    "exact_diag_ha",
-    "energy_offset_ha",
-    "n_function_evaluations",
-    "converged",
-    "wall_time_s",
-    "config_hash",
-)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -99,21 +66,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     if args.export is not None:
-        args.export.parent.mkdir(parents=True, exist_ok=True)
-        payload = {
-            "batch_id": spec.batch_id,
-            "description": spec.description,
-            "vqebd_version": __version__,
-            "exported_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "planned_runs": spec.total_runs,
-            "stored_runs": len(rows),
-            "failed": [{"run_id": r, "error": m} for r, m in report.failed],
-            "groups": [g.to_dict() for g in groups],
-            "rows": [{k: row.get(k) for k in EXPORT_FIELDS} for row in rows],
-        }
-        args.export.write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
+        write_export(args.export, spec, rows, groups, report.failed)
         print(f"\nExport: {args.export}")
 
     return 1 if report.failed else 0

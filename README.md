@@ -2,9 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.8.1-blue.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-5%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-536%20zöld-brightgreen.svg)](docs/testing/TR-F05_batch.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.9.0-blue.svg)](CHANGELOG.md)
+[![Fázis](https://img.shields.io/badge/fázis-6%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-641%20zöld-brightgreen.svg)](docs/testing/TR-F06_automatizalas.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -22,7 +22,7 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 5 lezárva (`v0.8.1`)** — a VQE-mag működik
+Jelenlegi állapot: **Fázis 6 lezárva (`v0.9.0`)** — a VQE-mag működik
 három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
@@ -55,7 +55,7 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 | **3** | **Hibaenyhítés (ISA ZNE + Mitiq keresztvalidáció, L4)** | ✅ **Lezárva** (`v0.6.0`) |
 | **4** | **Adatséma és perzisztens tárolás (SQLite / CSV / JSON)** | ✅ **Lezárva** (`v0.7.0`) |
 | **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | ✅ **Lezárva** (`v0.8.1`) |
-| 6 | Automatizálás és ütemezés | ⬜ Tervezett |
+| **6** | **Automatizálás, hibatárolás, ütemezés** | ✅ **Lezárva** (`v0.9.0`) |
 | 7 | Streamlit dashboard | ⬜ Tervezett |
 | 8 | Teljes konténerizáció | ⬜ Tervezett |
 | 9 | Dokumentáció és publikálás (Zenodo DOI) | ⬜ Tervezett |
@@ -236,26 +236,48 @@ osztályozza a kémiai pontossághoz (±1.6 mHa) képest.
 
 Részletek: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_batch.md).
 
+### Fázis 6 — automatizálás, hibatárolás és ütemezés
+
+A felügyelet nélküli működés három garanciát igényel: **a hiba nem vész el**, **az újrapróbálás nem
+fogyaszt kvótát**, és **a titok nem szivárog**.
+
+- **Hibatárolás:** minden sikertelen futás sor a `run_failures` táblában (séma v3), titoktalanított
+  üzenettel, a próbálkozás sorszámával és hibaosztállyal.
+- **Újrapróbálkozás:** csak az *átmeneti* hibát (hálózat, időtúllépés, HTTP 429/5xx), legfeljebb 3-szor,
+  exponenciális visszalépéssel; az ismeretlen hiba **tartós**. A próbálkozásszám az adatbázisban él,
+  ezért egy újraindított folyamat nem ismétel végtelenül.
+- **Pipeline és ütemező:** `scripts/run_pipeline.py` (batch → export → összegzés, JSON-soros napló) és a
+  `scheduler` compose-szolgáltatás átfedés elleni zárral.
+- **A valódi QPU nincs ütemezve:** az ütemező csak szimulátort indít; hardverhez `--allow-hardware` **és**
+  `VQEBD_ALLOW_HARDWARE=true` kell, batch szintű kvótakapuval és 1 próbálkozással (a K7 tanulsága).
+
+```bash
+python scripts/run_pipeline.py --preset f5-smoke --db data/db/pipeline.sqlite
+docker compose -f docker/docker-compose.yml up -d scheduler
+```
+
+Részletek: [`docs/06_automation.md`](docs/06_automation.md), [`TR-F06`](docs/testing/TR-F06_automatizalas.md).
+
 ### Gyors indítás
 
 ```bash
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (537 teszt, 1 kihagyott)
+make test       # teljes tesztkészlet (642 teszt, 1 kihagyott)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.8.1 python -m vqebd
+docker run --rm vqebd:0.9.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.1 .
-docker run --rm vqebd:0.8.1 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.9.0 .
+docker run --rm vqebd:0.9.0 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -273,17 +295,18 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | A Fázis 3 részletes terve |
 | [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | A Fázis 4 részletes terve |
 | [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | A Fázis 5 részletes terve |
-| [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | A Fázis 6 terve (automatizálás, hibatárolás) — **terv, nincs megvalósítva** |
+| [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | A Fázis 6 részletes terve |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
 | [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Hibaenyhítés és Zero-Noise Extrapolation (L4)** |
 | [`docs/04_data_schema.md`](docs/04_data_schema.md) | **Adatséma, SQLite adattárolás és FAIR exportálás** |
 | [`docs/05_batch.md`](docs/05_batch.md) | **Batch-futtatás, aktív tér és statisztika** |
+| [`docs/06_automation.md`](docs/06_automation.md) | **Automatizálás, hibatárolás, újrapróbálkozás, ütemezés** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
 | [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
-| [`docs/adr/`](docs/adr/) | Architektúra-döntések (ADR-0001…0007) |
+| [`docs/adr/`](docs/adr/) | Architektúra-döntések (ADR-0001…0008) |
 | [`docs/testing/`](docs/testing/) | Teszttervek és mérési jegyzőkönyvek |
 
 #### Architektúra-döntések
@@ -297,6 +320,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [0005](docs/adr/ADR-0005-determinizmus.md) | Minden véletlenforrás explicit seedet kap, és rekordba kerül |
 | [0006](docs/adr/ADR-0006-tobbplatformos-architektura.md) | **A platform önálló benchmark-dimenzió** — Qiskit ↔ Cirq ↔ qsim |
 | [0007](docs/adr/ADR-0007-batch-statisztika.md) | **Ismétlésen alapuló statisztika és hibaköltségvetés** — N seed × K friss kiértékelés, t-CI |
+| [0008](docs/adr/ADR-0008-hibakezeles-es-utemezes.md) | **A hiba is adat** — tárolt hibák, osztályozott újrapróbálás, a valódi QPU nincs ütemezve |
 
 ### Módszertani alapelvek
 
@@ -356,7 +380,7 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 5 completed (`v0.8.1`)** — the VQE core
+Current status: **Phase 6 completed (`v0.9.0`)** — the VQE core
 works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
@@ -391,7 +415,7 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 | **3** | **Error mitigation (ISA ZNE + Mitiq cross-validation, L4)** | ✅ **Completed** (`v0.6.0`) |
 | **4** | **Data schema and persistent storage (SQLite / CSV / JSON)** | ✅ **Completed** (`v0.7.0`) |
 | **5** | **Batch runs, active space (LiH, BeH2), statistics** | ✅ **Completed** (`v0.8.1`) |
-| 6 | Automation and scheduling | ⬜ Planned |
+| **6** | **Automation, failure storage, scheduling** | ✅ **Completed** (`v0.9.0`) |
 | 7 | Streamlit dashboard | ⬜ Planned |
 | 8 | Full containerization | ⬜ Planned |
 | 9 | Documentation and publication (Zenodo DOI) | ⬜ Planned |
@@ -575,26 +599,49 @@ and K fresh evaluations**, and classifies the error by its confidence interval
 Details: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_batch.md)
 (both in Hungarian).
 
+### Phase 6 — Automation, Failure Storage and Scheduling
+
+Unattended operation needs three guarantees: **a failure is not lost**, **a retry does not burn quota**,
+and **a secret does not leak**.
+
+- **Failure storage:** every failed run is a row in the `run_failures` table (schema v3), with a
+  scrubbed message, the attempt number and an error class.
+- **Retry:** only *transient* errors (network, timeout, HTTP 429/5xx), at most 3 times, with exponential
+  backoff; an unknown error is **permanent**. The attempt count lives in the database, so a restarted
+  process does not repeat forever.
+- **Pipeline and scheduler:** `scripts/run_pipeline.py` (batch → export → summary, JSON-lines log) and
+  the `scheduler` compose service with an overlap lock.
+- **The real QPU is not scheduled:** the scheduler runs simulators only; hardware needs `--allow-hardware`
+  **and** `VQEBD_ALLOW_HARDWARE=true`, with a batch-level quota gate and a single attempt (the lesson of K7).
+
+```bash
+python scripts/run_pipeline.py --preset f5-smoke --db data/db/pipeline.sqlite
+docker compose -f docker/docker-compose.yml up -d scheduler
+```
+
+Details: [`docs/06_automation.md`](docs/06_automation.md), [`TR-F06`](docs/testing/TR-F06_automatizalas.md)
+(both in Hungarian).
+
 ### Quick Start
 
 ```bash
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (537 tests, 1 skipped)
+make test       # full test suite (642 tests, 1 skipped)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.8.1 python -m vqebd
+docker run --rm vqebd:0.9.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.1 .
-docker run --rm vqebd:0.8.1 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.9.0 .
+docker run --rm vqebd:0.9.0 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -612,17 +659,18 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [`docs/plan/phase_03.md`](docs/plan/phase_03.md) | Detailed Phase 3 plan |
 | [`docs/plan/phase_04.md`](docs/plan/phase_04.md) | Detailed Phase 4 plan |
 | [`docs/plan/phase_05.md`](docs/plan/phase_05.md) | Detailed Phase 5 plan |
-| [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | Phase 6 plan (automation, failure storage) — **plan only, not implemented** |
+| [`docs/plan/phase_06.md`](docs/plan/phase_06.md) | Detailed Phase 6 plan |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
 | [`docs/03_mitigation_test.md`](docs/03_mitigation_test.md) | **Error mitigation and Zero-Noise Extrapolation (L4)** |
 | [`docs/04_data_schema.md`](docs/04_data_schema.md) | **Data schema, SQLite database and FAIR exports** |
 | [`docs/05_batch.md`](docs/05_batch.md) | **Batch runs, active space and statistics** |
+| [`docs/06_automation.md`](docs/06_automation.md) | **Automation, failure storage, retry, scheduling** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
 | [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |
-| [`docs/adr/`](docs/adr/) | Architecture decisions (ADR-0001…0007) |
+| [`docs/adr/`](docs/adr/) | Architecture decisions (ADR-0001…0008) |
 | [`docs/testing/`](docs/testing/) | Test plans and measurement logs |
 
 #### Architecture Decisions
@@ -636,6 +684,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**
 | [0005](docs/adr/ADR-0005-determinizmus.md) | Every random source gets an explicit seed and is recorded |
 | [0006](docs/adr/ADR-0006-tobbplatformos-architektura.md) | **The platform is its own benchmark dimension** — Qiskit ↔ Cirq ↔ qsim |
 | [0007](docs/adr/ADR-0007-batch-statisztika.md) | **Repetition-based statistics and error budget** — N seeds × K fresh evaluations, t-CI |
+| [0008](docs/adr/ADR-0008-hibakezeles-es-utemezes.md) | **A failure is data** — stored failures, classified retry, the real QPU is not scheduled |
 
 ### Methodological Principles
 

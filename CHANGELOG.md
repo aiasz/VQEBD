@@ -13,7 +13,52 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
-- **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
+- **D3** — szimulátoros GitHub Actions ütemezés (a repó pusholása után).
+- **Fázis 7** — Streamlit dashboard.
+
+---
+
+## [0.9.0] — 2026-11-02
+
+**Fázis 6 — automatizálás, strukturált hibatárolás, újrapróbálkozás, ütemezés.**
+
+A fázis lezárult: mind a 11 elfogadási kritérium teljesült
+([`TR-F06`](docs/testing/TR-F06_automatizalas.md)); 642 teszt, ebből 641 sikeres és 1 kihagyott
+(TC-302, `mitiq` nélkül). Terv: [`phase_06.md`](docs/plan/phase_06.md), döntés: ADR-0008.
+
+### Hozzáadva
+- **Séma v3:** `run_failures` tábla (append-only), v1 → v2 → v3 automatikus migráció; a `results` tábla
+  nem változik.
+- **`vqebd.pipeline`:** `classify` (kvóta / átmeneti / tartós, ismeretlen = tartós), `scrub_secrets`
+  (token, CRN, API-kulcs alakú sorozatok), `RetryPolicy` és `run_with_retry` (korlátos, exponenciális,
+  jitter nélküli visszalépés; a próbálkozásszám az adatbázisban tartósított), `run_pipeline`
+  (előellenőrzés → batch → export → összegzés, JSON-soros napló, kilépési kódok 0/1/2).
+- **`vqebd.scheduler`:** intervallum-hurok és átfedés elleni zárfájl (időalapú elavulással; PID-ellenőrzés
+  nélkül, mert Windowson az `os.kill(pid, 0)` megszüntetné a folyamatot).
+- **`scheduler` compose-szolgáltatás:** csak szimulátor, token nélkül.
+- **`scripts/run_pipeline.py`** (`--retry-abandoned`, `--max-attempts`, `--allow-hardware`);
+  **`vqebd.batch.export`** (a `run_batch.py` és a pipeline közös exportja, a formátum változatlan).
+- **Hardveres védelem:** `hardware_evaluation_budget`; batch szintű kvótakapu (+20% tartalék) a
+  pipeline előellenőrzésében.
+- Dokumentumok: `phase_06.md`, `ADR-0008`, `TP-F06`, `TR-F06`, `docs/06_automation.md`, séma v3 a
+  `docs/04_data_schema.md`-ben.
+
+### Változott
+- `run_batch`: új `retry`, `hardware_max_attempts`, `sleep` paraméter; a hibák a `run_failures`-be
+  kerülnek; a `BatchReport` új `abandoned` mezője. `retry` nélkül a viselkedés a Fázis 5-tel azonos.
+- `scripts/run_batch.py`: az exportot a közös `vqebd.batch.export` írja.
+
+### Mért
+- **A Fázis 5 batch hibái nem maradtak meg** (előmérés): a hiba csak a memóriában és a naplóban élt.
+- **A rossz backendnév már a `BatchCell` konstruktorában elbukik** (`KeyError`), a batch futása előtt.
+- **Konténeres futás** (`docker compose run scheduler`): `f5-smoke` 5 új futás, kilépési kód 0; a volume
+  jogosultsága rendben.
+
+### Ismert korlátok
+- Az `transient` szabályok **feltevések**: valódi IBM-hibával nem erősítettük meg (TR-F06, L1).
+- Az ütemezési hurkot valós alvással, hosszan nem futtattuk; az `--every` logikát injektált órával
+  teszteltük (TR-F06, L3).
+- Nincs értesítés hibáról.
 
 ---
 

@@ -4,7 +4,7 @@
 |---|---|
 | **Azonosító** | ADR-0008 |
 | **Cím** | A hiba is adat: tárolt hibák, osztályozott újrapróbálkozás, nem ütemezett hardver |
-| **Státusz** | **Javasolt** — a 3. döntés (hardver) és a D1–D4 kérdések a felhasználó jóváhagyására várnak |
+| **Státusz** | **Elfogadott** (2026-11-02, a D1–D4 alapértelmezések jóváhagyásával; megvalósítva a v0.9.0-ban) |
 | **Dátum** | 2026-11-02 |
 | **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Érinti** | Fázis 6, 7 (dashboard: hibák megjelenítése), 8 (konténerizáció) |
@@ -67,7 +67,10 @@ tervezett, rögzített mérésekben van (5.H), nem az ismétlésben.
 - **Negatív:** az „ismeretlen = tartós” szabály egy ritka átmeneti hibát véglegesít
   (amíg a kivételtípus nem kerül a szabálytáblába); séma v3 migráció.
 - **Kockázat:** az IBM Runtime átmeneti hibáinak tényleges kivételtípusait nem mértük;
-  a `transient` szabályok **feltevések**, amíg szimulált hibával nem tesztelik
-  (AC-6.2), és valódi esetből nem erősítik meg.
+  a `transient` szabályok **feltevések**: szimulált hibával tesztelték (AC-6.2, TR-F06), valódi
+  esetből nem erősítették meg (TR-F06 6., L1).
+- **Megvalósítási kiegészítés:** a 3. döntés batch szintű kvótakapuja (+20% tartalék) a
+  pipeline előellenőrzésében él; a futásonkénti védelem (K7) ettől függetlenül minden futásnál
+  lefut (TR-F06 3.).
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

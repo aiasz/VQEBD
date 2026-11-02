@@ -227,7 +227,7 @@ def _make_v1_database(path: Path) -> dict[str, object]:
 
 
 def test_schema_v2_migration_preserves_v1_records(tmp_path: Path) -> None:
-    """AC-5.9: egy v1 adatbázis megnyitva v2-re migrál; a v1 rekord bitre változatlan."""
+    """AC-5.9: egy v1 adatbázis megnyitva migrál (v1 → v2 → v3); a v1 rekord bitre változatlan."""
     from vqebd.storage.schema import SCHEMA_V2_COLUMNS
 
     db_file = tmp_path / "v1.sqlite"
@@ -235,8 +235,9 @@ def test_schema_v2_migration_preserves_v1_records(tmp_path: Path) -> None:
 
     with Database(db_file) as db:
         meta = dict(db._conn.execute("SELECT key, value FROM meta").fetchall())
-        assert meta["schema_version"] == "2"
+        assert meta["schema_version"] == "3"  # v1 → v2 → v3 (Fázis 6: run_failures)
         assert "migrated_v1_to_v2_at" in meta
+        assert "migrated_v2_to_v3_at" in meta
         row = db.get_result("v1-rekord")
         assert row is not None
         for key, value in original.items():
