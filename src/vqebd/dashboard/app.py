@@ -25,14 +25,20 @@ import streamlit as st
 
 from vqebd.dashboard.data import (
     DataLoadError,
+    default_bond_length,
     load_failures,
     load_results,
+    method_comparison_table,
 )
-from vqebd.dashboard.figures import dissociation_figure, ordered_methods
+from vqebd.dashboard.figures import (
+    dissociation_figure,
+    method_comparison_figure,
+    ordered_methods,
+)
 
 __all__ = ["DISPLAY_COLUMNS", "VIEWS", "discover_sources", "main"]
 
-VIEWS: Final[tuple[str, ...]] = ("Táblázat", "Disszociációs görbe")
+VIEWS: Final[tuple[str, ...]] = ("Táblázat", "Disszociációs görbe", "Módszer-összehasonlítás")
 """A nézetek (az oldalsáv „Nézet" kapcsolója). Az alapnézet az első; minden belső lépés egy
 újabb nézetet ad hozzá, a korábbiak változatlanok (AC-7.8)."""
 
@@ -120,6 +126,8 @@ def main() -> None:
         _render_table(results, failures)
     elif view == "Disszociációs görbe":
         _render_dissociation(results)
+    elif view == "Módszer-összehasonlítás":
+        _render_comparison(results)
 
 
 def _render_table(results: pd.DataFrame, failures: pd.DataFrame) -> None:
@@ -164,3 +172,32 @@ def _render_dissociation(results: pd.DataFrame) -> None:
         key="dissociation",
     )
     st.caption(f"{len(of_molecule)} futás a kijelölt molekulára és aktív térre.")
+
+
+def _render_comparison(results: pd.DataFrame) -> None:
+    """7.3: módszer-összehasonlító sávdiagram (nyers vs. mitigált vs. referencia)."""
+    molecules = sorted(results["molecule_name"].dropna().unique())
+    if not molecules:
+        st.info("A forrás nem tartalmaz molekulát tartalmazó eredményt.")
+        return
+    molecule = str(st.selectbox("Molekula", molecules, key="cmp-molecule"))
+    of_molecule = results[results["molecule_name"] == molecule]
+    spaces = ["összes", *sorted(of_molecule["active_space"].dropna().unique())]
+    space = str(st.selectbox("Aktív tér", spaces, key="cmp-space"))
+    active_space = None if space == "összes" else space
+    if active_space is not None:
+        of_molecule = of_molecule[of_molecule["active_space"] == active_space]
+    lengths = sorted(of_molecule["bond_length"].dropna().unique())
+    if not lengths:
+        st.info("Nincs kötéshosszal rendelkező eredmény a kijelölésben.")
+        return
+    preferred = default_bond_length(results, molecule, active_space=active_space)
+    index = lengths.index(preferred) if preferred in lengths else 0
+    bond_length = float(
+        st.selectbox("Kötéshossz (Å)", lengths, index=index, key=f"cmp-bond-{molecule}-{space}")
+    )
+    table = method_comparison_table(results, molecule, bond_length, active_space=active_space)
+    title = f"{molecule} {bond_length:g} Å — módszerek összehasonlítása"
+    st.plotly_chart(method_comparison_figure(table, title), key="comparison")
+    if not table.empty:
+        st.dataframe(table, hide_index=True)

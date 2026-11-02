@@ -328,6 +328,138 @@ def test_curve_view_with_no_molecules_shows_an_info_message(
     assert any("nem tartalmaz molekulát" in i.value for i in at.info)
 
 
+# =====================================================================================
+# 7.3 — módszer-összehasonlítás (AC-7.6)
+# =====================================================================================
+
+COMPARE_VIEW = "Módszer-összehasonlítás"
+
+
+def _chart_bars(at: AppTest) -> tuple[list[str], list[float], dict[str, Any]]:
+    """A sávdiagram (x, y) értékei és a teljes spec a Streamlit-protóból."""
+    charts = at.get("plotly_chart")
+    assert len(charts) == 1, f"pontosan egy ábra várt, van: {len(charts)}"
+    spec = json.loads(charts[0].proto.spec)
+    (bar,) = spec["data"]
+    return list(bar["x"]), list(bar["y"]), spec
+
+
+def test_comparison_view_shows_reference_raw_and_mitigated_bars(
+    monkeypatch: pytest.MonkeyPatch, fixture_db: Path
+) -> None:
+    """AC-7.6: a három sáv (referencia, nyers, mitigált) értéke egy ismert rekordra helyes."""
+    at = _run(monkeypatch, fixture_db)
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    assert not at.exception
+    x, y, spec = _chart_bars(at)
+    assert x == ["referencia (Full CI)", "egzakt", "zajos (nyers)", "ZNE Richardson"]
+    assert y == pytest.approx([0.0, 0.0, 38.1, 1.0], abs=1e-6)
+    # a kémiai pontosság sávja ±1.5936 mHa
+    (band,) = spec["layout"]["shapes"]
+    assert band["y0"] == pytest.approx(-1.5936) and band["y1"] == pytest.approx(1.5936)
+
+
+def test_comparison_view_also_lists_the_numbers_in_a_table(
+    monkeypatch: pytest.MonkeyPatch, fixture_db: Path
+) -> None:
+    at = _run(monkeypatch, fixture_db)
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    table = at.dataframe[-1].value
+    assert table["method"].tolist() == ["egzakt", "zajos (nyers)", "ZNE Richardson"]
+    assert table["n"].tolist() == [1, 1, 1]
+    assert table["mean_error_mha"].tolist() == pytest.approx([0.0, 38.1, 1.0], abs=1e-6)
+
+
+def test_comparison_changes_with_the_bond_length_selector(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, record_factory: RecordFactory
+) -> None:
+    path = tmp_path / "bonds.sqlite"
+    with Database(path) as db:
+        for r, err in ((0.5, 0.030), (1.0, 0.010)):
+            db.insert_record(
+                record_factory(run_id=f"e-{r}", bond_length=r, energy_ha=-1.1, full_ci_ha=-1.1)
+            )
+            db.insert_record(
+                record_factory(
+                    run_id=f"n-{r}",
+                    bond_length=r,
+                    backend="qiskit_aer_noisy",
+                    energy_ha=-1.1 + err,
+                    full_ci_ha=-1.1,
+                )
+            )
+    at = _run(monkeypatch, path)
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    assert at.selectbox(key="cmp-bond-H2-összes").options == ["0.5", "1.0"]
+    assert _chart_bars(at)[1] == pytest.approx([0.0, 0.0, 30.0], abs=1e-6)  # 0.5 Å (az első)
+    at.selectbox(key="cmp-bond-H2-összes").select(1.0).run()
+    assert not at.exception
+    assert _chart_bars(at)[1] == pytest.approx([0.0, 0.0, 10.0], abs=1e-6)
+
+
+def test_comparison_defaults_to_the_bond_length_with_most_methods(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, record_factory: RecordFactory
+) -> None:
+    path = tmp_path / "many.sqlite"
+    with Database(path) as db:
+        db.insert_record(record_factory(run_id="a", bond_length=0.5, energy_ha=-1.0))
+        db.insert_record(record_factory(run_id="b", bond_length=1.0, energy_ha=-1.1))
+        db.insert_record(
+            record_factory(run_id="c", bond_length=1.0, backend="qiskit_aer_shot", energy_ha=-1.0)
+        )
+    at = _run(monkeypatch, path)
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    assert at.selectbox(key="cmp-bond-H2-összes").value == 1.0  # 2 módszer vs 1
+
+
+def test_comparison_matches_the_published_tr_f05_statistics(
+    monkeypatch: pytest.MonkeyPatch, repo_root: Path
+) -> None:
+    """Keresztvalidáció: a dashboard átlaghibái egyeznek a TR-F05 4. pontjának táblázatával.
+
+    H₂ 0.735 Å, N = 20 seed: lövészaj +11.59, zajos +38.15, ZNE lineáris +15.52, ZNE Richardson
+    +11.54 mHa (átlag a Full CI-hez).
+    """
+    at = _run(monkeypatch, repo_root / "docs" / "figures" / "data" / "f5_statistical.json")
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    assert not at.exception
+    assert at.selectbox(key="cmp-molecule").value == "H2"
+    assert at.selectbox(key="cmp-bond-H2-összes").value == 0.735
+    x, y, _ = _chart_bars(at)
+    got = dict(zip(x, y, strict=True))
+    assert got["lövészaj"] == pytest.approx(11.59, abs=0.01)
+    assert got["zajos (nyers)"] == pytest.approx(38.15, abs=0.01)
+    assert got["ZNE lineáris"] == pytest.approx(15.52, abs=0.01)
+    assert got["ZNE Richardson"] == pytest.approx(11.54, abs=0.01)
+    table = at.dataframe[-1].value.set_index("method")
+    assert (table["n"] == 20).all()
+
+
+def test_comparison_lih_depth_wall_from_the_published_statistics(
+    monkeypatch: pytest.MonkeyPatch, repo_root: Path
+) -> None:
+    """LiH (2e,3o) zajosan +465.65 mHa: az UCCSD mélységi fala (TR-F05 4. pont)."""
+    at = _run(monkeypatch, repo_root / "docs" / "figures" / "data" / "f5_statistical.json")
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    at.selectbox(key="cmp-molecule").select("LiH").run()
+    assert not at.exception
+    x, y, _ = _chart_bars(at)
+    got = dict(zip(x, y, strict=True))
+    assert got["zajos (nyers)"] == pytest.approx(465.65, abs=0.01)
+    assert got["lövészaj"] == pytest.approx(28.04, abs=0.01)
+
+
+def test_comparison_view_with_no_molecules_shows_an_info_message(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    empty = tmp_path / "ures.sqlite"
+    Database(empty).close()
+    at = _run(monkeypatch, empty)
+    at.sidebar.radio(key="view").set_value(COMPARE_VIEW).run()
+    assert not at.exception
+    assert any("nem tartalmaz molekulát" in i.value for i in at.info)
+
+
 # --- hiányzó, üres és sérült adat (AC-7.10) -----------------------------------------------
 
 

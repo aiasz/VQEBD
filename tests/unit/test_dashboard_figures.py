@@ -16,10 +16,19 @@ import pytest
 
 pytest.importorskip("plotly", reason="az ábraréteg-tesztek a plotly csomagot igénylik")
 
-from vqebd.dashboard.data import METHOD_ORDER, load_results
+from vqebd.dashboard.data import (
+    CHEMICAL_ACCURACY_MHA,
+    COMPARISON_COLUMNS,
+    METHOD_ORDER,
+    default_bond_length,
+    load_results,
+    method_comparison_table,
+)
 from vqebd.dashboard.figures import (
     METHOD_COLORS,
+    REFERENCE_LABEL,
     dissociation_figure,
+    method_comparison_figure,
     ordered_methods,
     trace_points,
 )
@@ -239,3 +248,107 @@ def test_trace_points_reports_the_available_names() -> None:
     fig = go.Figure(go.Scatter(x=[1], y=[2], name="a"))
     with pytest.raises(KeyError, match="van: \\['a'\\]"):
         trace_points(fig, "b")
+
+
+# =====================================================================================
+# 7.3 — módszer-összehasonlítás (AC-7.6)
+# =====================================================================================
+
+
+def test_comparison_table_aggregates_per_method_with_known_numbers(
+    curve_frame: pd.DataFrame,
+) -> None:
+    """H₂ 0.735 Å: egzakt (0), két zajos futás (+30, +40 mHa), ZNE (+10 mHa)."""
+    table = method_comparison_table(curve_frame, "H2", 0.735)
+    assert list(table.columns) == list(COMPARISON_COLUMNS)
+    assert table["method"].tolist() == ["egzakt", "zajos (nyers)", "ZNE Richardson"]
+    assert table["n"].tolist() == [1, 2, 1]
+    assert table["mean_error_mha"].tolist() == pytest.approx([0.0, 35.0, 10.0], abs=1e-6)
+    sd = table["sd_mha"].tolist()
+    assert sd[1] == pytest.approx(7.0710678, abs=1e-6)  # mintaszórás (ddof = 1)
+    assert pd.isna(sd[0]) and pd.isna(sd[2])  # egy futásból nincs szórás
+    assert table["sem_mha"].tolist()[1] == pytest.approx(5.0, abs=1e-6)  # 7.0711 / gyök 2
+    assert table["chemically_accurate"].tolist() == [True, False, False]
+
+
+def test_comparison_table_uses_the_chemical_accuracy_threshold_on_the_mean(
+    tmp_path: Path, record_factory: RecordFactory
+) -> None:
+    path = tmp_path / "edge.sqlite"
+    with Database(path) as db:
+        for run_id, backend, err in (
+            ("in", "qiskit_aer_shot", CHEMICAL_ACCURACY_MHA - 0.01),
+            ("out", "qiskit_aer_noisy", CHEMICAL_ACCURACY_MHA + 0.01),
+        ):
+            db.insert_record(
+                record_factory(
+                    run_id=run_id,
+                    backend=backend,
+                    energy_ha=-1.1373060358 + err * 1e-3,
+                    full_ci_ha=-1.1373060358,
+                )
+            )
+    table = method_comparison_table(load_results(path), "H2", 0.735).set_index("method")
+    assert bool(table.loc["lövészaj", "chemically_accurate"]) is True
+    assert bool(table.loc["zajos (nyers)", "chemically_accurate"]) is False
+
+
+def test_comparison_table_matches_bond_length_with_float_tolerance(
+    curve_frame: pd.DataFrame,
+) -> None:
+    assert len(method_comparison_table(curve_frame, "H2", 0.7350000000001)) == 3
+    assert method_comparison_table(curve_frame, "H2", 0.74).empty
+
+
+def test_comparison_table_respects_the_active_space(curve_frame: pd.DataFrame) -> None:
+    both = method_comparison_table(curve_frame, "LiH", 1.6)
+    assert both["n"].tolist() == [2]  # a két aktív tér együtt: 2 egzakt futás
+    one = method_comparison_table(curve_frame, "LiH", 1.6, active_space="(2e,5o)")
+    assert one["n"].tolist() == [1]
+
+
+def test_comparison_table_for_missing_data_is_empty_with_all_columns(
+    curve_frame: pd.DataFrame,
+) -> None:
+    table = method_comparison_table(curve_frame, "N2", 0.735)
+    assert table.empty and list(table.columns) == list(COMPARISON_COLUMNS)
+
+
+def test_default_bond_length_prefers_the_point_with_most_methods(
+    curve_frame: pd.DataFrame,
+) -> None:
+    # H₂: 0.735 Å-nél 3 módszer, 1.0 Å-nél 2, 0.5 Å-nél 1
+    assert default_bond_length(curve_frame, "H2") == 0.735
+    # LiH: minden pontnál 1 módszer: döntetlennél a legkisebb
+    assert default_bond_length(curve_frame, "LiH") == 1.2
+    assert default_bond_length(curve_frame, "LiH", active_space="(2e,5o)") == 1.6
+    assert default_bond_length(curve_frame, "N2") is None
+
+
+def test_comparison_figure_has_reference_raw_and_mitigated_bars(
+    curve_frame: pd.DataFrame,
+) -> None:
+    """AC-7.6: referencia (0), nyers (+35) és mitigált (+10) sáv a vártakkal."""
+    table = method_comparison_table(curve_frame, "H2", 0.735)
+    fig = method_comparison_figure(table, "teszt")
+    (bar,) = fig.data
+    assert list(bar.x) == [REFERENCE_LABEL, "egzakt", "zajos (nyers)", "ZNE Richardson"]
+    assert list(bar.y) == pytest.approx([0.0, 0.0, 35.0, 10.0], abs=1e-6)
+    assert list(bar.error_y.array) == pytest.approx([0.0, 0.0, 7.0710678, 0.0], abs=1e-6)
+    assert list(bar.customdata) == [None, 1, 2, 1]
+    assert fig.layout.title.text == "teszt"
+    assert bar.marker.color[2] == METHOD_COLORS["zajos (nyers)"]
+
+
+def test_comparison_figure_marks_the_chemical_accuracy_band(curve_frame: pd.DataFrame) -> None:
+    fig = method_comparison_figure(method_comparison_table(curve_frame, "H2", 0.735))
+    (band,) = fig.layout.shapes
+    assert band.y0 == pytest.approx(-CHEMICAL_ACCURACY_MHA)
+    assert band.y1 == pytest.approx(CHEMICAL_ACCURACY_MHA)
+
+
+def test_comparison_figure_without_data_is_an_explained_empty_figure() -> None:
+    empty = pd.DataFrame(columns=list(COMPARISON_COLUMNS))
+    fig = method_comparison_figure(empty, "x")
+    assert len(fig.data) == 0
+    assert "Nincs megjeleníthető adat" in fig.layout.annotations[0].text

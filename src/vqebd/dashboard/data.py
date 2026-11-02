@@ -30,15 +30,18 @@ from vqebd.storage import Database
 
 __all__ = [
     "CHEMICAL_ACCURACY_MHA",
+    "COMPARISON_COLUMNS",
     "DEFAULT_BASIS",
     "DEFAULT_MAPPER",
     "FAILURE_COLUMNS",
     "METHOD_ORDER",
     "DataLoadError",
+    "default_bond_length",
     "derive_columns",
     "derive_n_qubits",
     "load_failures",
     "load_results",
+    "method_comparison_table",
     "method_label",
 ]
 
@@ -324,3 +327,85 @@ def load_failures(path: Path | str) -> pd.DataFrame:
         if rows
         else pd.DataFrame(columns=list(FAILURE_COLUMNS))
     )
+
+
+# --- módszer-összehasonlítás (7.3) ----------------------------------------------------------
+
+COMPARISON_COLUMNS: Final[tuple[str, ...]] = (
+    "method",
+    "n",
+    "mean_error_mha",
+    "sd_mha",
+    "sem_mha",
+    "chemically_accurate",
+)
+
+
+def _select_point(
+    frame: pd.DataFrame, molecule: str, bond_length: float, active_space: str | None
+) -> pd.DataFrame:
+    """Egy (molekula, kötéshossz[, aktív tér]) pont futásai, hibaértékkel."""
+    mask = (frame["molecule_name"] == molecule) & np.isclose(
+        frame["bond_length"].to_numpy(dtype=float), bond_length, rtol=0.0, atol=1e-9
+    )
+    if active_space is not None:
+        mask &= frame["active_space"] == active_space
+    return frame[mask].dropna(subset=["error_mha"])
+
+
+def method_comparison_table(
+    frame: pd.DataFrame,
+    molecule: str,
+    bond_length: float,
+    *,
+    active_space: str | None = None,
+) -> pd.DataFrame:
+    """Módszerenként összesítve az energiahiba (a Full CI-hez, mHa) egy kötéshosszra.
+
+    Oszlopok: ``COMPARISON_COLUMNS``. ``sd_mha`` a mintaszórás (``ddof = 1``), egyetlen futásnál
+    ``NaN``; ``sem_mha = sd / sqrt(n)``. ``chemically_accurate`` igaz, ha az **átlagos** hiba
+    abszolút értéke a kémiai pontosságon belül van (a futásonkénti pontosság a ``results``
+    táblában van). A sorok a ``METHOD_ORDER`` szerint rendezettek, a többi utánuk, ábécében.
+    Adat nélkül üres tábla, teljes oszlopkészlettel.
+    """
+    point = _select_point(frame, molecule, bond_length, active_space)
+    if point.empty:
+        return pd.DataFrame(columns=list(COMPARISON_COLUMNS))
+    rows: list[dict[str, Any]] = []
+    for method, group in point.groupby("method", sort=False):
+        errors = group["error_mha"].to_numpy(dtype=float)
+        n = int(errors.size)
+        mean = float(errors.mean())
+        sd = float(errors.std(ddof=1)) if n > 1 else float("nan")
+        rows.append(
+            {
+                "method": str(method),
+                "n": n,
+                "mean_error_mha": mean,
+                "sd_mha": sd,
+                "sem_mha": sd / float(np.sqrt(n)) if n > 1 else float("nan"),
+                "chemically_accurate": abs(mean) < CHEMICAL_ACCURACY_MHA,
+            }
+        )
+    order = {m: i for i, m in enumerate(METHOD_ORDER)}
+    rows.sort(key=lambda r: (order.get(r["method"], len(order)), r["method"]))
+    return pd.DataFrame(rows, columns=list(COMPARISON_COLUMNS))
+
+
+def default_bond_length(
+    frame: pd.DataFrame, molecule: str, *, active_space: str | None = None
+) -> float | None:
+    """A legtöbb különböző módszert tartalmazó kötéshossz (döntetlennél a legkisebb).
+
+    Ez a legtanulságosabb alapértelmezés az összehasonlításhoz. ``None``, ha nincs adat.
+    """
+    subset = frame[frame["molecule_name"] == molecule].dropna(subset=["bond_length", "error_mha"])
+    if active_space is not None:
+        subset = subset[subset["active_space"] == active_space]
+    if subset.empty:
+        return None
+    counts = {
+        float(length): int(group["method"].nunique())
+        for length, group in subset.groupby("bond_length")
+    }
+    return min(counts, key=lambda length: (-counts[length], length))

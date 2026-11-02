@@ -15,9 +15,19 @@ from typing import Any, Final
 import pandas as pd
 import plotly.graph_objects as go
 
-from vqebd.dashboard.data import METHOD_ORDER
+from vqebd.dashboard.data import CHEMICAL_ACCURACY_MHA, METHOD_ORDER
 
-__all__ = ["METHOD_COLORS", "dissociation_figure", "ordered_methods", "trace_points"]
+__all__ = [
+    "METHOD_COLORS",
+    "REFERENCE_LABEL",
+    "dissociation_figure",
+    "method_comparison_figure",
+    "ordered_methods",
+    "trace_points",
+]
+
+REFERENCE_LABEL: Final[str] = "referencia (Full CI)"
+"""A sávdiagram referenciasávja: a Full CI hibája definíció szerint 0."""
 
 METHOD_COLORS: Final[dict[str, str]] = {
     "egzakt": "#0072B2",
@@ -162,6 +172,59 @@ def dissociation_figure(
         yaxis_title="Energia (Ha)",
         legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "x": 0},
         hovermode="closest",
+        margin={"t": 90},
+    )
+    return fig
+
+
+def method_comparison_figure(table: pd.DataFrame, title: str = "") -> go.Figure:
+    """Sávdiagram: módszerenként az átlagos energiahiba a Full CI-hez (mHa), referenciasávval.
+
+    Args:
+        table: A ``vqebd.dashboard.data.method_comparison_table`` eredménye.
+        title: Az ábra címe.
+
+    Returns:
+        Egyetlen sávsorozatot tartalmazó ábra. Az első sáv a **referencia** (Full CI, hiba
+        definíció szerint 0), utána a módszerek a ``METHOD_ORDER`` szerint. A hibasáv a
+        mintaszórás (több futásnál); a kémiai pontosság (±1.6 mHa) zöld sávként jelenik meg.
+        Adat nélkül magyarázott üres ábra.
+    """
+    if table.empty:
+        return _empty_figure("Nincs megjeleníthető adat a kijelölt ponthoz.", title)
+
+    labels = [REFERENCE_LABEL, *table["method"].tolist()]
+    values = [0.0, *table["mean_error_mha"].tolist()]
+    spreads = [0.0, *table["sd_mha"].fillna(0.0).tolist()]
+    counts = [None, *table["n"].tolist()]
+    colors = ["#52514e", *[METHOD_COLORS.get(m, _FALLBACK_COLOR) for m in table["method"]]]
+
+    fig = go.Figure(
+        go.Bar(
+            x=labels,
+            y=values,
+            marker_color=colors,
+            error_y={"type": "data", "array": spreads, "visible": True},
+            customdata=counts,
+            hovertemplate=("%{x}<br>hiba = %{y:+.3f} mHa<br>futások: %{customdata}<extra></extra>"),
+            name="hiba",
+        )
+    )
+    fig.add_hrect(
+        y0=-CHEMICAL_ACCURACY_MHA,
+        y1=CHEMICAL_ACCURACY_MHA,
+        fillcolor="#0ca30c",
+        opacity=0.15,
+        line_width=0,
+        annotation_text="kémiai pontosság (±1.6 mHa)",
+        annotation_position="top left",
+    )
+    fig.update_layout(
+        title=title,
+        template="plotly_white",
+        yaxis_title="Hiba a Full CI-hez (mHa)",
+        xaxis_title="Módszer",
+        showlegend=False,
         margin={"t": 90},
     )
     return fig
