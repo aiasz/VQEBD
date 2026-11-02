@@ -4,14 +4,14 @@
 |---|---|
 | **Azonosító** | TR-F05 |
 | **Típus** | Test Report (mérési jegyzőkönyv) |
-| **Dokumentum-verzió** | 1.0.0 |
-| **Dátum** | 2026-09-25 (batch-futtatás) · 2026-11-02 (lezárás) |
+| **Dokumentum-verzió** | 1.1.0 (7. pont: 5.H hardveres mérés) |
+| **Dátum** | 2026-09-25 (batch-futtatás) · 2026-11-02 (lezárás, 5.H) |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Fázis** | 5 — Batch-futtatás, aktív tér, statisztikai módszertan |
 | **Tesztterv** | [`TP-F05`](TP-F05_batch.md) |
 | **Terv / döntés** | [`phase_05.md`](../plan/phase_05.md) · [`ADR-0007`](../adr/ADR-0007-batch-statisztika.md) |
 | **Kódállapot** | `vqebd` 0.8.0, Docker-image `vqebd:0.8.0` |
-| **Státusz** | **Lezárva — mind a 10 elfogadási kritérium teljesült** (5.H hardveres mérés nélkül, lásd 7. pont) |
+| **Státusz** | **Lezárva — mind a 10 elfogadási kritérium teljesült.** A 7. pont a kiadás utáni 5.H hardveres méréssel egészíti ki |
 
 ---
 
@@ -27,7 +27,7 @@ a frozen-core redukcióval), **batch-motor** (determinisztikus, folytatható fut
 | Tesztkészlet | **529 teszt: 528 sikeres, 1 kihagyott** (TC-302, a `mitiq` nincs a képben) |
 | `f5-deterministic` | 50 / 50 futás, 0 hibás, összesen 2535 s |
 | `f5-statistical` | 180 / 180 futás, 0 hibás |
-| Új ábrák | fig07 (aktív tér), fig08 (ismétlés), fig09 (hibaköltségvetés) |
+| Új ábrák | fig07 (aktív tér), fig08 (ismétlés), fig09 (hibaköltségvetés), fig10 (hardveres PES, 5.H) |
 | Új / javított megállapítás | K5 lezárva (4. pont); K8 új (3.2 pont) |
 
 **A fázis tudományos eredménye két mondatban.** Az ismétlés a szórást N^−½ szerint
@@ -229,12 +229,61 @@ készült, a repóban nincs; az eredmény a fenti értékekkel reprodukálható,
 
 ---
 
-## 7. Ami nem része a lezárásnak
+## 7. Hardveres H₂ disszociációs görbe — 5.H (2026-11-02)
 
-- **5.H hardveres H₂ disszociációs görbe** — nem elfogadási kritérium
-  (`phase_05.md` 6.4). Nem futott le. A kvótaablak 2026-10-21 után újra nyitva
-  áll; a mérés csak `--dry-run` után és külön jóváhagyással indítható. Kimenet
-  (később): `hardware_h2_pes.json`, fig10.
+Adat: [`hardware_h2_pes.json`](../figures/data/hardware_h2_pes.json) · ábra:
+`fig10_hardver_pes.png` · szkript: `scripts/run_hardware_pes.py`.
+
+**Beállítás.** `ibm_kingston` (156 qubit, Heron r2), H₂ STO-3G, 5 geometria, 8192
+lövés/pont, θ* a **zajmentes** (L2) optimumból. Optimalizálás hardveren **nem**
+történt, a mért hiba tehát az eszköz hibája θ*-ban, nem a VQE hibája. Két job,
+mindkettő 5 PUB-bal: `dbk5lf1ffo6c73bas75g` (resilience 0, nyers) és
+`dbk5mu9kdqps7391qe0g` (resilience 1: TREX + twirling, 32 randomizáció).
+
+**Kvóta.** Előtte 600 / 600 s szabad. A két job számlázott ideje **24 + 33 =
+57 QPU-s**; utána 543 s maradt. A becslés ≤ 120 s volt.
+
+**Hiba a Full CI-hez, mHa (± 1 SEM, `ensemble_standard_error`).**
+
+| R (Å) | nyers (resilience 0) | TREX (resilience 1) | TREX javítása |
+|---|---|---|---|
+| 0.5 | +27.72 ± 3.03 | +12.07 ± 3.57 | 15.65 |
+| 0.735 | +22.20 ± 2.80 | +17.56 ± 3.15 | 4.64 |
+| 1.0 | +17.38 ± 2.69 | +5.42 ± 2.87 | 11.96 |
+| 1.5 | +12.43 ± 2.41 | **−0.68 ± 2.52** | 13.11 |
+| 2.0 | +12.16 ± 1.71 | +5.52 ± 1.89 | 6.64 |
+
+**Értelmezés.**
+
+1. **A nyers hiba 12–28 mHa**, és a TREX mind az 5 pontban csökkenti (4.6–15.7
+   mHa-val).
+2. **Egyetlen pont, az R = 1.5 Å egyeztethető össze a kémiai pontossággal**
+   (−0.68 ± 2.52 mHa, a ±1.6 mHa sáv az 1σ-sávon belül van). A sáv széléhez mért
+   távolság a TREX-es pontokra: R = 0.5 Å 2.9σ, R = 0.735 Å 5.1σ, R = 2.0 Å 2.1σ
+   (ezek 95%-on kívül esnek a sávon), R = 1.0 Å 1.3σ (95%-on nem zárható ki).
+   **A hardver tehát a görbén nem éri el a kémiai pontosságot**, a TREX sem.
+3. **A hiba nem monoton R-ben.** A TREX-es hiba R = 0.735 Å-nél (+17.56) nagyobb,
+   mint R = 1.0–2.0 Å-nél. Az okát nem vizsgáltuk; a θ*-függő kapuk és a
+   kalibrációs állapot egyaránt szóba jön. Következtetést nem vontunk le belőle.
+4. **A variációs elv nem sérül:** minden pont a Full CI fölött van, az egyetlen
+   negatív érték (−0.68) 0.3σ-n belül van.
+5. **Összevetés a Fázis 2 mérésével** (R = 0.735 Å, TREX, 1 PUB: −3.96 ± 12.5
+   mHa, [TR-F02](TR-F02_hardware_run.md)): a mostani +17.56 ± 3.15 mHa-tól 21.5
+   mHa-ra van, az együttes bizonytalanság 12.9 mHa, azaz **1.7σ**. A két mérés
+   összeférhető; a Fázis 2 értéke azért nem volt feloldó, mert körülbelül
+   négyszer nagyobb hibasávval készült.
+
+**Korlátok.** (a) **Pontonként egyetlen futás**, nincs seed- vagy időbeli
+ismétlés, ezért a hibasáv csak a lövés- és twirling-zajt tartalmazza, a
+kalibrációs driftet nem. (b) A két szint **külön jobban, külön időpontban**
+futott, a különbségük tartalmazhat driftet is. (c) A nyers szint SEM-je
+(`num_randomizations = 1`) a lövészaj becslése. (d) A θ* a zajmentes optimum; a
+hardveren optimalizált θ jobb lehet (nem mértük).
+
+---
+
+## 8. Ami nem része a lezárásnak
+
 - **K7 — hardveres VQE-útvonal kvótavédelem nélkül** (`run_vqe`, `--backend ibm_qpu`).
   Ez fogyasztotta el a 2026-09-23-i keretet (42 job × 15 s). **Javítva a v0.8.0
   után** (CHANGELOG, Unreleased): engedély, kvóta-előellenőrzés és kemény
@@ -244,7 +293,7 @@ készült, a repóban nincs; az eredmény a fenti értékekkel reprodukálható,
 
 ---
 
-## 8. Reprodukálás
+## 9. Reprodukálás
 
 ```bash
 docker build -f docker/Dockerfile -t vqebd:0.8.0 .

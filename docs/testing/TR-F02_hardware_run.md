@@ -148,4 +148,14 @@ kiolvasás (ezt a TREX kezeli) és a véges mintaszám.
 A mérés maga (job, energiaérték) **nem változott**; csak az értelmezése és a
 hozzá tartozó bizonytalansági adatok.
 
+### 2. kiegészítés (2026-11-02, Fázis 5.H)
+
+Az egyetlen pontot (R = 0.735 Å) a Fázis 5.H **5 geometriára** egészítette ki,
+ugyanazon az `ibm_kingston` backenden, nyers (resilience 0) és TREX (resilience 1)
+szinten, 8192 lövéssel, 2 jobban (57 QPU-s). Az R = 0.735 Å-nél a TREX-es hiba
++17.56 ± 3.15 mHa, ami az itteni −3.96 ± 12.5 mHa-tól 1.7σ-ra van: a két mérés
+összeférhető, ez a jegyzőkönyv 1.1.0 állításai (1σ-n belüli ingadozás, a mérés
+nem feloldó) változatlanok. A teljes görbe és az értelmezés:
+[TR-F05 7. pont](TR-F05_batch.md), `fig10_hardver_pes.png`.
+
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

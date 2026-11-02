@@ -11,6 +11,15 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Hozzáadva
+- **Fázis 5.H — H₂ disszociációs görbe valódi QPU-n** (`ibm_kingston`, 5 geometria,
+  8192 lövés, θ* a zajmentes optimumból; 2 job, **57 QPU-s** a 600 s-ból).
+  Nyers hiba +12 … +28 mHa; TREX-szel +5 … +18 mHa, az R = 1.5 Å pontban
+  −0.68 ± 2.52 mHa. A hardver a görbén nem éri el a kémiai pontosságot.
+  Pontonként egyetlen futás; a hibasáv drift nélküli. Adat:
+  `docs/figures/data/hardware_h2_pes.json`; ábra: `fig10_hardver_pes.png`;
+  jegyzőkönyv: TR-F05 7. pont, TR-F02 2. kiegészítés.
+
 ### Mért
 - **K8 — a qsim-eltérés oka (LiH (2e,5o), 1.595 Å):** a Powell `complex128`
   Qiskit-en 4309 kiértékelés után 9·10⁻¹² Ha-ra konvergál, a qsim (`complex64`)
@@ -37,9 +46,6 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
   nem küld be semmit.
 
 ### Tervezett
-- **Fázis 5.H** — H₂ disszociációs görbe valódi QPU-n (`scripts/run_hardware_pes.py`).
-  A kvóta-ablak 2026-10-21 óta nyitva van; a mérés `--dry-run` és külön jóváhagyás
-  után indítható. Nem elfogadási kritérium, `v0.8.1` kiegészítés lehet.
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
 

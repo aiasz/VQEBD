@@ -32,9 +32,9 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 > CASCI-keresztvalidáció ≤ 4·10⁻¹⁴ Ha), a batch-motor, az ismétlésen alapuló
 > statisztika (ADR-0007) és a séma v2. Mindkét batch lefutott (50 + 180 futás),
 > a 10 elfogadási kritérium teljesült: [`TR-F05`](docs/testing/TR-F05_batch.md).
-> **A hardveres H₂ disszociációs görbe (5.H) nem része a lezárásnak**; a
-> kvóta-ablak nyitva van, a mérés külön jóváhagyásra vár
-> ([`phase_05_allapot.md`](docs/plan/phase_05_allapot.md)).
+> **A hardveres H₂ disszociációs görbe (5.H)** a kiadás után, 2026-11-02-án
+> lefutott az `ibm_kingston` QPU-n (57 QPU-s): a hardver a görbén nem éri el a
+> kémiai pontosságot ([`TR-F05` 7.](docs/testing/TR-F05_batch.md)).
 
 > **v0.7.1 — javítókör (2026-09-25).** A Fázis 5 előtti átvizsgálás három mérési
 > hibát tárt fel és javított: (1) az Aer-mintavétel minden kiértékelésnél ugyanazt
@@ -225,10 +225,14 @@ osztályozza a kémiai pontossághoz (±1.6 mHa) képest.
   qubiten 0.34 mHa csonkolással kémiai pontosságon belül marad; a minimális
   (2e,3o) tér 15–72 mHa-t veszít.
 - **Ismert korlát:** LiH (2e,3o) zajosan +466 mHa (az UCCSD mélységi fala).
+- **Valódi QPU (5.H):** H₂ görbe 5 geometrián (`ibm_kingston`, 8192 lövés): nyers
+  hiba +12 … +28 mHa, TREX-szel +5 … +18 mHa; csak az R = 1.5 Å pont egyeztethető
+  össze a kémiai pontossággal (−0.68 ± 2.52 mHa). Pontonként egyetlen futás.
 
 ![Aktív tér: LiH és BeH₂](docs/figures/fig07_aktiv_ter.png)
 ![Az ismétlés hatása](docs/figures/fig08_ismetles.png)
 ![Hibaköltségvetés](docs/figures/fig09_hibakoltsegvetes.png)
+![H₂ disszociációs görbe valódi QPU-n](docs/figures/fig10_hardver_pes.png)
 
 Részletek: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_batch.md).
 
@@ -363,9 +367,9 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 > statistics (ADR-0007) and schema v2 are done. Both batches have completed
 > (50 + 180 runs) and all 10 acceptance criteria are met:
 > [`TR-F05`](docs/testing/TR-F05_batch.md) (in Hungarian). **The hardware H₂
-> dissociation curve (5.H) is not part of the closure**; the quota window is open
-> again and the measurement awaits separate approval
-> ([`phase_05_allapot.md`](docs/plan/phase_05_allapot.md), in Hungarian).
+> dissociation curve (5.H)** ran after the release, on 2026-11-02, on the
+> `ibm_kingston` QPU (57 QPU-s): the hardware does not reach chemical accuracy
+> along the curve ([`TR-F05` §7](docs/testing/TR-F05_batch.md), in Hungarian).
 
 > **v0.7.1 — correction round (2026-09-25).** The review before Phase 5 found and
 > fixed three measurement defects: (1) Aer sampling applied the same offset to
@@ -558,10 +562,14 @@ and K fresh evaluations**, and classifies the error by its confidence interval
   BeH₂ (4e,6o) on 10 qubits at 0.34 mHa truncation, within chemical accuracy; the
   minimal (2e,3o) space loses 15–72 mHa.
 - **Known limit:** LiH (2e,3o) under noise is +466 mHa (the UCCSD depth wall).
+- **Real QPU (5.H):** H₂ curve at 5 geometries (`ibm_kingston`, 8192 shots): raw
+  error +12 … +28 mHa, with TREX +5 … +18 mHa; only the R = 1.5 Å point is
+  compatible with chemical accuracy (−0.68 ± 2.52 mHa). One run per point.
 
 ![Active space: LiH and BeH₂](docs/figures/fig07_aktiv_ter.png)
 ![Effect of repetition](docs/figures/fig08_ismetles.png)
 ![Error budget](docs/figures/fig09_hibakoltsegvetes.png)
+![H₂ dissociation curve on a real QPU](docs/figures/fig10_hardver_pes.png)
 
 Details: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_batch.md)
 (both in Hungarian).

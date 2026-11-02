@@ -133,6 +133,7 @@ a pontossághoz?”) mért válasza, a `phase_05.md` 3. fejezetének táblázat�
 > [`docs/05_batch.md`](../05_batch.md), a README (HU és EN) és a CHANGELOG lezárva.
 > K5 lezárva (TR-F05 6. pont). **Új: K8** (qsim tűrés, TR-F05 3.2) — oka megmérve (`complex64`), a tűrés száma változatlan. Hátra: a
 > `v0.8.0` commit és címke (felhasználói jóváhagyással), valamint T8 (5.H).
+> **T8 kész (2026-11-02):** 2 job, 57 QPU-s, 543 s maradt; TR-F05 7. pont, fig10.
 > Az alábbi táblázat az eredeti állapotot rögzíti.
 
 | # | Teendő | Függ | Hogyan |

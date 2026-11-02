@@ -419,6 +419,48 @@ def measure_mitigation() -> dict[str, Any]:
 
 
 # ================================================================= ábrák
+def measure_hardware_pes() -> dict[str, Any]:
+    """fig10 adata: a mentett hardveres mérés (Fázis 5.H) — QPU-t NEM ér el.
+
+    A mérést a ``scripts/run_hardware_pes.py`` végzi (engedéllyel és kvóta-
+    ellenőrzéssel); ez a függvény csak a ``hardware_h2_pes.json``-t olvassa.
+    """
+    source = Path("docs/figures/data/hardware_h2_pes.json")
+    if not source.exists():
+        raise FileNotFoundError(
+            f"{source} hiányzik: előbb a scripts/run_hardware_pes.py szükséges "
+            "(VQEBD_ALLOW_HARDWARE=true, kvóta-előellenőrzéssel)"
+        )
+    raw = json.loads(source.read_text(encoding="utf-8"))
+    refs = {r["bond_length"]: r for r in raw["references"]}
+    levels = []
+    for run in raw["runs"]:
+        levels.append(
+            {
+                "resilience_level": run["resilience_level"],
+                "job_id": run["job_id"],
+                "quantum_seconds": run["quantum_seconds"],
+                "points": [
+                    {
+                        "bond_length": p["bond_length"],
+                        "energy_ha": p["energy_ha"],
+                        "error_vs_fci_ha": p["error_vs_fci_ha"],
+                        "sem_ha": p["ensemble_standard_error_ha"],
+                    }
+                    for p in run["points"]
+                ],
+            }
+        )
+    bonds = sorted(refs)
+    return {
+        "backend": raw["backend"],
+        "shots": raw["shots"],
+        "bonds": bonds,
+        "full_ci_ha": [refs[b]["full_ci_ha"] for b in bonds],
+        "levels": levels,
+    }
+
+
 def figure_reference_chain(data: dict[str, Any], out: Path) -> None:
     """A hibalánc: hol keletkezik a hiba, és mekkora."""
     import matplotlib.pyplot as plt
@@ -768,6 +810,99 @@ def figure_dissociation(data: dict[str, Any], out: Path) -> None:
 
     fig.subplots_adjust(left=0.10, right=0.97, top=0.90, bottom=0.09)
     fig.savefig(out / "fig04_disszociacio.png", dpi=200, facecolor=SURFACE)
+    plt.close(fig)
+
+
+def figure_hardware_pes(data: dict[str, Any], out: Path) -> None:
+    """fig10: H₂ PES valódi QPU-n — nyers (0. szint) és TREX (1. szint), hibasávval."""
+    import matplotlib.pyplot as plt
+
+    fig, (ax_top, ax_bottom) = plt.subplots(
+        2,
+        1,
+        figsize=(9, 6.6),
+        facecolor=SURFACE,
+        sharex=True,
+        gridspec_kw={"height_ratios": [2.1, 1], "hspace": 0.12},
+    )
+    style = {
+        0: (SERIES["cirq_simulator"], "o", "nyers (resilience 0)"),
+        1: (SERIES["qiskit_statevector"], "s", "TREX + twirling (resilience 1)"),
+    }
+    bonds = data["bonds"]
+    ax_top.plot(
+        bonds,
+        data["full_ci_ha"],
+        color=INK_MUTED,
+        linewidth=1.6,
+        linestyle="--",
+        marker="D",
+        markersize=4,
+        markeredgecolor=SURFACE,
+        label="Full CI (L0), a mért geometriákon",
+        zorder=2,
+    )
+    chem = CHEMICAL_ACCURACY_HA * 1e3
+    ax_bottom.axhspan(-chem, chem, color=STATUS["good"], alpha=0.12, zorder=1, linewidth=0)
+    ax_bottom.axhline(0, color=INK_MUTED, linewidth=1.0, zorder=2)
+    ax_bottom.text(
+        bonds[0],
+        chem * 1.35,
+        "kémiai pontosság (±1.6 mHa)",
+        color=STATUS["good"],
+        fontsize=8.5,
+        ha="left",
+        va="bottom",
+        fontweight="600",
+    )
+    for level in data["levels"]:
+        color, marker, label = style[level["resilience_level"]]
+        pts = level["points"]
+        x = [p["bond_length"] for p in pts]
+        ax_top.errorbar(
+            x,
+            [p["energy_ha"] for p in pts],
+            yerr=[p["sem_ha"] for p in pts],
+            color=color,
+            marker=marker,
+            markersize=6,
+            markeredgecolor=SURFACE,
+            linestyle="none",
+            capsize=3,
+            elinewidth=1.4,
+            label=f"{label} — {level['quantum_seconds']} QPU-s",
+            zorder=3,
+        )
+        ax_bottom.errorbar(
+            x,
+            [p["error_vs_fci_ha"] * 1e3 for p in pts],
+            yerr=[p["sem_ha"] * 1e3 for p in pts],
+            color=color,
+            marker=marker,
+            markersize=6,
+            markeredgecolor=SURFACE,
+            linestyle="-",
+            linewidth=1.2,
+            capsize=3,
+            elinewidth=1.4,
+            zorder=3,
+        )
+    ax_top.set_ylabel("energia (Ha)", color=INK_SECONDARY, fontsize=10)
+    style_axes(ax_top)
+    title(
+        ax_top,
+        f"H2 disszociációs görbe valódi QPU-n ({data['backend']})",
+        f"{data['shots']} lövés/pont, θ* a zajmentes optimumból; hibasáv: 1 SEM (ensemble)",
+    )
+    legend = ax_top.legend(frameon=False, fontsize=9.5, loc="lower right")
+    for text in legend.get_texts():
+        text.set_color(INK_SECONDARY)
+    ax_bottom.set_xlabel("kötéshossz (Å)", color=INK_SECONDARY, fontsize=10)
+    ax_bottom.set_ylabel("hiba a Full CI-hez (mHa)", color=INK_SECONDARY, fontsize=9.5)
+    style_axes(ax_bottom)
+
+    fig.subplots_adjust(left=0.10, right=0.97, top=0.90, bottom=0.09)
+    fig.savefig(out / "fig10_hardver_pes.png", dpi=200, facecolor=SURFACE)
     plt.close(fig)
 
 
@@ -1764,6 +1899,8 @@ def main(argv: list[str] | None = None) -> int:
         ("aktiv_ter", measure_active_space, figure_active_space),
         ("ismetles", measure_repetition, figure_repetition),
         ("hibakoltsegvetes", measure_error_budget, figure_error_budget),
+        # Fázis 5.H — a mentett hardveres mérésből rajzol, QPU-t nem ér el.
+        ("hardver_pes", measure_hardware_pes, figure_hardware_pes),
     ]
     if not args.quick:
         steps.append(("skalazas", measure_scaling, figure_scaling))
