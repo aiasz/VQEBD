@@ -5,7 +5,7 @@
 | **Fázis** | 9 |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **Megvalósítás alatt** — a helyi munka a `v1.0.0`-ig; a **kiadás és a Zenodo-DOI a felhasználó jóváhagyására és közreműködésére vár** (5. fejezet) |
+| **Státusz** | **Kiadásra kész (2026-11-02)** — a helyi munka a `v1.0.0`-ig kész: [`TR-F09`](../testing/TR-F09_publikalas.md). **Az AC-9.1 (zöld CI a GitHubon) a push után, az AC-9.10 (release, DOI) a felhasználó jóváhagyása és a Zenodo-kapcsoló után zár** (5. fejezet) |
 | **Célverzió** | `v1.0.0` (a mesterterv 8.1: „Fázis 9 lezárva = első publikált release, DOI") |
 | **Előzmény** | [`phase_08.md`](phase_08.md), [`00_master_plan.md`](00_master_plan.md) 7–8. fejezet, v0.11.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |

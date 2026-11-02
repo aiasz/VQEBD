@@ -5,7 +5,7 @@
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![Verzió](https://img.shields.io/badge/verzió-1.0.0-blue.svg)](CHANGELOG.md)
 [![Fázis](https://img.shields.io/badge/fázis-8%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-771%20zöld-brightgreen.svg)](docs/testing/TR-F08_konteneres_rendszer.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-791%20zöld-brightgreen.svg)](docs/testing/TR-F09_publikalas.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
