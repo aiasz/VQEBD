@@ -141,6 +141,49 @@ def test_direct_and_lock_versions_never_conflict(
     assert not conflicts, f"verzióütközés (requirements.txt vs lock): {conflicts}"
 
 
+# --- Fázis 7: dashboard-függőségek és a lock betartatása -----------------------
+
+
+@pytest.fixture(scope="module")
+def dashboard_pins(repo_root: Path) -> dict[str, str]:
+    return _parse_pins(repo_root / "requirements-dashboard.txt")
+
+
+def test_dashboard_pins_are_in_the_lock_with_the_same_version(
+    dashboard_pins: dict[str, str], locked_pins: dict[str, str]
+) -> None:
+    """A dashboard közvetlen függőségei a lockban pontosan ugyanazzal a verzióval szerepelnek."""
+    assert dashboard_pins, "a requirements-dashboard.txt üres"
+    for name, version in dashboard_pins.items():
+        assert locked_pins.get(name) == version, (
+            f"{name}: a requirements-dashboard.txt {version}-t ír elő, "
+            f"a lock {locked_pins.get(name)}-t"
+        )
+
+
+def test_pyarrow_stays_numpy1_compatible(
+    dashboard_pins: dict[str, str], locked_pins: dict[str, str]
+) -> None:
+    """M2/M3 (phase_07.md): a pyarrow 26.0.0 NumPy >= 2-t követel, a projekt numpy 1.26.4-en van.
+
+    A pin emelésekor az ``AppTest``-alapú teszt jelez, de ez az őr olcsó és azonnali.
+    """
+    major = int(dashboard_pins["pyarrow"].split(".")[0])
+    assert locked_pins["numpy"].startswith("1."), "a numpy 2.x-re váltás újraértékelendő (ADR-0001)"
+    assert major <= 25, "a pyarrow >= 26 NumPy >= 2-t követel (mérve: phase_07.md 2. fejezet)"
+
+
+def test_dockerfile_enforces_the_lock_as_constraints(repo_root: Path) -> None:
+    """M5 (phase_07.md): a build a requirements.lock-ot kényszerként használja.
+
+    Korábban csak a közvetlen pinek voltak rögzítve, és egy újraépített image a 71 lockolt
+    csomagból 21-ben eltért.
+    """
+    dockerfile = (repo_root / "docker" / "Dockerfile").read_text(encoding="utf-8")
+    assert "-c requirements.lock" in dockerfile
+    assert "requirements-dashboard.txt" in dockerfile
+
+
 # --- Licencelkülönítés -------------------------------------------------------
 
 

@@ -120,6 +120,13 @@ module = [
 ]
 ignore_missing_imports = true
 
+# A dashboard adatrétege (Fázis 7): a pandas és a plotly nem szállít típusstubokat az
+# image-ben (a pandas-stubs külön csomag, és a lockot növelné). A DataFrame ezért `Any`;
+# a dashboard-logika helyességét a tesztek védik (tests/unit/test_dashboard_*.py).
+[[tool.mypy.overrides]]
+module = ["pandas", "pandas.*", "plotly", "plotly.*"]
+ignore_missing_imports = true
+
 # A Cirq és a qsim SZÁLLÍT típusstubokat (py.typed), de a névteret implicit
 # re-exportokkal építi fel (`from cirq.ops import X` helyett `cirq.X`). A mypy
 # strict módban ezt `attr-defined` hibaként jelzi, holott a használat helyes és

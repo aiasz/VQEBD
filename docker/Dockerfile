@@ -69,10 +69,16 @@ WORKDIR /app
 # --- Függőségek (külön réteg a cache-hatékonyságért) -------------------------
 # Előbb CSAK a requirements fájlokat másoljuk: így a forráskód változása nem
 # invalidálja a pip-réteget.
-COPY requirements.txt requirements-dev.txt ./
-RUN python -m pip install --upgrade pip setuptools wheel \
- && python -m pip install -r requirements.txt \
- && python -m pip install -r requirements-dev.txt
+#
+# A requirements.lock KÉNYSZERKÉNT (-c) érvényesül (Fázis 7, 0. lépés, M5): korábban
+# csak a közvetlen pinek (requirements.txt) voltak rögzítve, a tranzitív réteg lebegett,
+# és egy újraépített image a 71 lockolt csomagból 21-ben eltért. A pip/setuptools/wheel
+# verzióját is a lockból vesszük.
+COPY requirements.txt requirements-dev.txt requirements-dashboard.txt requirements.lock ./
+RUN python -m pip install $(grep -E '^(pip|setuptools|wheel)==' requirements.lock) \
+ && python -m pip install \
+        -r requirements.txt -r requirements-dev.txt -r requirements-dashboard.txt \
+        -c requirements.lock
 
 # --- Forrás ------------------------------------------------------------------
 COPY --chown=vqebd:vqebd VERSION pyproject.toml ./

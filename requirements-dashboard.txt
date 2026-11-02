@@ -1,0 +1,30 @@
+# =============================================================================
+# VQEBD — a dashboard függőségei (Fázis 7, ADR-0009)
+# =============================================================================
+# A requirements.txt UTÁN, ugyanazzal a kényszerfájllal telepítendő (a Docker-build
+# így teszi):
+#     pip install -r requirements.txt -r requirements-dev.txt -r requirements-dashboard.txt \
+#         -c requirements.lock
+#
+# A tranzitív réteget a requirements.lock rögzíti.
+#
+# MÉRT KÉNYSZER (2026-11-02, docs/plan/phase_07.md 2. fejezet, M2–M3):
+#
+#   A Streamlit a `pyarrow 26.0.0`-t húzza be, amely NumPy >= 2.0-t követel. A
+#   projekt `numpy==1.26.4`-re van rögzítve (a Mitiq miatt, ADR-0001), így az
+#   `st.dataframe` futásidőben elbukik:
+#
+#       ImportError: pyarrow requires NumPy 2.0 or newer, found 1.26.4
+#
+#   A pip feloldója ezt NEM jelzi (a pyarrow nem deklarál numpy-függést). A
+#   pyarrow 19.0.1 ... 25.0.0 mind működik numpy 1.26.4 mellett; a 26.0.0 nem.
+#   Ezért a pin: a legfrissebb működő kiadás. A pyarrow pinje mellett a feloldó a
+#   Streamlit 1.59.1-et választja.
+#
+# Ha valaki a pyarrow pinjét emeli, az `AppTest`-alapú dashboard-tesztek
+# (tests/integration/test_dashboard_app.py) azonnal jelzik az ütközést.
+# =============================================================================
+
+streamlit==1.59.1        # a pyarrow-pin mellett a feloldó ezt választja; headless teszt: streamlit.testing.v1.AppTest
+plotly==7.1.0            # interaktív ábrák (ADR-0009, 2. döntés)
+pyarrow==25.0.0          # a legfrissebb, numpy 1.26.4-gyel működő kiadás (lásd fent)
