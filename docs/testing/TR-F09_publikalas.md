@@ -11,7 +11,7 @@
 | **Tesztterv** | [`TP-F09`](TP-F09_publikalas.md) |
 | **Terv** | [`phase_09.md`](../plan/phase_09.md) · [`docs/09_publishing.md`](../09_publishing.md) |
 | **Kódállapot** | `vqebd` 1.0.0 |
-| **Státusz** | **Kiadásra kész.** 8 / 10 kritérium teljesült; az **AC-9.1** (zöld CI a GitHubon) a push után, az **AC-9.10** (release, DOI) a jóváhagyás és a Zenodo-kapcsoló után zár |
+| **Státusz** | **Kiadásra kész.** 9 / 10 kritérium teljesült (az AC-9.1 és az AC-9.2 GitHub-oldali része a push után igazolva); csak az **AC-9.10** (release, DOI) nyitott: a Zenodo-kapcsoló után zár |
 
 ---
 
@@ -19,7 +19,9 @@
 
 | | |
 |---|---|
-| Elfogadási kritériumok | **8 / 10 teljesült**; 2 nyitott (kifelé ható lépések) |
+| Elfogadási kritériumok | **9 / 10 teljesült**; 1 nyitott (AC-9.10: release és DOI, kifelé ható lépés) |
+| GitHub CI a kiadási commiton (`d0c22ce`) | **zöld:** mindkét job sikeres (build–lint–típus–teszt; DOI-validálás); futás: 41450527321 |
+| GitHub licenc-felismerés | `licenseInfo.key` = **`mit`** |
 | Tesztkészlet | **792 teszt: 791 sikeres, 1 kihagyott** (TC-302, `mitiq` nélkül) |
 | Új tesztek a Fázis 9-ben | **20** (`tests/repo/test_publication.py`); a v0.11.0: 772 |
 | Minőségi kapuk | ruff check, ruff format, mypy (strict): tiszta |
@@ -31,8 +33,8 @@
 
 | AC | Teszteset | Eredmény | Bizonyíték |
 |---|---|---|---|
-| AC-9.1 | TC-901 | ⏳ **nyitott:** a hiba javítva (`c9794db`), és mindkét CI-tesztlépés helyben reprodukálva zöld; a GitHubon a **push után** igazolandó | `gh run list` a push után |
-| AC-9.2 | TC-902 | ✅ helyben: a `LICENSE` a kanonikus MIT-törzs, nincs benne GPL/Mitiq/függelék; a `NOTICE` a Mitiq/GPL megjegyzést, a modulútvonalat, a lockot és az ADR-0003-at tartalmazza. ⏳ a GitHub `licenseInfo.key` = `mit` felismerése a push után igazolandó | `test_publication.py` |
+| AC-9.1 | TC-901 | ✅ a hiba javítva (`c9794db`); a GitHub CI **minden jobja zöld** a `d0c22ce` kiadási commiton (futás: 41450527321) | `gh run list`, `gh run view` |
+| AC-9.2 | TC-902 | ✅ helyben: a `LICENSE` a kanonikus MIT-törzs, nincs benne GPL/Mitiq/függelék; a `NOTICE` a Mitiq/GPL megjegyzést, a modulútvonalat, a lockot és az ADR-0003-at tartalmazza. ✅ a GitHub `licenseInfo.key` = `mit` felismerése igazolva | `test_publication.py` |
 | AC-9.3 | TC-903 | ✅ `cffconvert --validate`: „valid according to schema version 1.2.0"; a Zenodo-metaadat: verzió 1.0.0, dátum 2026-11-02, licenc MIT; a `version`/`date-released` a `VERSION`-nel és a `CHANGELOG`-gal egyezik | végrehajtás, `test_publication.py` |
 | AC-9.4 | TC-904 | ✅ `CONTRIBUTING.md`, `SECURITY.md`, 3 issue-sablon-fájl; a README mindkét nyelven hivatkozik rájuk | `test_publication.py` |
 | AC-9.5 | TC-905 | ✅ „Röviden" / „In short" blokk, háromparancsos gyors indítás HU és EN, példa kimenet, CI-jelvény | `test_publication.py` |
@@ -75,7 +77,7 @@ A README „Gyors kipróbálás" parancsait **szó szerint** futtattuk egy tiszt
 |---|---|---|
 | L1 | **A „külső személy" az asszisztens volt, ugyanazon a gépen** (TC-908) | független személy próbája nem volt; a Fázis 10 első lépése lehet |
 | L2 | A Zenodo felülete és a DOI-kiosztás nem volt ellenőrizhető | a `09_publishing.md` 2. pontja emlékezetből készült, ezt jelöli |
-| L3 | A GitHub-oldali licenc-felismerés és a zöld CI csak a push után igazolható | AC-9.1, AC-9.2 |
+| L3 | ~~A GitHub-oldali licenc-felismerés és a zöld CI csak a push után igazolható~~ | **igazolva** a push után (AC-9.1, AC-9.2) |
 | L4 | **Eldöntve (D4):** a Zenodo-rekord szerzője csak Kormos Attila; az AI a README/dokumentumok „Készítők" soraiban és a `LICENSE` szerzői sorában marad | a `LICENSE` szerzői sorának egységesítése külön döntés |
 | L5 | A README példa kimenete a program magyar nyelvű kimenete | az angol szakasz ezt jelzi |
 | L6 | Nincs böngészős képernyőkép a README-ban | TR-F07 L1 |
