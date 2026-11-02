@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | **Fázis** | 7 |
-| **Dokumentum-verzió** | 1.0.0 |
+| **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **Terv — a megvalósítás nem kezdődött el.** A 7. fejezet döntései jóváhagyásra várnak |
+| **Státusz** | **Megvalósítás alatt** — a 0. lépés és a 7.1, 7.2 lépés kész; a 7.3 és 7.4 hátra van. A 7. fejezet döntései az alapértelmezésekkel jóváhagyva |
 | **Célverzió** | `v0.10.0` |
 | **Előzmény** | [`phase_06.md`](phase_06.md), [`00_master_plan.md`](00_master_plan.md) 7. fejezet, v0.9.0 ([`CHANGELOG`](../../CHANGELOG.md)) |
 | **Új ADR** | [`ADR-0009`](../adr/ADR-0009-dashboard-architektura.md) — Streamlit + Plotly, tiszta adat- és ábraréteg, csak olvasás |
@@ -39,8 +39,9 @@ belső lépés egyenként, (D) a hibák megjelenítése.
 | # | Kérdés | Mérés | Következmény |
 |---|---|---|---|
 | M1 | Telepíthető-e a Streamlit a pinelt stack mellé? | `pip install --dry-run streamlit plotly -c requirements.lock`: 26 új csomag, **a numerikus stack (numpy, scipy, qiskit, pandas) érintetlen** | Telepíthető |
-| M2 | Működik-e is? | **Nem:** a Streamlit a `pyarrow 26.0.0`-t húzza be, az **NumPy ≥ 2.0-t követel** (`ImportError`), így az `st.dataframe` a `numpy 1.26.4` mellett elbukik. A pip feloldója ezt **nem jelzi** (futásidejű hiba) | Új kényszer: **`pyarrow==25.0.0`** |
-| M3 | Melyik `pyarrow` jó? | 19.0.1 … 25.0.0 mind működik `numpy 1.26.4` mellett; a 26.0.0 nem | A pin a legfrissebb működő (25.0.0); ezzel a feloldó Streamlit **1.59.1**-et választ |
+| M2 | Működik-e is? | **Nem:** a Streamlit a `pyarrow 26.0.0`-t húzza be, az **NumPy ≥ 2.0-t követel** (`ImportError`), így az `st.dataframe` a `numpy 1.26.4` mellett elbukik. A pip feloldója ezt **nem jelzi** (futásidejű hiba) | Új kényszer a `pyarrow` pinjére |
+| M3 | Melyik `pyarrow` jó? | **Első (hibás) mérés:** 19.0.1 … 25.0.0 működik, mert csak táblát hoztam létre. **Javítva, lásd M9** | A pin végül **`pyarrow==24.0.0`**; ezzel a feloldó Streamlit **1.59.1**-et választ |
+| M9 | Összeomlik-e valami szálváltás után? | **Igen, a `pyarrow 25.0.0`:** ha egy script-futásban `st.dataframe` fut, a következő futás (a Streamlit minden futást új szálban végez) első `pyarrow.compute`-hívása (a pandas `Series.unique()`-ja az új `str` oszloptípuson) **szegmentációs hibával** (exit 139) leáll. A 16.1.0 … 24.0.0 mind rendben van. Valószínű ok (nem bizonyított): az alapértelmezett `mimalloc` memóriakezelő; mérve: `ARROW_DEFAULT_MEMORY_POOL=mimalloc` összeomlik, `=system` és `=jemalloc` nem | Élesben a szerver leállna a felhasználó második kattintásánál. Védő teszt: `test_dashboard_pyarrow_guard.py` (alfolyamatban) |
 | M4 | Tesztelhető-e fej nélkül? | `streamlit.testing.v1.AppTest`: widgetváltás (`selectbox`) újrafuttatja az appot, a `metric` és `dataframe` frissül; 0.23 s/futás | A belső lépések automatikusan tesztelhetők; a JS-ben renderelt Plotly-t **nem**, ezért az ábrákat adatszinten teszteljük |
 | M5 | Betartatja-e a build a `requirements.lock`-ot? | **Nem.** A Dockerfile csak a `requirements.txt`-t (közvetlen pinek) telepíti; egy most épített image a 71 lockolt csomagból **21-ben eltér** (pl. `pillow` 12.3.0 ↔ 13.0.0, `certifi`, `pydantic`, `cryptography`). A numerikus stack (numpy, scipy, qiskit, aer, pyscf) azonos | A reprodukálhatósági ígéret (ADR-0001) nem teljesül a tranzitív rétegen; lásd 0. lépés |
 | M6 | Hasonló-e a hiba a lockon kívüli telepítésnél? | A lockkal telepítve a pip figyelmeztet: `ibm-cloud-sdk-core 3.28.1` (az image-ben) `python_dateutil>=3.0.0`-t kér, a lock 2.9.0.post0-t pinel | Az eltérés konkrét következménye; a 0. lépés megszünteti |
@@ -58,7 +59,7 @@ Unreleased).
 | # | Cél | Szállítandó |
 |---|---|---|
 | G0 | Reprodukálható build | a Docker-build a `requirements.lock`-ot **kényszerként** használja (`-c`); a lock újragenerálva a dashboard-függőségekkel |
-| G1 | Függőségek | `requirements-dashboard.txt`: `streamlit`, `plotly`, `pyarrow==25.0.0` (indok a fájlban); a numerikus stack változatlan |
+| G1 | Függőségek | `requirements-dashboard.txt`: `streamlit`, `plotly`, `pyarrow==24.0.0` (indok a fájlban); a numerikus stack változatlan |
 | G2 | Adatréteg | `vqebd.dashboard.data`: három forrás egységes `DataFrame`-be; levezetett oszlopok (hiba mHa-ban, módszer-címke, kémiai pontosság, qubitszám) |
 | G3 | Ábrarétegek | `vqebd.dashboard.figures`: tiszta függvények, amelyek Plotly-ábrát adnak, az UI-tól függetlenül tesztelhetők |
 | G4 | UI | `dashboard/app.py` (vékony belépő) + `vqebd.dashboard.app`: oldalsáv (adatforrás, szűrők), négy nézet |
@@ -138,7 +139,7 @@ Minden lépés **külön commit**; a következő lépés az előző összes tesz
 | # | Kritérium | Ellenőrzés |
 |---|---|---|
 | **AC-7.1** | A Docker-build a lockot betartatja: egy frissen épített image `pip freeze`-e a lockkal **0 eltérést** mutat | végrehajtás |
-| **AC-7.2** | A dashboard-függőségekkel a numerikus stack változatlan (numpy, scipy, qiskit, pandas), és az `st.dataframe` működik (`pyarrow 25.0.0`) | teszt + végrehajtás |
+| **AC-7.2** | A dashboard-függőségekkel a numerikus stack változatlan (numpy, scipy, qiskit, pandas), az `st.dataframe` működik, és a **második script-futás nem omlik össze** (`pyarrow 24.0.0`, M9) | teszt + végrehajtás |
 | **AC-7.3** | **7.1:** az app elindul (`AppTest`, kivétel nélkül), a táblázat és a Hibák fül pontosan a fixture rekordjait mutatja | integrációs teszt |
 | **AC-7.4** | Az adatréteg ugyanarra a rekordra azonos levezetett oszlopokat ad mindhárom forrásból (SQLite, batch-export, teljes lista) | keresztvalidáció |
 | **AC-7.5** | **7.2:** molekulaváltásra az ábra pontjai a kiválasztott molekuláéra változnak (a Full CI-görbével együtt) | egység- + integrációs teszt |
@@ -200,5 +201,6 @@ CHANGELOG, `v0.10.0`; minőségi kapuk (ruff, mypy strict, teljes tesztkészlet)
 | Verzió | Dátum | Változás |
 |---|---|---|
 | 1.0.0 | 2026-11-02 | Első változat, a függőségi és adatelőmérés (2. fejezet) alapján |
+| 1.1.0 | 2026-11-02 | **Javítás (M9):** a `pyarrow==25.0.0` pin hibás volt; a 25.0.0 szálváltás után szegmentációs hibával omlik össze, a helyes pin 24.0.0. Az első mérés (M3) csak táblát hozott létre, a `pyarrow.compute`-ot és a szálváltást nem tesztelte |
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*

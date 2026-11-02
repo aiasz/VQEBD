@@ -8,23 +8,33 @@
 #
 # A tranzitív réteget a requirements.lock rögzíti.
 #
-# MÉRT KÉNYSZER (2026-11-02, docs/plan/phase_07.md 2. fejezet, M2–M3):
+# MÉRT KÉNYSZEREK (2026-11-02, docs/plan/phase_07.md 2. fejezet, M2, M3, M9):
 #
-#   A Streamlit a `pyarrow 26.0.0`-t húzza be, amely NumPy >= 2.0-t követel. A
-#   projekt `numpy==1.26.4`-re van rögzítve (a Mitiq miatt, ADR-0001), így az
-#   `st.dataframe` futásidőben elbukik:
+#   1. A Streamlit a `pyarrow 26.0.0`-t húzza be, amely NumPy >= 2.0-t követel. A
+#      projekt `numpy==1.26.4`-re van rögzítve (a Mitiq miatt, ADR-0001), így az
+#      `st.dataframe` futásidőben elbukik:
 #
-#       ImportError: pyarrow requires NumPy 2.0 or newer, found 1.26.4
+#          ImportError: pyarrow requires NumPy 2.0 or newer, found 1.26.4
 #
-#   A pip feloldója ezt NEM jelzi (a pyarrow nem deklarál numpy-függést). A
-#   pyarrow 19.0.1 ... 25.0.0 mind működik numpy 1.26.4 mellett; a 26.0.0 nem.
-#   Ezért a pin: a legfrissebb működő kiadás. A pyarrow pinje mellett a feloldó a
-#   Streamlit 1.59.1-et választja.
+#      A pip feloldója ezt NEM jelzi (a pyarrow nem deklarál numpy-függést).
 #
-# Ha valaki a pyarrow pinjét emeli, az `AppTest`-alapú dashboard-tesztek
-# (tests/integration/test_dashboard_app.py) azonnal jelzik az ütközést.
+#   2. A `pyarrow 25.0.0` SZEGMENTÁCIÓS HIBÁVAL omlik össze (exit 139): ha egy
+#      script-futásban `st.dataframe` fut, a KÖVETKEZŐ futás (a Streamlit minden
+#      futást új szálban végez) első `pyarrow.compute`-hívása (pl. a pandas
+#      `Series.unique()`-ja az új `str` oszloptípuson) elbukik. Valószínű ok (nem
+#      bizonyított): a 25.0.0 alapértelmezett mimalloc memóriakezelője a szál
+#      megszűnése után; mérve: ARROW_DEFAULT_MEMORY_POOL=mimalloc összeomlik,
+#      =system és =jemalloc nem. Élesben ez a
+#      szerver leállását jelentené a felhasználó második kattintásánál.
+#
+#   A pyarrow 16.1.0 ... 24.0.0 mind működik numpy 1.26.4 mellett ebben a
+#   kétfutásos próbában; a 25.0.0 és a 26.0.0 nem. Ezért a pin: a legfrissebb
+#   MŰKÖDŐ kiadás, a 24.0.0.
+#
+# Ha valaki a pyarrow pinjét emeli, a tests/integration/test_dashboard_pyarrow_guard.py
+# (alfolyamatban futó kétfutásos AppTest) azonnal jelzi az összeomlást.
 # =============================================================================
 
 streamlit==1.59.1        # a pyarrow-pin mellett a feloldó ezt választja; headless teszt: streamlit.testing.v1.AppTest
 plotly==7.1.0            # interaktív ábrák (ADR-0009, 2. döntés)
-pyarrow==25.0.0          # a legfrissebb, numpy 1.26.4-gyel működő kiadás (lásd fent)
+pyarrow==24.0.0          # a legfrissebb, numpy 1.26.4-gyel és szálváltással is működő kiadás (lásd fent)

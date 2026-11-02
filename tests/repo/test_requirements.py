@@ -161,16 +161,21 @@ def test_dashboard_pins_are_in_the_lock_with_the_same_version(
         )
 
 
-def test_pyarrow_stays_numpy1_compatible(
+def test_pyarrow_stays_on_the_measured_working_range(
     dashboard_pins: dict[str, str], locked_pins: dict[str, str]
 ) -> None:
-    """M2/M3 (phase_07.md): a pyarrow 26.0.0 NumPy >= 2-t követel, a projekt numpy 1.26.4-en van.
+    """M2/M3/M9 (phase_07.md): a pyarrow >= 26 NumPy >= 2-t követel, a 25.0.0 pedig szálváltás után
+    szegmentációs hibával összeomlik; a projekt numpy 1.26.4-en van.
 
-    A pin emelésekor az ``AppTest``-alapú teszt jelez, de ez az őr olcsó és azonnali.
+    A pin emelésekor a ``test_dashboard_pyarrow_guard`` (alfolyamatban futó AppTest) is jelez, de
+    ez az őr olcsó és azonnali.
     """
-    major = int(dashboard_pins["pyarrow"].split(".")[0])
     assert locked_pins["numpy"].startswith("1."), "a numpy 2.x-re váltás újraértékelendő (ADR-0001)"
-    assert major <= 25, "a pyarrow >= 26 NumPy >= 2-t követel (mérve: phase_07.md 2. fejezet)"
+    major, minor = (int(part) for part in dashboard_pins["pyarrow"].split(".")[:2])
+    assert (major, minor) <= (24, 0), (
+        "a pyarrow 25.0.0 szegmentációs hibával omlik össze, a >= 26 NumPy >= 2-t követel "
+        "(mérve: phase_07.md 2. fejezet, M2/M9)"
+    )
 
 
 def test_dockerfile_enforces_the_lock_as_constraints(repo_root: Path) -> None:

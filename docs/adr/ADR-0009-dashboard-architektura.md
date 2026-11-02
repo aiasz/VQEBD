@@ -19,7 +19,9 @@ A dashboardnak három olyan korlátja van, amelyet a mérés tárt fel:
 
 1. **Rögzített numerikus stack.** `numpy 1.26.4` (a Mitiq miatt, ADR-0001). A Streamlit a `pyarrow
    26.0.0`-t húzza be, amely NumPy ≥ 2-t követel; a hiba **futásidejű**, a pip feloldója nem jelzi
-   (M2). Ugyanaz a hibatípus, mint a Mitiq/`ply` eset.
+   (M2). Ugyanaz a hibatípus, mint a Mitiq/`ply` eset. Ráadásul a `pyarrow 25.0.0` **szegmentációs
+   hibával** omlik össze szálváltás után (M9), tehát a „legfrissebb numpy 1.x-szel induló" verzió
+   sem jó.
 2. **Az adat nem mindig adatbázis.** Egy tiszta klónon csak a verziózott JSON-exportok vannak meg
    (M7 és `phase_07.md` 1.); a körméret pedig sehol nincs tárolva.
 3. **A Streamlit-appot nehéz tesztelni**, ha a logika benne él; az `AppTest` fej nélkül fut, de a JS
@@ -54,8 +56,9 @@ teszt őrzi (az adatbázisfájl bitre változatlan).
 
 ### 5. A függőségek a lockkal együtt, a `pyarrow` pinelve
 
-`requirements-dashboard.txt`: `streamlit`, `plotly`, **`pyarrow==25.0.0`** (a legfrissebb, amely még
-NumPy 1.x-szel működik; mérve 19.0.1…25.0.0, a 26.0.0 nem). A Docker-build a `requirements.lock`-ot
+`requirements-dashboard.txt`: `streamlit`, `plotly`, **`pyarrow==24.0.0`** (a legfrissebb, amely
+NumPy 1.x-szel **és** szálváltás után is működik; mérve 16.1.0…24.0.0 rendben, a 25.0.0 összeomlik,
+a 26.0.0 NumPy ≥ 2-t követel). A Docker-build a `requirements.lock`-ot
 **kényszerként** használja (`-c`), mert a lock jelenleg nincs betartatva: egy frissen épített image a
 71 lockolt csomagból 21-ben eltér (M5).
 
@@ -64,10 +67,11 @@ NumPy 1.x-szel működik; mérve 19.0.1…25.0.0, a 26.0.0 nem). A Docker-build 
 - **Pozitív:** a dashboard logikája gyorsan és mypy-védetten tesztelhető; egy tiszta klónon is van
   megjeleníthető adat; a build reprodukálható; a dashboard nem rongálhat adatot.
 - **Negatív:** a `pyarrow` pin nem szokványos (a hiba okát az `requirements-dashboard.txt`
-  magyarázza); a lock újragenerálása minden függőségváltásnál kell; a vizuális megjelenés nincs
+  magyarázza; a védelem egy alfolyamatban futó teszt); a lock újragenerálása minden függőségváltásnál kell; a vizuális megjelenés nincs
   automatikusan ellenőrizve.
-- **Kockázat:** a `pyarrow==25.0.0` pin idővel ütközhet egy újabb Streamlit-tel; a Streamlit 1.59.1 a
-  mért feloldás. A körméret levezetése a VQEBD alapértelmezett leképezésére épül; más leképezésű
+- **Kockázat:** a `pyarrow==24.0.0` pin idővel ütközhet egy újabb Streamlit-tel; a Streamlit 1.59.1 a
+  mért feloldás. **Az első mérésem (25.0.0 „működik") hibás volt**, mert csak táblát hozott létre;
+  a szálváltás utáni `pyarrow.compute`-hívás (M9) csak a 7.2 lépés `AppTest`-jében bukott ki. A körméret levezetése a VQEBD alapértelmezett leképezésére épül; más leképezésű
   rekordnál (ha az export nem hordozza a `mapper`-t) a `size_assumed` jelzi a feltevést.
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
