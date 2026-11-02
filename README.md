@@ -2,9 +2,9 @@
 
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-0.8.0-blue.svg)](CHANGELOG.md)
+[![Verzió](https://img.shields.io/badge/verzió-0.8.1-blue.svg)](CHANGELOG.md)
 [![Fázis](https://img.shields.io/badge/fázis-5%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-528%20zöld-brightgreen.svg)](docs/testing/TR-F05_batch.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-536%20zöld-brightgreen.svg)](docs/testing/TR-F05_batch.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -22,7 +22,7 @@
 ### ⚠️ A projekt állapota
 
 Ez a projekt **fejlesztés alatt áll**, lépcsőzetes fázisokban.
-Jelenlegi állapot: **Fázis 5 lezárva (`v0.8.0`)** — a VQE-mag működik
+Jelenlegi állapot: **Fázis 5 lezárva (`v0.8.1`)** — a VQE-mag működik
 három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
@@ -54,7 +54,7 @@ Mitiq-kel keresztvalidálva), és strukturált SQLite adattárolással (`vqebd.s
 | **2** | **Egyszeri futás valódi IBM-hardveren (`ibm_kingston` Heron QPU, L5)** | ✅ **Lezárva** (`v0.5.0`) |
 | **3** | **Hibaenyhítés (ISA ZNE + Mitiq keresztvalidáció, L4)** | ✅ **Lezárva** (`v0.6.0`) |
 | **4** | **Adatséma és perzisztens tárolás (SQLite / CSV / JSON)** | ✅ **Lezárva** (`v0.7.0`) |
-| **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | ✅ **Lezárva** (`v0.8.0`) |
+| **5** | **Batch futtatás, aktív tér (LiH, BeH2), statisztika** | ✅ **Lezárva** (`v0.8.1`) |
 | 6 | Automatizálás és ütemezés | ⬜ Tervezett |
 | 7 | Streamlit dashboard | ⬜ Tervezett |
 | 8 | Teljes konténerizáció | ⬜ Tervezett |
@@ -242,20 +242,20 @@ Részletek: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (529 teszt, 1 kihagyott)
+make test       # teljes tesztkészlet (537 teszt, 1 kihagyott)
 ```
 
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:0.8.0 python -m vqebd
+docker run --rm vqebd:0.8.1 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.0 .
-docker run --rm vqebd:0.8.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.1 .
+docker run --rm vqebd:0.8.1 python -m vqebd
 ```
 
 Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)**
@@ -355,7 +355,7 @@ konvenciót követik.
 ### ⚠️ Project Status
 
 This project is **under active development**, in staged phases.
-Current status: **Phase 5 completed (`v0.8.0`)** — the VQE core
+Current status: **Phase 5 completed (`v0.8.1`)** — the VQE core
 works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5), ISA-level Zero-Noise Extrapolation error
@@ -389,7 +389,7 @@ mitigation (L4, cross-validated against Mitiq), and structured SQLite storage
 | **2** | **Single run on real IBM hardware (`ibm_kingston` Heron QPU, L5)** | ✅ **Completed** (`v0.5.0`) |
 | **3** | **Error mitigation (ISA ZNE + Mitiq cross-validation, L4)** | ✅ **Completed** (`v0.6.0`) |
 | **4** | **Data schema and persistent storage (SQLite / CSV / JSON)** | ✅ **Completed** (`v0.7.0`) |
-| **5** | **Batch runs, active space (LiH, BeH2), statistics** | ✅ **Completed** (`v0.8.0`) |
+| **5** | **Batch runs, active space (LiH, BeH2), statistics** | ✅ **Completed** (`v0.8.1`) |
 | 6 | Automation and scheduling | ⬜ Planned |
 | 7 | Streamlit dashboard | ⬜ Planned |
 | 8 | Full containerization | ⬜ Planned |
@@ -580,20 +580,20 @@ Details: [`docs/05_batch.md`](docs/05_batch.md), [`TR-F05`](docs/testing/TR-F05_
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (529 tests, 1 skipped)
+make test       # full test suite (537 tests, 1 skipped)
 ```
 
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:0.8.0 python -m vqebd
+docker run --rm vqebd:0.8.1 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.0 .
-docker run --rm vqebd:0.8.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:0.8.1 .
+docker run --rm vqebd:0.8.1 python -m vqebd
 ```
 
 Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)**

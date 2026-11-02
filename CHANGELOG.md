@@ -11,6 +11,17 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Tervezett
+- **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
+- **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
+
+---
+
+## [0.8.1] — 2026-11-02
+
+**Kvótavédelem a hardveres VQE-útvonalon (K7) és a hardveres H₂ görbe (5.H).**
+Nincs séma- vagy API-törés; a szimulátoros útvonal számítása nem változott. Tesztkészlet: 537 teszt, 536 sikeres, 1 kihagyott (TC-302, `mitiq` nélkül).
+
 ### Hozzáadva
 - **Fázis 5.H — H₂ disszociációs görbe valódi QPU-n** (`ibm_kingston`, 5 geometria,
   8192 lövés, θ* a zajmentes optimumból; 2 job, **57 QPU-s** a 600 s-ból).
@@ -41,13 +52,6 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
   **Következmény:** az alapértelmezett `--maxiter 300` hardveren elutasításra kerül
   (300 × 15 s > 600 s); a hardveres futáshoz kis `--maxiter` kell.
   Tesztek: `tests/unit/test_hardware_guard.py` (7 új).
-- **A `--dry-run` nem tud kvótát lekérdezni lejárt tokennel** (2026-11-02: HTTP 403 az
-  `instances/usage` végponton). A hibaüzenet a tokencserét javasolja; a szkript
-  nem küld be semmit.
-
-### Tervezett
-- **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
-- **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
 
 ---
 
@@ -58,7 +62,7 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 A fázis lezárult: mind a 10 elfogadási kritérium teljesült
 ([`TR-F05`](docs/testing/TR-F05_batch.md)); 529 teszt, ebből 528 sikeres és 1
 kihagyott (TC-302, a `mitiq` nélkül). A hardveres H₂ PES (5.H) **nem** része a
-kiadásnak (lásd *Tervezett*).
+kiadásnak; a v0.8.1-ben pótolva.
 
 ### Hozzáadva
 - **Aktív tér:** `ActiveSpaceSpec`, `energy_offset` (magtaszítás + inaktív energia),
@@ -126,9 +130,8 @@ kiadásnak (lásd *Tervezett*).
   a 2026-09-23-i keretet).
 
 ### Elhalasztva
-- **5.H — hardveres H₂ PES:** jóváhagyva, de az IBM-kvóta kimerült (630/600 s) és a
-  kvóta-előellenőrzés megtagadta a beküldést, **job nem keletkezett**. A
-  kvóta-ablak 2026-10-21 óta nyitva van; a mérés még nem futott.
+- **5.H — hardveres H₂ PES:** az IBM-kvóta kimerült (630/600 s), a kvóta-előellenőrzés
+  megtagadta a beküldést, **job nem keletkezett**. A mérés a v0.8.1-ben futott le.
 
 ---
 
