@@ -11,7 +11,7 @@
 | **Tesztterv** | [`TP-F09`](TP-F09_publikalas.md) |
 | **Terv** | [`phase_09.md`](../plan/phase_09.md) · [`docs/09_publishing.md`](../09_publishing.md) |
 | **Kódállapot** | `vqebd` 1.0.0 |
-| **Státusz** | **Kiadásra kész.** 9 / 10 kritérium teljesült (az AC-9.1 és az AC-9.2 GitHub-oldali része a push után igazolva); csak az **AC-9.10** (release, DOI) nyitott: a Zenodo-kapcsoló után zár |
+| **Státusz** | **Lezárva — mind a 10 elfogadási kritérium teljesült.** A `v1.0.0` GitHub Release és a Zenodo-archívum létrejött; DOI: `10.5281/zenodo.23886002` (koncepció), `10.5281/zenodo.23886003` (verzió) |
 
 ---
 
@@ -19,7 +19,9 @@
 
 | | |
 |---|---|
-| Elfogadási kritériumok | **9 / 10 teljesült**; 1 nyitott (AC-9.10: release és DOI, kifelé ható lépés) |
+| Elfogadási kritériumok | **10 / 10 teljesült** |
+| Kiadás | GitHub Release `v1.0.0` (a `d0c22ce` commiton); Zenodo-rekord: <https://zenodo.org/records/23886003>; szerzők: Kormos, Attila; licenc: MIT |
+| DOI | koncepció: `10.5281/zenodo.23886002`; verzió: `10.5281/zenodo.23886003`; mindkettő feloldódik (HTTP 302 a `doi.org`-ról) |
 | GitHub CI a kiadási commiton (`d0c22ce`) | **zöld:** mindkét job sikeres (build–lint–típus–teszt; DOI-validálás); futás: 41450527321 |
 | GitHub licenc-felismerés | `licenseInfo.key` = **`mit`** |
 | Tesztkészlet | **792 teszt: 791 sikeres, 1 kihagyott** (TC-302, `mitiq` nélkül) |
@@ -42,7 +44,7 @@
 | AC-9.7 | TC-907 | ✅ a README két kulcsverzió-táblázata (14 csomag) azonos egymással és a lockkal | `test_publication.py` |
 | AC-9.8 | TC-908 | ✅ tiszta klónból a README parancsai szó szerint (3. pont) | végrehajtás |
 | AC-9.9 | TC-909 | ✅ a `VERSION`, a `CITATION.cff`, a Compose-címkék (3), a BibTeX (HU és EN) és a dokumentumok verziója 1.0.0; a `docs/09_publishing.md` megvan | `test_version_consistency.py`, `test_publication.py` |
-| AC-9.10 | TC-910 | ⏳ **nyitott:** a GitHub Release `v1.0.0` és a Zenodo-DOI jóváhagyásra, ill. a felhasználó Zenodo-kapcsolójára vár | `docs/09_publishing.md` |
+| AC-9.10 | TC-910 | ✅ a GitHub Release `v1.0.0` létrejött; a Zenodo a release-t archiválta; a DOI-k (`10.5281/zenodo.23886002`, `10.5281/zenodo.23886003`) beírva a `CITATION.cff`-be és a README-ba (HU és EN, jelvénnyel) | `gh release view`, Zenodo API, `docs/09_publishing.md` |
 
 ## 3. A README-alapú telepítés (AC-9.8)
 

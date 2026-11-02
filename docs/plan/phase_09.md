@@ -5,7 +5,7 @@
 | **Fázis** | 9 |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **Kiadásra kész (2026-11-02)** — a helyi munka a `v1.0.0`-ig kész: [`TR-F09`](../testing/TR-F09_publikalas.md). **Az AC-9.1 (zöld CI a GitHubon) a push után, az AC-9.10 (release, DOI) a felhasználó jóváhagyása és a Zenodo-kapcsoló után zár** (5. fejezet) |
+| **Státusz** | **Megvalósítva és lezárva (2026-11-02)** — mind a 10 elfogadási kritérium teljesült: [`TR-F09`](../testing/TR-F09_publikalas.md). A `v1.0.0` GitHub Release és a Zenodo-archívum létrejött, DOI: `10.5281/zenodo.23886002` |
 | **Célverzió** | `v1.0.0` (a mesterterv 8.1: „Fázis 9 lezárva = első publikált release, DOI") |
 | **Előzmény** | [`phase_08.md`](phase_08.md), [`00_master_plan.md`](00_master_plan.md) 7–8. fejezet, v0.11.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
@@ -117,8 +117,7 @@ Ez a fázis az eddigiektől két ponton tér el:
 
 ## 8. Kilépési feltétel
 
-AC-9.1 … AC-9.10 teljesül; TP-F09 és TR-F09 elkészült; `v1.0.0`; a DOI beírva. **Ha a DOI a felhasználó
-Zenodo-beállítására vár, a fázis „kiadva, DOI függőben” állapotban van**, és az AC-9.10 második fele a DOI beérkezésekor zár.
+AC-9.1 … AC-9.10 teljesül; TP-F09 és TR-F09 elkészült; `v1.0.0`; a DOI beírva (**teljesült**, 2026-11-02).
 
 ---
 

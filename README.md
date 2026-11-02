@@ -1,10 +1,11 @@
 # VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard
 
 [![CI](https://github.com/aiasz/VQEBD/actions/workflows/ci.yml/badge.svg)](https://github.com/aiasz/VQEBD/actions/workflows/ci.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23886002.svg)](https://doi.org/10.5281/zenodo.23886002)
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![Verzió](https://img.shields.io/badge/verzió-1.0.0-blue.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-8%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Fázis](https://img.shields.io/badge/fázis-9%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
 [![Tesztek](https://img.shields.io/badge/tesztek-791%20zöld-brightgreen.svg)](docs/testing/TR-F09_publikalas.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
@@ -120,7 +121,7 @@ pontosságot (`TR-F05`), a hardveres görbén csak egy pont egyeztethető vele (
 | **6** | **Automatizálás, hibatárolás, ütemezés** | ✅ **Lezárva** (`v0.9.0`) |
 | **7** | **Streamlit dashboard** | ✅ **Lezárva** (`v0.10.0`) |
 | **8** | **Konténeres rendszer, a dashboard egyparancsos indítása** | ✅ **Lezárva** (`v0.11.0`) |
-| **9** | **Dokumentáció, validálás, publikálás (Zenodo DOI)** | 🔄 **Kiadásra kész** (`v1.0.0`) — a release és a DOI jóváhagyásra, ill. a Zenodo-kapcsolóra vár |
+| **9** | **Dokumentáció, validálás, publikálás (Zenodo DOI)** | ✅ **Lezárva** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Közösségi visszacsatolás | ⬜ Tervezett |
 
 ### Mit old meg ez a projekt?
@@ -476,7 +477,9 @@ külön biztonsági kapcsoló védi: `VQEBD_ALLOW_HARDWARE=false` az alapértelm
 ### Hivatkozás
 
 Ha a projektet használod, hivatkozz rá a [`CITATION.cff`](CITATION.cff) szerint (GitHub: *Cite this repository*).
-A **Zenodo DOI** a `v1.0.0` kiadás után kerül ide ([`docs/09_publishing.md`](docs/09_publishing.md)).
+**Zenodo DOI:** [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) (a projekt minden verziójára;
+a `v1.0.0` pontos pillanatképe: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)).
+A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
 
 ```bibtex
 @software{vqebd,
@@ -605,7 +608,7 @@ limitations are stated openly in the test reports, e.g.: no noisy-simulation con
 | **6** | **Automation, failure storage, scheduling** | ✅ **Completed** (`v0.9.0`) |
 | **7** | **Streamlit dashboard** | ✅ **Completed** (`v0.10.0`) |
 | **8** | **Container system, one-command dashboard launch** | ✅ **Completed** (`v0.11.0`) |
-| **9** | **Documentation, validation, publication (Zenodo DOI)** | 🔄 **Ready to release** (`v1.0.0`) — the release and the DOI await approval and the Zenodo switch |
+| **9** | **Documentation, validation, publication (Zenodo DOI)** | ✅ **Completed** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Community feedback | ⬜ Planned |
 
 ### What Does This Project Solve?
@@ -967,7 +970,9 @@ by default. Reporting a vulnerability: [`SECURITY.md`](SECURITY.md).
 ### Citation
 
 If you use this project, please cite it according to [`CITATION.cff`](CITATION.cff) (GitHub: *Cite this repository*).
-The **Zenodo DOI** will be added here after the `v1.0.0` release ([`docs/09_publishing.md`](docs/09_publishing.md), in Hungarian).
+**Zenodo DOI:** [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) (all versions; the exact `v1.0.0`
+snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). The release procedure:
+[`docs/09_publishing.md`](docs/09_publishing.md) (in Hungarian).
 
 ```bibtex
 @software{vqebd,
