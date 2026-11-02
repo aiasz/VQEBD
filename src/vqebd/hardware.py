@@ -9,6 +9,12 @@ szkript beküldés **előtt**:
 2. lekérdezi a kvótaállást (``QiskitRuntimeService.usage()``, csak olvasás), és
    megtagadja a beküldést, ha a becsült igény nem fér bele.
 
+A VQE-útvonalra (``run_vqe``, ``python -m vqebd --backend ibm_qpu``) ugyanez
+érvényes, kiegészítve **kiértékelési kerettel**: az optimalizáló nem küldhet be
+több jobot, mint amennyit a kvóta-előellenőrzés fedezett. Mért eset (2026-09-23):
+a védelem nélküli útvonal 42 jobot küldött be, 15 QPU-s jobonként, és ezzel
+elfogyasztotta a teljes keretet.
+
 Mért eset (2026-09-25): 630 / 600 s felhasználva, ``usage_limit_reached = true``,
 újra elérhető 2026-10-21 — a Fázis 5 hardveres kiegészítése ezért elhalasztva.
 
@@ -23,13 +29,21 @@ from collections.abc import Mapping
 from typing import Any
 
 __all__ = [
+    "QPU_SECONDS_PER_EVALUATION",
+    "EvaluationBudgetExceededError",
     "HardwareNotAllowedError",
     "QuotaExhaustedError",
     "assert_hardware_allowed",
     "assert_quota_available",
     "connect_service",
+    "guard_hardware_vqe",
     "quota_summary",
 ]
+
+QPU_SECONDS_PER_EVALUATION = 15.0
+"""Egy kiértékelés (egy job) számlázott QPU-ideje, mp. Mérve: a 2026-09-23-i 41
+lefutott VQE-job mindegyike pontosan 15 s volt (``ibm_kingston``, H₂, 8192 lövés).
+Nagyobb áramkörnél ez alsó becslés; a kemény kiértékelési keret ezt nem függeti."""
 
 
 class HardwareNotAllowedError(PermissionError):
@@ -38,6 +52,10 @@ class HardwareNotAllowedError(PermissionError):
 
 class QuotaExhaustedError(RuntimeError):
     """A hátralévő QPU-kvóta nem elég a tervezett futáshoz."""
+
+
+class EvaluationBudgetExceededError(RuntimeError):
+    """Az optimalizáló több kiértékelést kért, mint a kvóta-előellenőrzés fedezett."""
 
 
 def assert_hardware_allowed() -> None:
@@ -102,3 +120,38 @@ def connect_service() -> Any:
     if creds.instance:
         kwargs["instance"] = creds.instance
     return QiskitRuntimeService(**kwargs)
+
+
+def guard_hardware_vqe(max_evaluations: int, *, service: Any | None = None) -> float:
+    """Beküldés előtti védelem egy hardveres VQE-futásra.
+
+    Sorrend: (1) engedély — hálózati hívás nélkül; (2) kvóta lekérdezése; (3) a
+    legrosszabb eset (``max_evaluations`` × :data:`QPU_SECONDS_PER_EVALUATION`) a
+    hátralévő kerethez mérve.
+
+    Args:
+        max_evaluations: A futás kiértékeléseinek felső korlátja (optimalizáló +
+            újramintavételezés, ZNE-nél a zajszorzókkal szorozva).
+        service: Opcionális, már csatlakozott szolgáltatás (tesztekhez).
+
+    Returns:
+        A kvótához mért becsült QPU-igény (mp).
+
+    Raises:
+        HardwareNotAllowedError: Ha a ``VQEBD_ALLOW_HARDWARE`` nem ``true``.
+        QuotaExhaustedError: Ha a kvóta nem fedezi a legrosszabb esetet.
+        ValueError: Ha ``max_evaluations`` nem pozitív.
+    """
+    if max_evaluations < 1:
+        raise ValueError(f"a kiértékelési keret legalább 1: {max_evaluations}")
+    assert_hardware_allowed()
+    required = max_evaluations * QPU_SECONDS_PER_EVALUATION
+    usage = quota_summary((service or connect_service()).usage())
+    try:
+        assert_quota_available(usage, required)
+    except QuotaExhaustedError as exc:
+        raise QuotaExhaustedError(
+            f"{exc} — a futás legfeljebb {max_evaluations} kiértékelést kérhet; "
+            "csökkentsd az optimalizáló iterációkorlátját (--maxiter)"
+        ) from exc
+    return required

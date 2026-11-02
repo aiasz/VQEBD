@@ -16,10 +16,13 @@ from qiskit.quantum_info import SparsePauliOp
 
 from vqebd.credentials import IbmCredentials
 from vqebd.hardware import (
+    QPU_SECONDS_PER_EVALUATION,
+    EvaluationBudgetExceededError,
     HardwareNotAllowedError,
     QuotaExhaustedError,
     assert_hardware_allowed,
     assert_quota_available,
+    guard_hardware_vqe,
     quota_summary,
 )
 from vqebd.seeds import SeedSet
@@ -144,3 +147,129 @@ def test_evaluate_observables_submits_one_job_with_all_pubs(
         evaluator.evaluate_observables(ops, [[0.1]])
     with pytest.raises(ValueError, match="qubit"):
         evaluator.evaluate_observables([SparsePauliOp("ZZZ")], [[0.1]])
+
+
+# --- hardveres VQE-útvonal: kvótavédelem és kiértékelési keret (K7) --------------
+
+
+def _service_with(usage: dict[str, Any]) -> MagicMock:
+    service = MagicMock()
+    service.usage.return_value = usage
+    return service
+
+
+def test_guard_vqe_requires_permission_before_any_network(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Engedély nélkül a kvótát sem kérdezzük le: nincs hálózati hívás."""
+    monkeypatch.delenv("VQEBD_ALLOW_HARDWARE", raising=False)
+    service = _service_with({"usage_remaining_seconds": 600, "usage_limit_reached": False})
+    with pytest.raises(HardwareNotAllowedError):
+        guard_hardware_vqe(10, service=service)
+    service.usage.assert_not_called()
+
+
+def test_guard_vqe_refuses_when_worst_case_exceeds_quota(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A 2026-09-23-i eset: 300 kiértékelés × 15 s ≫ 600 s — beküldés előtt megáll."""
+    monkeypatch.setenv("VQEBD_ALLOW_HARDWARE", "true")
+    service = _service_with({"usage_remaining_seconds": 600, "usage_limit_reached": False})
+    with pytest.raises(QuotaExhaustedError, match="--maxiter"):
+        guard_hardware_vqe(300, service=service)
+
+
+def test_guard_vqe_passes_and_returns_requirement(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VQEBD_ALLOW_HARDWARE", "true")
+    service = _service_with({"usage_remaining_seconds": 600, "usage_limit_reached": False})
+    assert guard_hardware_vqe(20, service=service) == 20 * QPU_SECONDS_PER_EVALUATION
+
+
+def test_guard_vqe_rejects_nonpositive_budget(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("VQEBD_ALLOW_HARDWARE", "true")
+    with pytest.raises(ValueError, match="legalább 1"):
+        guard_hardware_vqe(0, service=_service_with({}))
+
+
+class _CountingEvaluator:
+    """Az EnergyEvaluator ``__call__``-keretét tesztelő, hálózatmentes kiértékelő."""
+
+    @staticmethod
+    def build() -> Any:
+        from vqebd.backends.estimators import EnergyEvaluator
+
+        class Dummy(EnergyEvaluator):
+            def __init__(self) -> None:
+                super().__init__(num_qubits=1)
+                self.evaluated = 0
+
+            def evaluate(self, parameters: Any) -> float:
+                self.evaluated += 1
+                return 0.0
+
+            @property
+            def kind(self) -> Any:
+                return "qiskit_statevector"
+
+        return Dummy()
+
+
+def test_evaluator_budget_stops_before_the_extra_evaluation() -> None:
+    """A keret elfogyása után a kiértékelés NEM indul el (QPU-n ez job lenne)."""
+    evaluator = _CountingEvaluator.build()
+    evaluator.max_calls = 3
+    for _ in range(3):
+        evaluator([0.0])
+    with pytest.raises(EvaluationBudgetExceededError, match="keret"):
+        evaluator([0.0])
+    assert evaluator.evaluated == 3
+    assert evaluator.call_count == 3
+
+
+def test_evaluator_without_budget_is_unlimited() -> None:
+    evaluator = _CountingEvaluator.build()
+    assert evaluator.max_calls is None
+    for _ in range(50):
+        evaluator([0.0])
+    assert evaluator.call_count == 50
+
+
+def test_run_vqe_on_qpu_is_guarded_before_any_computation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A ``run_vqe`` hardveres útja engedély nélkül azonnal megáll (K7)."""
+    from vqebd.chemistry.molecule import h2
+    from vqebd.config import OptimizerSpec, VQEConfig
+    from vqebd.vqe.runner import run_vqe
+
+    monkeypatch.delenv("VQEBD_ALLOW_HARDWARE", raising=False)
+    config = VQEConfig(
+        molecule=h2(), backend="ibm_qpu", optimizer=OptimizerSpec(method="COBYLA", maxiter=5)
+    )
+    with (
+        patch("vqebd.backends.estimators.IBMQpuEnergyEvaluator") as evaluator_cls,
+        pytest.raises(HardwareNotAllowedError),
+    ):
+        run_vqe(config, compute_fci=False)
+    evaluator_cls.assert_not_called()
+
+
+def test_run_vqe_on_qpu_budget_includes_reestimate_and_mitigation() -> None:
+    """A legrosszabb eset: maxiter + K × zajszorzók száma (ZNE esetén)."""
+    from vqebd.chemistry.molecule import h2
+    from vqebd.config import MitigationSpec, OptimizerSpec, VQEConfig
+    from vqebd.vqe.runner import run_vqe
+
+    config = VQEConfig(
+        molecule=h2(),
+        backend="ibm_qpu",
+        optimizer=OptimizerSpec(method="COBYLA", maxiter=10),
+        mitigation=MitigationSpec(strategy="zne_local", scale_factors=(1, 3, 5)),
+        reestimate=4,
+    )
+    with (
+        patch("vqebd.vqe.runner.guard_hardware_vqe", side_effect=RuntimeError("stop")) as guard,
+        pytest.raises(RuntimeError, match="stop"),
+    ):
+        run_vqe(config, compute_fci=False)
+    guard.assert_called_once_with(10 + 4 * 3)

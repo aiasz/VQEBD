@@ -245,7 +245,7 @@ optimalizálás annyi jobot küld be, amennyi kiértékelést az optimalizáló 
 | K4 | UCCSD mélységi fal (LiH (2e,3o): +466 mHa zajosan) | mérve | hardverhatékony ansatz (Fázis 6+) |
 | K5 | Az optimalizáló végértéke +2.5 ± 1.0 mHa-val a friss átlag fölött | nyitott | TR-F05-ben kivizsgálni |
 | K6 | 5.H a lezárás előtt vagy után (4. fejezet) | **felhasználói döntés** | — |
-| K7 | A hardveres VQE-útvonal (`run_vqe`, CLI `--backend ibm_qpu`) kvótavédelem és jobszám-korlát nélkül fut — ez fogyasztotta el a keretet | mérve (5.2) | engedély + kvóta-előellenőrzés + kiértékelési keret a `run_vqe`-ben is (felajánlva, jóváhagyásra vár) |
+| K7 | A hardveres VQE-útvonal (`run_vqe`, CLI `--backend ibm_qpu`) kvótavédelem és jobszám-korlát nélkül futott — ez fogyasztotta el a keretet | **javítva (2026-11-02, a v0.8.0 után)** | engedély + kvóta-előellenőrzés + kemény kiértékelési keret a `run_vqe`-ben; lásd CHANGELOG |
 
 ---
 

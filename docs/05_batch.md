@@ -167,17 +167,26 @@ Két szint védi az IBM-kvótát:
 ellenőrzi, **beküldés nélkül**. A kvóta egy **gördülő 28 napos ablak**, nem naptári
 hónap.
 
-> **Ismert hiány (K7).** A `run_vqe` / `python -m vqebd --backend ibm_qpu` útvonal
-> **nem** ellenőrzi a kvótát, és nem korlátozza a jobok számát: egy optimalizálás
-> annyi jobot küld, amennyi kiértékelést az optimalizáló kér. Hardveres mérésre
-> addig a `run_hardware_pes.py` használható.
+A VQE-útvonalra (`run_vqe`, `python -m vqebd --backend ibm_qpu`) ugyanez
+érvényes, kiegészítve **kiértékelési kerettel** (K7, javítva):
+
+1. engedély (`VQEBD_ALLOW_HARDWARE=true`), hálózati hívás előtt;
+2. a legrosszabb eset — `maxiter` + a végső becslések (ZNE-nél × a zajszorzók
+   száma) × **15 QPU-s** — a hátralévő kerethez mérve;
+3. kemény keret: az optimalizáló a fedezett számnál több kiértékelést
+   (jobot) nem indíthat (`EvaluationBudgetExceededError`).
+
+> **Következmény:** az alapértelmezett `--maxiter 300` hardveren elutasításra
+> kerül (300 × 15 s = 4500 s > 600 s). Hardveres VQE-hez kis iterációkorlát kell,
+> pl. `--maxiter 20` (≈ 300 s). Az indoklás: a védelem nélküli útvonal 2026-09-23-án
+> 42 jobbal fogyasztotta el a teljes keretet.
 
 ## 7. Ismert korlátok
 
 | # | Korlát |
 |---|---|
 | K4 | UCCSD mélységi fal: LiH (2e,3o) zajos szimulációban +466 mHa |
-| K7 | A hardveres VQE-útvonal kvótavédelem nélkül (6. pont) |
+| K7 | ~~A hardveres VQE-útvonal kvótavédelem nélkül~~ — **javítva** (6. pont) |
 | K8 | A qsim (`complex64`) a LiH (2e,5o) 1.595 Å-nél 2.8·10⁻⁵ Ha-val tér el, a névleges tűrés (10⁻⁵ Ha) fölött; a kémiai pontosság 1.8%-a ([TR-F05](testing/TR-F05_batch.md) 3.2) |
 | 5.H | Hardveres H₂ disszociációs görbe: még nem futott le |
 

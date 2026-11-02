@@ -44,6 +44,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from vqebd.config import BackendKind
+from vqebd.hardware import EvaluationBudgetExceededError
 from vqebd.seeds import SeedSet
 
 __all__ = [
@@ -76,12 +77,24 @@ class EnergyEvaluator(ABC):
     def __init__(self, num_qubits: int) -> None:
         self.num_qubits = num_qubits
         self.call_count = 0
+        self.max_calls: int | None = None
+        """Kemény keret a ``__call__`` hívásokra (``None`` = nincs). Valódi QPU-n a
+        ``run_vqe`` állítja be a kvóta-előellenőrzés által fedezett értékre."""
 
     def __call__(self, parameters: Sequence[float]) -> float:
         """Az elektronos energia várható értéke a megadott paramétereknél (Ha).
 
         A magtaszítási energiát **nem** tartalmazza: azt a hívó adja hozzá.
+
+        Raises:
+            EvaluationBudgetExceededError: Ha a ``max_calls`` keret elfogyott. A
+                kiértékelés ilyenkor **nem** indul el (valódi QPU-n ez job lenne).
         """
+        if self.max_calls is not None and self.call_count >= self.max_calls:
+            raise EvaluationBudgetExceededError(
+                f"a kiértékelési keret ({self.max_calls}) elfogyott; az optimalizáló "
+                "több kiértékelést kért, mint amennyit a kvóta-előellenőrzés fedezett"
+            )
         self.call_count += 1
         return self.evaluate(parameters)
 

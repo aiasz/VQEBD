@@ -36,6 +36,7 @@ from vqebd.chemistry.mapping import map_to_qubits
 from vqebd.chemistry.problem import build_electronic_structure
 from vqebd.chemistry.reference import collect_references
 from vqebd.config import VQEConfig
+from vqebd.hardware import guard_hardware_vqe
 from vqebd.platforms import check_optimizer_compatibility, platform_of
 from vqebd.seeds import SeedSet
 from vqebd.versions import environment_fingerprint, package_versions
@@ -72,6 +73,17 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     if incompatibility is not None:
         warnings.warn(incompatibility, RuntimeWarning, stacklevel=2)
 
+    # Valódi QPU: engedély + kvóta-előellenőrzés a számítás ELŐTT. A legrosszabb eset
+    # az optimalizáló kiértékelés-korlátja, plusz a végső (újra)becslés, ZNE-nél a
+    # zajszorzókkal szorozva. Az optimalizáló ennél többet nem kérhet (max_calls).
+    eval_budget: int | None = None
+    if config.backend == "ibm_qpu":
+        eval_budget = config.optimizer.maxiter
+        final_estimates = max(config.reestimate, 1)
+        if config.mitigation.strategy != "none":
+            final_estimates *= len(config.mitigation.scale_factors)
+        guard_hardware_vqe(eval_budget + final_estimates)
+
     structure = build_electronic_structure(config.molecule, config.active_space)
     hamiltonian = map_to_qubits(
         structure, config.mapper, two_qubit_reduction=config.two_qubit_reduction
@@ -80,6 +92,7 @@ def run_vqe(config: VQEConfig, *, compute_fci: bool = True) -> VQEResult:
     ansatz = build_ansatz(structure, hamiltonian, config.ansatz, seeds)
 
     evaluator = make_energy_evaluator(config.backend, ansatz.circuit, hamiltonian.operator, seeds)
+    evaluator.max_calls = eval_budget
     outcome = minimize_energy(evaluator, ansatz.initial_point, config.optimizer)
 
     # A konstans eltolás: magtaszítás + aktív térben az inaktív energia (Fázis 5).

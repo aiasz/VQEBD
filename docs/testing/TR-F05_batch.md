@@ -221,8 +221,10 @@ készült, a repóban nincs; az eredmény a fenti értékekkel reprodukálható,
   áll; a mérés csak `--dry-run` után és külön jóváhagyással indítható. Kimenet
   (később): `hardware_h2_pes.json`, fig10.
 - **K7 — hardveres VQE-útvonal kvótavédelem nélkül** (`run_vqe`, `--backend ibm_qpu`).
-  Ez fogyasztotta el a 2026-09-23-i keretet (42 job × 15 s). Nem javítva;
-  jóváhagyásra vár.
+  Ez fogyasztotta el a 2026-09-23-i keretet (42 job × 15 s). **Javítva a v0.8.0
+  után** (CHANGELOG, Unreleased): engedély, kvóta-előellenőrzés és kemény
+  kiértékelési keret; 7 új egységteszt. Ez a jegyzőkönyv a v0.8.0 állapotát
+  rögzíti, a javítás nem része a 10 elfogadási kritérium bizonyítékának.
 - **K8 — qsim platformtűrés** (3.2 pont).
 
 ---

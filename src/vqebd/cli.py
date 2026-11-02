@@ -138,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         result = run_vqe(config, compute_fci=not args.no_fci)
-    except (RuntimeError, ValueError) as exc:
+    except (RuntimeError, ValueError, PermissionError) as exc:
         print(f"HIBA: {exc}", file=sys.stderr)
         return 2
 

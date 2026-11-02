@@ -11,11 +11,28 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Javítva
+- **K7 — kvótavédelem a hardveres VQE-útvonalon.** A `run_vqe` (és a
+  `python -m vqebd --backend ibm_qpu`) korábban engedély és kvótaellenőrzés nélkül,
+  korlátlan számú jobot küldhetett be; ez fogyasztotta el a 2026-09-23-i keretet
+  (42 job × 15 QPU-s). Mostantól: (1) `VQEBD_ALLOW_HARDWARE=true` kell, hálózati
+  hívás előtt; (2) a kvóta lekérdezése, és megtagadás, ha a legrosszabb eset
+  (`maxiter` + végső becslések, ZNE-nél a zajszorzókkal szorozva, × 15 s) nem fér
+  bele; (3) kemény kiértékelési keret (`EnergyEvaluator.max_calls`): az
+  optimalizáló a fedezett számnál több jobot nem indíthat
+  (`EvaluationBudgetExceededError`). Új: `vqebd.hardware.guard_hardware_vqe`.
+  A CLI a `PermissionError`-t is `HIBA:` üzenetként, 2-es kilépési kóddal adja.
+  **Következmény:** az alapértelmezett `--maxiter 300` hardveren elutasításra kerül
+  (300 × 15 s > 600 s); a hardveres futáshoz kis `--maxiter` kell.
+  Tesztek: `tests/unit/test_hardware_guard.py` (7 új).
+- **A `--dry-run` nem tud kvótát lekérdezni lejárt tokennel** (2026-11-02: HTTP 403 az
+  `instances/usage` végponton). A hibaüzenet a tokencserét javasolja; a szkript
+  nem küld be semmit.
+
 ### Tervezett
 - **Fázis 5.H** — H₂ disszociációs görbe valódi QPU-n (`scripts/run_hardware_pes.py`).
   A kvóta-ablak 2026-10-21 óta nyitva van; a mérés `--dry-run` és külön jóváhagyás
   után indítható. Nem elfogadási kritérium, `v0.8.1` kiegészítés lehet.
-- **K7** — kvótavédelem és jobszám-korlát a hardveres VQE-útvonalon (`run_vqe`).
 - **K8** — a qsim platformtűrés (10⁻⁵ Ha) és a LiH (2e,5o) qsim-eltérés (2.8·10⁻⁵ Ha)
   rendezése: tűrés a tér méretéhez kötve, vagy a cella kivétele a platformegyezésből.
 - **Fázis 6** — automatizálás, retry mechanizmus és ütemezés.
