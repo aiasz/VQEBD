@@ -21,6 +21,10 @@
 
 **Készítők:** Kormos Attila · Claude AI (Anthropic, Claude Opus 5)
 
+> 🤖 **MI-vel készített kísérlet.** A kódot, a kísérlettervezést, a mérések lefuttatását, az elemzést és a dokumentációt
+> lényegében teljes egészében az Anthropic Claude modelljei készítették Kormos Attila irányításával. **Független szakmai
+> lektorálás és külső replikáció nem történt.** Részletek: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
+
 ### Röviden
 
 **Mit csinál?** Ugyanazt a kvantumkémiai számítást (H₂, LiH, BeH₂ alapállapoti energiája VQE-vel) futtatja
@@ -408,6 +412,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | A Fázis 7 részletes terve |
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | A Fázis 8 részletes terve |
 | [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | A Fázis 9 részletes terve |
+| [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **A Fázis 11 terve (jóváhagyásra vár):** a Heron-zajmodell validálása, a hardveres mérések az ingyenes keretbe darabolva |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
@@ -420,7 +425,9 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 | [`docs/09_publishing.md`](docs/09_publishing.md) | **Kiadás, GitHub Release, Zenodo, DOI** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **A VQE-mag: használat, architektúra, korlátok** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Telepítés, futtatás, hibaelhárítás |
-| [`docs/references.md`](docs/references.md) | **37 hivatkozás, 35 gépileg DOI-validálva** |
+| [`docs/10_literature_positioning.md`](docs/10_literature_positioning.md) | **Szakirodalmi pozicionálás** — hová illik a VQEBD a hasonló benchmarkok között (nem szisztematikus áttekintés) |
+| [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md) | **MI-felhasználási nyilatkozat** (HU/EN) |
+| [`docs/references.md`](docs/references.md) | **59 hivatkozás, 57 gépileg DOI-validálva** |
 | [`docs/adr/`](docs/adr/) | Architektúra-döntések (ADR-0001…0009) |
 | [`docs/testing/`](docs/testing/) | Teszttervek és mérési jegyzőkönyvek |
 
@@ -492,6 +499,15 @@ A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
 }
 ```
 
+### MI-felhasználás
+
+A projekt **MI-vel készített kísérlet**: a kód, a tervek, a futtatások, az elemzés és a szöveg szerzője lényegében a Claude
+(Sonnet 5.5, Opus 5, Opus 5.5; Claude Code), a célokat, a jóváhagyásokat, az IBM-hozzáférést és a kiadási döntéseket Kormos
+Attila adta. Ami **nem** történt meg: független szakértői lektorálás, külső replikáció, a hivatkozott művek teljes szövegének
+emberi átolvasása; a hardveres eredmények pontonként egyetlen futásúak. A tudományos újdonságot nem állítjuk
+([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)). A teljes, pontos nyilatkozat, a dokumentált MI-hibákkal
+és egy cikkbe szánt szövegjavaslattal: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
+
 ### Közreműködés
 
 Hibajelzést és javaslatot a [GitHub Issues](https://github.com/aiasz/VQEBD/issues) között várunk (sablonokkal).
@@ -507,6 +523,10 @@ A commit-üzenetek a [Conventional Commits](https://www.conventionalcommits.org/
 > on simulators and on real IBM quantum hardware.
 
 **Authors:** Attila Kormos · Claude AI (Anthropic, Claude Opus 5)
+
+> 🤖 **AI-assisted experiment.** The code, experimental design, execution of the measurements, analysis and documentation were
+> produced almost entirely by Anthropic's Claude models under the direction of Attila Kormos. **No independent expert review
+> or external replication has taken place.** Details: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
 ### In short
 
@@ -901,6 +921,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | Detailed Phase 7 plan |
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | Detailed Phase 8 plan |
 | [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | Detailed Phase 9 plan |
+| [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **Phase 11 plan (awaiting approval; in Hungarian):** validating the Heron noise model, hardware runs split to fit the free quota |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
@@ -913,7 +934,9 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 | [`docs/09_publishing.md`](docs/09_publishing.md) | **Release, GitHub Release, Zenodo, DOI** |
 | [`docs/01_vqe_core.md`](docs/01_vqe_core.md) | **The VQE core: usage, architecture, limits** |
 | [`docs/00_setup.md`](docs/00_setup.md) | Installation, running, troubleshooting |
-| [`docs/references.md`](docs/references.md) | **37 references, 35 machine DOI-validated** |
+| [`docs/10_literature_positioning.md`](docs/10_literature_positioning.md) | **Literature positioning** — where VQEBD stands among similar benchmarks (not a systematic review; in Hungarian) |
+| [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md) | **AI-use disclosure** (HU/EN) |
+| [`docs/references.md`](docs/references.md) | **59 references, 57 machine DOI-validated** |
 | [`docs/adr/`](docs/adr/) | Architecture decisions (ADR-0001…0009) |
 | [`docs/testing/`](docs/testing/) | Test plans and measurement logs |
 
@@ -984,6 +1007,15 @@ snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). T
   license = {MIT}
 }
 ```
+
+### AI Use
+
+The project is an **AI-assisted experiment**: the code, plans, runs, analysis and text were produced essentially by Claude
+(Sonnet 5.5, Opus 5, Opus 5.5; Claude Code), while Attila Kormos provided the goals, approvals, IBM access and release
+decisions. What has **not** happened: independent expert review, external replication, human reading of the cited works in
+full; the hardware results are single runs per point. No scientific novelty is claimed
+([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md), in Hungarian). The full, exact statement, with the documented AI errors
+and a suggested text for a paper: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
 ### Contributing
 

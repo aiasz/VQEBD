@@ -14,6 +14,12 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ### Hozzáadva
 - **Zenodo DOI** a `v1.0.0` kiadáshoz: koncepció-DOI [`10.5281/zenodo.23886002`](https://doi.org/10.5281/zenodo.23886002) (a projekt minden verziójára), verzió-DOI [`10.5281/zenodo.23886003`](https://doi.org/10.5281/zenodo.23886003) (a `v1.0.0` pillanatképe). A `CITATION.cff` (`doi`, `identifiers`) és a README (jelvény, hivatkozási blokk, HU és EN) tartalmazza. A Zenodo-rekord szerzője: Kormos, Attila; licenc: MIT.
 
+- **MI-felhasználási nyilatkozat** ([`AI_DISCLOSURE.md`](AI_DISCLOSURE.md), HU/EN): pontosan rögzíti, hogy a projekt MI-vel készített kísérlet, ki mit végzett, mely modellek (a commitok `Co-Authored-By` sorai alapján), mi **nem** ellenőrzött (nincs független lektorálás és replikáció), a dokumentált MI-hibákat, és cikkbe szánt szövegjavaslatot. Jelölve: README (HU/EN banner és szakasz), `CITATION.cff` (`message`, `abstract`), `docs/09_publishing.md` (kötelező ellenőrzőpont).
+- **Szakirodalmi pozicionálás** ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)): a hasonló VQE- és hibaenyhítési benchmarkok áttekintése, nyíltan **nem szisztematikus** (S1–S6 korlátok), kivonat- és metaadat-szinten. Megállapítás: a VQEBD módszerei ismertek; a kiválasztási torzítás, a lövésszám-függő optimalizáló-sorrend és a kiolvasási hibaenyhítés haszna független forrásokkal egyező; nyitott kérdésnek *látszik* a kalibrációból épített Heron-zajmodell validálása VQE-energián.
+- **`docs/references.md` 1.2.0**: +20 gépileg DOI-validált tétel (összesen 59, ebből 57 DOI-validált); a `scripts/gen_references.py` bővítve.
+
+- **Fázis 11 terve** ([`docs/plan/phase_11.md`](docs/plan/phase_11.md)): a kalibrációból épített Heron-zajmodell validálása; előzetes (felderítő) mérés kvóta nélkül (a kiolvasást modellező becslő mind az 5 meglévő hardveres nyers ponttal \|z\| < 2 egyezést ad); előre kimondott hipotézisek és döntési szabályok; a hardveres mérések blokkokra darabolva a 600 s / 28 napos keretbe (az 1. ablakban ~388 s ≤ 480 s). **Jóváhagyásra vár, hardveres futtatás nem történt.**
+
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés.

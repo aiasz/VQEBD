@@ -268,6 +268,137 @@ ENTRIES: list[tuple[str, str | None, str, str]] = [
         "Statisztika és mérési módszertan",
         "A VQE mérési költsége és a lövészaj skálázása; az ismétlés/lövésszám tervezés alapja.",
     ),
+    # --- Szakirodalmi pozicionálás (Fázis 11 előkészítés, 2026-11-02) ---
+    (
+        "cerezo2021",
+        "10.1038/s42254-021-00348-9",
+        "Szakirodalmi pozicionálás — VQE-összefoglalók és hardveres demonstrációk",
+        "Variációs kvantumalgoritmusok áttekintése (trainálhatóság, pontosság, hatékonyság "
+        "nyitott kérdései).",
+    ),
+    (
+        "bharti2022",
+        "10.1103/RevModPhys.94.015004",
+        "Szakirodalmi pozicionálás — VQE-összefoglalók és hardveres demonstrációk",
+        "NISQ-algoritmusok áttekintése; a VQE tágabb keretei.",
+    ),
+    (
+        "preskill2018",
+        "10.22331/q-2018-08-06-79",
+        "Szakirodalmi pozicionálás — VQE-összefoglalók és hardveres demonstrációk",
+        "A „NISQ” korszak fogalmának és korlátainak alapműve.",
+    ),
+    (
+        "kandala2019",
+        "10.1038/s41586-019-1040-7",
+        "Szakirodalmi pozicionálás — VQE-összefoglalók és hardveres demonstrációk",
+        "A hibaenyhítés hardveres kiterjesztése a zajos processzor elérhetőségére (ZNE hardveren).",
+    ),
+    (
+        "vandenberg2022trex",
+        "10.1103/PhysRevA.105.032620",
+        "Szakirodalmi pozicionálás — hibaenyhítés és kiolvasási hiba",
+        "A TREX (twirled readout error extinction) eredeti közleménye: az IBM Runtime resilience "
+        "1 szintjének módszere.",
+    ),
+    (
+        "majumdar2023",
+        "10.48550/arXiv.2307.05203",
+        "Szakirodalmi pozicionálás — hibaenyhítés és kiolvasási hiba",
+        "Bevált gyakorlatok a digitális ZNE-hez (zajerősítés, extrapoláció, kompozíció) — "
+        "preprint.",
+    ),
+    (
+        "belaloui2025",
+        "10.48550/arXiv.2508.15072",
+        "Szakirodalmi pozicionálás — hibaenyhítés és kiolvasási hiba",
+        "VQE-paraméterek minősége kiolvasási hibaenyhítéssel valódi IBM-hardveren (T-REx) — "
+        "preprint.",
+    ),
+    (
+        "aharonov2025",
+        "10.48550/arXiv.2508.10997",
+        "Szakirodalmi pozicionálás — hibaenyhítés és kiolvasási hiba",
+        "Karakterizáció-alapú hibaenyhítés (QESEM) a ZNE-vel szemben — preprint.",
+    ),
+    (
+        "bonetmonroig2023",
+        "10.1103/PhysRevA.107.032407",
+        "Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás",
+        "Gradiensmentes optimalizálók (SLSQP, COBYLA, CMA-ES, SPSA) összehasonlítása kis "
+        "molekulákon.",
+    ),
+    (
+        "singh2023",
+        "10.1063/5.0161057",
+        "Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás",
+        "Optimalizálók összehasonlítása kvantumkémiai VQA-ban, ideális és zajos szimulátoron, "
+        "IBM-zajmodellel.",
+    ),
+    (
+        "illesova2025",
+        "10.48550/arXiv.2505.22398",
+        "Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás",
+        "Nyolc optimalizáló a H2, H4, LiH VHA-feladatán; a lövészaj átrendezi a sorrendet — "
+        "preprint.",
+    ),
+    (
+        "novak2025",
+        "10.48550/arXiv.2511.08289",
+        "Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás",
+        "Lövészaj okozta hamis minimumok és „winner's curse” torzítás VQE-ben — preprint.",
+    ),
+    (
+        "li2023kitaev",
+        "10.1103/PhysRevResearch.5.033071",
+        "Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás",
+        "VQE-benchmark a Kitaev-modellen; a mért energia a lövészaj miatt az alapállapot alá "
+        "eshet.",
+    ),
+    (
+        "wang2021",
+        "10.1038/s41467-021-27045-6",
+        "Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás",
+        "Zaj okozta barren plateau: a mély áramkörök zajos tanulhatatlansága (az UCCSD mélységi "
+        "fal értelmezéséhez).",
+    ),
+    (
+        "bautra2026",
+        "10.48550/arXiv.2603.14607",
+        "Szakirodalmi pozicionálás — zajmodellek validálása",
+        "Kalibrációból épített digitális ikrek összevetése valódi IBM-hardverrel — preprint.",
+    ),
+    (
+        "ji2026",
+        "10.1103/5r9m-y6z6",
+        "Szakirodalmi pozicionálás — zajmodellek validálása",
+        "Adathatékony zajmodellezés gépi tanulással, gyártói kalibrációs adatból kiindulva.",
+    ),
+    (
+        "cirstoiu2023",
+        "10.22331/q-2023-07-13-1059",
+        "Szakirodalmi pozicionálás — benchmark-platformok és reprodukálhatóság",
+        "A hibaenyhítés volumetrikus benchmarkolása (Qermit) valódi eszközökön.",
+    ),
+    (
+        "cosentino2026",
+        "10.48550/arXiv.2603.08680",
+        "Szakirodalmi pozicionálás — benchmark-platformok és reprodukálhatóság",
+        "A Metriq nyílt, együttműködő benchmark-platform — preprint.",
+    ),
+    (
+        "lall2025",
+        "10.59161/azye8097",
+        "Szakirodalmi pozicionálás — benchmark-platformok és reprodukálhatóság",
+        "Kvantumszámítógép-metrikák és -benchmarkok áttekintése (definíciók, módszertan, "
+        "szoftver).",
+    ),
+    (
+        "koster2026",
+        "10.48550/arXiv.2607.08348",
+        "Szakirodalmi pozicionálás — benchmark-platformok és reprodukálhatóság",
+        "A kvantumszámítási kutatás reprodukálhatósága nagy léptékben — preprint.",
+    ),
     # --- DOI nélküli tételek ---
     ("kraft1988", None, "Optimalizálók", "Az SLSQP algoritmus eredeti technikai jelentése."),
     (
@@ -470,7 +601,7 @@ def citation_line(rec: Record) -> str:
     return " ".join(parts).replace("* **", "*, **").rstrip(".") + "."
 
 
-DOC_VERSION = "1.1.0"
+DOC_VERSION = "1.2.0"
 """A jegyzék dokumentum-verziója; új tételnél lép (``00_master_plan.md`` 8.3)."""
 
 CHANGELOG_ROWS: list[tuple[str, str, str]] = [
@@ -479,6 +610,12 @@ CHANGELOG_ROWS: list[tuple[str, str, str]] = [
         "1.1.0",
         "2026-09-25",
         "Fázis 5: +2 tétel (student1908, wecker2015) — statisztika és mérési módszertan.",
+    ),
+    (
+        "1.2.0",
+        "2026-11-02",
+        "Szakirodalmi pozicionálás: +20 tétel (VQE-összefoglalók, hibaenyhítés és kiolvasás, "
+        "optimalizálás zajban, zajmodellek, benchmark-platformok).",
     ),
 ]
 """A jegyzék változásnaplója. Kézzel vezetett: a generálás dátuma nem írja felül."""

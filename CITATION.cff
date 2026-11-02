@@ -4,7 +4,7 @@
 # (docs/09_publishing.md).
 cff-version: 1.2.0
 title: "VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard"
-message: "Ha ezt a szoftvert használod, kérjük, az alábbiak szerint hivatkozz rá."
+message: "Ha ezt a szoftvert használod, kérjük, az alábbiak szerint hivatkozz rá. Figyelem: a szoftvert, a kísérleteket és a dokumentációt lényegében teljes egészében MI (Anthropic Claude) készítette a szerző irányításával; független lektorálás nem történt (AI_DISCLOSURE.md). / Please cite as below. Note: the software, experiments and documentation were produced almost entirely by AI (Anthropic Claude) under the author's direction; no independent review has taken place (AI_DISCLOSURE.md)."
 type: software
 version: 1.0.0
 date-released: "2026-11-02"
@@ -41,6 +41,10 @@ abstract: >-
   alapállapoti energiájának számítására, hibaenyhítési stratégiák összehasonlításával,
   szimulátoron és valódi IBM-hardveren; az eredményeket sémaverziózott adatbázisban
   tárolja és interaktív dashboardon jeleníti meg.)
+  AI-assisted work: the code, experimental design, measurements, analysis and
+  documentation were produced almost entirely by Anthropic's Claude models under the
+  author's direction; no independent expert review or external replication has taken
+  place (see AI_DISCLOSURE.md).
 
 keywords:
   - quantum computing

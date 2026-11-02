@@ -65,6 +65,8 @@ döntés, amelyet **a kiadás előtt** el kell dönteni, mert a rekordban utóla
 | 6 | A Zenodo-kapcsoló **be van kapcsolva** (2. pont) | zenodo.org → GitHub |
 | 7 | A szerzői lista és az ORCID rendben (2.1) | `CITATION.cff` |
 | 8 | A `CHANGELOG.md` `[X.Y.Z]` szakasza a kiadási jegyzet | lásd 4. pont |
+| 9 | **Az MI-használat jelölve van**: a kiadási jegyzet első sora, a README, a `CITATION.cff` és a Zenodo-rekord leírása hivatkozik az [`AI_DISCLOSURE.md`](../AI_DISCLOSURE.md)-re; a nyilatkozat a valós állapotot tükrözi (mi nem ellenőrzött) | `tests/repo/test_publication.py`; a Zenodo-leírást a szerző állítja a Zenodo felületén |
+| 10 | Ha új hivatkozás vagy állítás került a pozicionálásba: a `docs/references.md` újragenerálva, a [`10_literature_positioning.md`](10_literature_positioning.md) korlátai (S1–S6) érvényesek | `python scripts/gen_references.py` |
 
 ## 4. A release létrehozása
 

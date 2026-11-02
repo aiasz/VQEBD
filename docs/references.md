@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | **Dokumentum** | `docs/references.md` |
-| **Dokumentum-verzió** | 1.1.0 |
-| **Dátum** | 2026-09-25 |
+| **Dokumentum-verzió** | 1.2.0 |
+| **Dátum** | 2026-11-02 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
 | **Generálta** | `scripts/gen_references.py` |
-| **Tételek** | 39 db, ebből **37** gépileg DOI-validált |
+| **Tételek** | 59 db, ebből **57** gépileg DOI-validált |
 
 ---
 
@@ -218,6 +218,101 @@ Az idézési év a **lapszám** éve (`published-print`), nem az online-first d�
   *Felhasználás:* A VQE mérési költsége és a lövészaj skálázása; az ismétlés/lövésszám tervezés alapja.
 
 
+## Szakirodalmi pozicionálás — VQE-összefoglalók és hardveres demonstrációk
+
+**[cerezo2021]** Cerezo, M., Arrasmith, A., Babbush, R., Benjamin, S., Endo, S., Fujii, K., McClean, J., Mitarai, K., Yuan, X., Cincio, L., Coles, P. (2021). Variational quantum algorithms. *Nature Reviews Physics*, **3** 625-644.
+  DOI: [10.1038/s42254-021-00348-9](https://doi.org/10.1038/s42254-021-00348-9)
+  *Felhasználás:* Variációs kvantumalgoritmusok áttekintése (trainálhatóság, pontosság, hatékonyság nyitott kérdései).
+
+**[bharti2022]** Bharti, K., Cervera-Lierta, A., Kyaw, T., Haug, T., Alperin-Lea, S., Anand, A., Degroote, M., Heimonen, H., Kottmann, J., Menke, T., Mok, W., Sim, S., et al. (2022). Noisy intermediate-scale quantum algorithms. *Reviews of Modern Physics*, **94** 015004.
+  DOI: [10.1103/revmodphys.94.015004](https://doi.org/10.1103/revmodphys.94.015004)
+  *Felhasználás:* NISQ-algoritmusok áttekintése; a VQE tágabb keretei.
+
+**[preskill2018]** Preskill, J. (2018). Quantum Computing in the NISQ era and beyond. *Quantum*, **2** 79.
+  DOI: [10.22331/q-2018-08-06-79](https://doi.org/10.22331/q-2018-08-06-79)
+  *Felhasználás:* A „NISQ” korszak fogalmának és korlátainak alapműve.
+
+**[kandala2019]** Kandala, A., Temme, K., Córcoles, A., Mezzacapo, A., Chow, J., Gambetta, J. (2019). Error mitigation extends the computational reach of a noisy quantum processor. *Nature*, **567** 491-495.
+  DOI: [10.1038/s41586-019-1040-7](https://doi.org/10.1038/s41586-019-1040-7)
+  *Felhasználás:* A hibaenyhítés hardveres kiterjesztése a zajos processzor elérhetőségére (ZNE hardveren).
+
+
+## Szakirodalmi pozicionálás — hibaenyhítés és kiolvasási hiba
+
+**[vandenberg2022trex]** van den Berg, E., Minev, Z., Temme, K. (2022). Model-free readout-error mitigation for quantum expectation values. *Physical Review A*, **105** 032620.
+  DOI: [10.1103/physreva.105.032620](https://doi.org/10.1103/physreva.105.032620)
+  *Felhasználás:* A TREX (twirled readout error extinction) eredeti közleménye: az IBM Runtime resilience 1 szintjének módszere.
+
+**[majumdar2023]** Majumdar, Ritajit, Rivero, Pedro, Metz, Friederike, Hasan, Areeq, Wang, Derek S (2023). Best practices for quantum error mitigation with digital zero-noise extrapolation. *arXiv*.
+  DOI: [10.48550/arXiv.2307.05203](https://doi.org/10.48550/arXiv.2307.05203)
+  *Felhasználás:* Bevált gyakorlatok a digitális ZNE-hez (zajerősítés, extrapoláció, kompozíció) — preprint.
+
+**[belaloui2025]** Belaloui, Nacer Eddine, Tounsi, Abdellah, Khamadja, Abdelmouheymen Rabah, Benkadour, Hamza, Louamri, Mohamed Messaoud, Benslama, Achour, Rouabah, Mohamed Taha (2025). Improving VQE Parameter Quality on Noisy Quantum Processors with Cost-Effective Readout Error Mitigation. *arXiv*.
+  DOI: [10.48550/arXiv.2508.15072](https://doi.org/10.48550/arXiv.2508.15072)
+  *Felhasználás:* VQE-paraméterek minősége kiolvasási hibaenyhítéssel valódi IBM-hardveren (T-REx) — preprint.
+
+**[aharonov2025]** Aharonov, Dorit, Alberton, Ori, Arad, Itai, Atia, Yosi, Bairey, Eyal, Dov, Matan Ben, Berkovitch, Asaf, Brakerski, Zvika, Cohen, Itsik, Fuchs, Eran, Golan, Omri, Golan, Or, et al. (2025). Reliable high-accuracy error mitigation for utility-scale quantum circuits. *arXiv*.
+  DOI: [10.48550/arXiv.2508.10997](https://doi.org/10.48550/arXiv.2508.10997)
+  *Felhasználás:* Karakterizáció-alapú hibaenyhítés (QESEM) a ZNE-vel szemben — preprint.
+
+
+## Szakirodalmi pozicionálás — optimalizálás zajban és kiválasztási torzítás
+
+**[bonetmonroig2023]** Bonet-Monroig, X., Wang, H., Vermetten, D., Senjean, B., Moussa, C., Bäck, T., Dunjko, V., O'Brien, T. (2023). Performance comparison of optimization methods on variational quantum algorithms. *Physical Review A*, **107** 032407.
+  DOI: [10.1103/physreva.107.032407](https://doi.org/10.1103/physreva.107.032407)
+  *Felhasználás:* Gradiensmentes optimalizálók (SLSQP, COBYLA, CMA-ES, SPSA) összehasonlítása kis molekulákon.
+
+**[singh2023]** Singh, H., Majumder, S., Mishra, S. (2023). Benchmarking of different optimizers in the variational quantum algorithms for applications in quantum chemistry. *The Journal of Chemical Physics*, **159** 044117.
+  DOI: [10.1063/5.0161057](https://doi.org/10.1063/5.0161057)
+  *Felhasználás:* Optimalizálók összehasonlítása kvantumkémiai VQA-ban, ideális és zajos szimulátoron, IBM-zajmodellel.
+
+**[illesova2025]** Illésová, S., Novák, V., Bezděk, T., Possel, C., Beseda, M. (2025). Numerical Optimization Strategies for the Variational Hamiltonian Ansatz in Noisy Quantum Environments. *arXiv*.
+  DOI: [10.48550/arXiv.2505.22398](https://doi.org/10.48550/arXiv.2505.22398)
+  *Felhasználás:* Nyolc optimalizáló a H2, H4, LiH VHA-feladatán; a lövészaj átrendezi a sorrendet — preprint.
+
+**[novak2025]** Novák, Vojtěch, Illésová, Silvie, Bezděk, Tomáš, Zelinka, Ivan, Beseda, Martin (2025). Reliable Optimization Under Noise in Quantum Variational Algorithms. *arXiv*.
+  DOI: [10.48550/arXiv.2511.08289](https://doi.org/10.48550/arXiv.2511.08289)
+  *Felhasználás:* Lövészaj okozta hamis minimumok és „winner's curse” torzítás VQE-ben — preprint.
+
+**[li2023kitaev]** Li, A., Alam, M., Iadecola, T., Jahin, A., Job, J., Kurkcuoglu, D., Li, R., Orth, P., Özgüler, A., Perdue, G., Tubman, N. (2023). Benchmarking variational quantum eigensolvers for the square-octagon-lattice Kitaev model. *Physical Review Research*, **5** 033071.
+  DOI: [10.1103/physrevresearch.5.033071](https://doi.org/10.1103/physrevresearch.5.033071)
+  *Felhasználás:* VQE-benchmark a Kitaev-modellen; a mért energia a lövészaj miatt az alapállapot alá eshet.
+
+**[wang2021]** Wang, S., Fontana, E., Cerezo, M., Sharma, K., Sone, A., Cincio, L., Coles, P. (2021). Noise-induced barren plateaus in variational quantum algorithms. *Nature Communications*, **12** 6961.
+  DOI: [10.1038/s41467-021-27045-6](https://doi.org/10.1038/s41467-021-27045-6)
+  *Felhasználás:* Zaj okozta barren plateau: a mély áramkörök zajos tanulhatatlansága (az UCCSD mélységi fal értelmezéséhez).
+
+
+## Szakirodalmi pozicionálás — zajmodellek validálása
+
+**[bautra2026]** Bautra, Edgars, Dimitrijevs, Maksims, Yakaryilmaz, Abuzer (2026). Evaluating Calibration-Based Digital Twins for IBM Quantum Hardware Simulation. *arXiv*.
+  DOI: [10.48550/arXiv.2603.14607](https://doi.org/10.48550/arXiv.2603.14607)
+  *Felhasználás:* Kalibrációból épített digitális ikrek összevetése valódi IBM-hardverrel — preprint.
+
+**[ji2026]** Ji, Y., Roth, M., Kreplin, D., Polian, I., Wilhelm, F. (2026). Data-efficient quantum noise modeling via machine learning. *Physical Review Applied*, **25** 034051.
+  DOI: [10.1103/5r9m-y6z6](https://doi.org/10.1103/5r9m-y6z6)
+  *Felhasználás:* Adathatékony zajmodellezés gépi tanulással, gyártói kalibrációs adatból kiindulva.
+
+
+## Szakirodalmi pozicionálás — benchmark-platformok és reprodukálhatóság
+
+**[cirstoiu2023]** Cirstoiu, C., Dilkes, S., Mills, D., Sivarajah, S., Duncan, R. (2023). Volumetric Benchmarking of Error Mitigation with Qermit. *Quantum*, **7** 1059.
+  DOI: [10.22331/q-2023-07-13-1059](https://doi.org/10.22331/q-2023-07-13-1059)
+  *Felhasználás:* A hibaenyhítés volumetrikus benchmarkolása (Qermit) valódi eszközökön.
+
+**[cosentino2026]** Cosentino, Alessandro, Li, Changhao, Russo, Vincent, Chase, Bradley A., Lubinski, Tom, Niu, Siyuan, Patel, Neer, Shammah, Nathan, Zeng, William J. (2026). Metriq: A Collaborative Platform for Benchmarking Quantum Computers. *arXiv*.
+  DOI: [10.48550/arXiv.2603.08680](https://doi.org/10.48550/arXiv.2603.08680)
+  *Felhasználás:* A Metriq nyílt, együttműködő benchmark-platform — preprint.
+
+**[lall2025]** Lall, D., Agarwal, A., Zhang, W., Lindoy, L., Lindström, T., Webster, S., Hall, S., Chancellor, N., Wallden, P., Garcia-Patron, R., Kashefi, E., Kendon, V., et al. (2025). A Review and Collection of Metrics and Benchmarks for Quantum Computers: definitions, methodologies and software. *150th anniversary of the Metre Convention — From Units to the Universe*.
+  DOI: [10.59161/azye8097](https://doi.org/10.59161/azye8097)
+  *Felhasználás:* Kvantumszámítógép-metrikák és -benchmarkok áttekintése (definíciók, módszertan, szoftver).
+
+**[koster2026]** Köster, Dominik, Franz, Maja, Zec, Benjamin, Hoess, Nicole, Ramsauer, Ralf, Mauerer, Wolfgang (2026). Works on My QPU: Reproducibility in Quantum Computing Research. *arXiv*.
+  DOI: [10.48550/arXiv.2607.08348](https://doi.org/10.48550/arXiv.2607.08348)
+  *Felhasználás:* A kvantumszámítási kutatás reprodukálhatósága nagy léptékben — preprint.
+
+
 ---
 
 ## Felhasznált szoftverek
@@ -273,5 +368,6 @@ eredményrekord `*_version` mezői rögzítik. Az indoklást lásd:
 |---|---|---|
 | 1.0.0 | 2026-09-22 | Első kiadás. 37 tétel, ebből 35 gépileg DOI-validált. |
 | 1.1.0 | 2026-09-25 | Fázis 5: +2 tétel (student1908, wecker2015) — statisztika és mérési módszertan. |
+| 1.2.0 | 2026-11-02 | Szakirodalmi pozicionálás: +20 tétel (VQE-összefoglalók, hibaenyhítés és kiolvasás, optimalizálás zajban, zajmodellek, benchmark-platformok). |
 
 *Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
