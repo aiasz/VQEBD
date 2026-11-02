@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 9 — Dokumentáció, validálás, publikálás |
 | **Tesztterv** | [`TP-F09`](TP-F09_publikalas.md) |
 | **Terv** | [`phase_09.md`](../plan/phase_09.md) · [`docs/09_publishing.md`](../09_publishing.md) |
@@ -97,4 +97,4 @@ docker run --rm -v "$PWD:/repo:ro" -e VQEBD_REPO_ROOT=/repo -e PYTHONPATH=/repo/
     -w /repo vqebd:1.0.0 python -m pytest tests -ra -m "not hardware" -p no:cacheprovider
 ```
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

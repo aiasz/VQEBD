@@ -16,7 +16,7 @@ A két hibafajta szétválasztása (ISO 5725-1):
 
 A :func:`block_mean_spread` ezt empirikusan is kimutatja (AC-5.6, fig08).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

@@ -6,7 +6,7 @@
 | **Cím** | Determinizmus- és seed-politika a reprodukálhatóság biztosítására |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-22 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 1–9 |
 
 ---
@@ -118,4 +118,4 @@ SIMD-útja miatt az utolsó néhány bit eltérhet. Ezért:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

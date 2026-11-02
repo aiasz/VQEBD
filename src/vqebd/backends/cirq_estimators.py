@@ -13,7 +13,7 @@ pontosság–sebesség kompromisszum a qsim oldalán: 24 qubiten ~22-szeres
 gyorsulást ad, ~10⁻⁷ Ha hiba árán — ami négy nagyságrenddel a kémiai pontosság
 alatt van.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

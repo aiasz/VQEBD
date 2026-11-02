@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-23 |
 | **Projektverzió** | 0.4.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1b — Véges lövésszám és zajmodellek |
 
 ---

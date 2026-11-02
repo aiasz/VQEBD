@@ -6,7 +6,7 @@
 | **Dokumentum** | `docs/plan/00_master_plan.md` |
 | **Dokumentum-verzió** | 1.9.0 |
 | **Dátum** | 2026-09-22 · 2026-09-25 (1.2.0) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Státusz** | Elfogadott — Fázis 0–4 lezárva (v0.7.1 javítókörrel), Fázis 5 végrehajtás alatt |
 | **Alapdokumentum** | `quantum-benchmark-projektterv.md` (v0, 2026-09-22) |
 | **Licenc** | MIT |
@@ -534,4 +534,4 @@ Ez a Fázis 1 egyik automatikus tesztje lesz.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

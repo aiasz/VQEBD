@@ -63,4 +63,4 @@ Ezért a Fázis 2 a következő, biztonságos stratégiát követi:
 | AC-2.4 | A futási metaadatok (Job ID, backend név, állapot, paraméterek) rögzítésre kerülnek | mérési jegyzőkönyv |
 | AC-2.5 | A CI és az automatikus tesztkészlet kvótát nem fogyaszt (`not hardware`) | CI audit |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

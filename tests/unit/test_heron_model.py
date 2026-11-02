@@ -3,7 +3,7 @@
 A blokkfuttató (``scripts/run_heron_blocks.py``) kvótakapuját, a protokoll-befagyasztást és a
 blokkterv költségvetését teszteli; az IBM-szolgáltatás mockolt, beküldés nem történik.
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

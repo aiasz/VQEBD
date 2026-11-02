@@ -38,4 +38,4 @@ L0  Full CI (PySCF, klasszikus referencia)
 - Ha az IBM token érvénytelen vagy hiányzik, az `IBMQpuEnergyEvaluator` azonnal elbukik a hálózat terhelése előtt.
 - Nem támogatott vagy inaktív backend esetén a rendszer figyelmeztet vagy felajánlja a legkisebb hibájú aktív QPU-t.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

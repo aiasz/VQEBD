@@ -5,7 +5,7 @@ A VQEBD hibaenyhítési architektúrája pluginalapú: minden stratégia ugyanaz
 objektumot ad vissza, amely a mitigált érték mellett a nyers pontokat és az
 illesztési diagnosztikát is hordozza.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

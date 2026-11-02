@@ -11,7 +11,7 @@ szolgáltatótól és helyi szimuláció):
 - :data:`PROTOCOL` és :func:`protocol_fingerprint` — a befagyasztott protokoll ujjlenyomata, amit
   a hardveres futtató beküldés előtt ellenőriz (R4: nincs utólagos küszöb- vagy geometriamódosítás).
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

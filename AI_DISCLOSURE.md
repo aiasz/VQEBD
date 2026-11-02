@@ -184,4 +184,4 @@ AI-generated text may contain further errors not uncovered here.
 
 ---
 
-*Készítők / Authors: Kormos Attila, Claude AI (Anthropic) — MIT licenc / MIT License*
+*Szerző / Author: Kormos Attila · Megvalósítás MI-eszközzel / Implemented with an AI tool: Claude (Anthropic) — MIT licenc / MIT License*

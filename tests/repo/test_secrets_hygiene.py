@@ -7,7 +7,7 @@ Ez a projekt legmagasabb kockázatú, legalacsonyabb költségű hibája (R0.4 k
 2. ``.dockerignore`` — a titkok nem kerülhetnek az image rétegeibe.
 3. Tartalmi ellenőrzés — a verziózott fájlokban ne legyen tokennek látszó string.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

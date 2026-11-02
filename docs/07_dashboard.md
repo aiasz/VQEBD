@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
 | **Projektverzió** | 1.0.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 7 — Dashboard |
 | **Háttér** | [`phase_07.md`](plan/phase_07.md) · [`ADR-0009`](adr/ADR-0009-dashboard-architektura.md) · [`TR-F07`](testing/TR-F07_dashboard.md) |
 
@@ -142,4 +142,4 @@ A pin emelésekor a `tests/integration/test_dashboard_pyarrow_guard.py` jelzi az
 | L4 | Nincs hitelesítés, többfelhasználós működés és élő frissítés; az adat a betöltéskor, a fájl módosítási idejével kulcsolt gyorsítótárból jön |
 | L5 | ~~A `dashboard` Compose-szolgáltatás hiánya~~ — **megoldva a Fázis 8-ban** ([`08_deployment.md`](08_deployment.md)) |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -6,7 +6,7 @@
 | **Cím** | SQLite kanonikus tároló, CSV/Parquet export, sémaverziózás |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-22 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 4, 5, 6, 7, 8, 9 |
 
 ---
@@ -96,4 +96,4 @@ végleges mezőlistája a Fázis 4 tervdokumentumában kerül rögzítésre; az 
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

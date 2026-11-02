@@ -33,4 +33,4 @@ determinisztikus exportot.
 - Érvénytelen sémaverziójú adatbázis megnyitása `ValueError` hibával leáll.
 - Sérült vagy hiányzó SQLite fájl esetén a réteg automatikusan és tisztán inicializálja az új adatbázist.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

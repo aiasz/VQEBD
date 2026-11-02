@@ -1,6 +1,6 @@
 """Hibaenyhítési stratégiák egységtesztjei (AC-3.5, AC-3.6, ADR-0003).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

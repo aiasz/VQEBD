@@ -9,7 +9,7 @@
 | **Célverzió** | `v0.11.0` |
 | **Előzmény** | [`phase_07.md`](phase_07.md), [`00_master_plan.md`](00_master_plan.md) 7. fejezet, v0.10.0 |
 | **Új ADR** | nincs; a döntések a 5. fejezetben vannak (nem architektúra-szintűek) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -123,4 +123,4 @@ minőségi kapuk (ruff, mypy strict, teljes tesztkészlet) zöldek.
 |---|---|---|
 | 1.0.0 | 2026-11-02 | Első változat; a felhasználó helyi-gépes döntése és az erőforrás-mérés (2. fejezet) alapján, megvalósítással együtt |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

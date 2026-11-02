@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
 | **Projektverzió** | 0.1.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 0 — Alapinfrastruktúra |
 
 > **Történeti dokumentum.** Ez az állomány a Fázis 0 (alapinfrastruktúra) állapotát írja le. A naprakész
@@ -217,4 +217,4 @@ A teljes lista és a mérési eredmények:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

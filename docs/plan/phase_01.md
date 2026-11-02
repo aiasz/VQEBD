@@ -5,7 +5,7 @@
 | **Fázis** | 1 |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Státusz** | **Elfogadott — végrehajtás alatt** |
 | **Célverzió** | `v0.2.0` |
 | **Előzmény** | [`phase_00.md`](phase_00.md), [`TR-F00`](../testing/TR-F00_alapinfrastruktura.md), [`TR-000`](../testing/TR-000_spike.md) |
@@ -379,4 +379,4 @@ ellenőrzése.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

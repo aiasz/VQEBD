@@ -11,7 +11,7 @@ teljes batch-infrastruktúra rá épül.
 
 Ezért itt **mátrixot és állapotvektort** hasonlítunk össze, nem csak energiát.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

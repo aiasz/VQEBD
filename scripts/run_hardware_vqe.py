@@ -15,7 +15,7 @@ Biztonsági és kvótavédelmi alapelvek
   ``docs/figures/data/hardware_h2_kingston.json``).
 - A ``resilience_level`` mindig explicit (TR-F02, 1. javítási kör).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

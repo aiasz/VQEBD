@@ -2,7 +2,7 @@
 
 A trace-ek ``x`` / ``y`` értékeit vizsgáljuk: a JS-ben renderelt képet a headless teszt nem látja.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

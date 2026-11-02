@@ -18,7 +18,7 @@ elfogyasztotta a teljes keretet.
 Mért eset (2026-09-25): 630 / 600 s felhasználva, ``usage_limit_reached = true``,
 újra elérhető 2026-10-21 — a Fázis 5 hardveres kiegészítése ezért elhalasztva.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

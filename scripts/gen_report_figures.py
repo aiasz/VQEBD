@@ -25,7 +25,7 @@ első három slotját kapja, amelyek minden párban tisztán elkülönülnek. A
 státuszszínek szándékosan eltérnek a sorozatszínektől, és mindig **ikonnal vagy
 felirattal együtt** jelennek meg — a szín soha nem hordoz önmagában jelentést.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

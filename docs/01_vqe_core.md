@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
 | **Projektverzió** | 0.2.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1 — H2-VQE szimulátoron |
 
 ---
@@ -353,4 +353,4 @@ alapján: az IBM `FakeBackend`-ek valódi kalibrációs adatból építenek zajm
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

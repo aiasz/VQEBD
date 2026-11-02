@@ -4,7 +4,7 @@ A determinizmus a projekt egyik alapkövetelménye. Ezek a tesztek azt igazoljá
 hogy a seed-származtatás **tiszta függvény**: környezettől, futástól és
 platformtól független.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

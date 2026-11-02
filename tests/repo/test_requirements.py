@@ -11,7 +11,7 @@ tesztelt felület:
 Ha a kettő elcsúszik egymástól, az eredmények utólag nem reprodukálhatók — ezt
 kapják el az alábbi tesztek.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

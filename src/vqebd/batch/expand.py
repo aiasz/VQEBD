@@ -7,7 +7,7 @@ ujjlenyomat a teljes konfigurációé (a seedet is beleértve), így:
 - egy megszakadt batch újraindítva a már tárolt ``run_id``-kat kihagyja, és a
   végeredmény azonos egy megszakítás nélküli futáséval (AC-5.5).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

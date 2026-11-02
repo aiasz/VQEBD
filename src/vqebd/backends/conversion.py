@@ -32,7 +32,7 @@ A Mitiq QASM-alapú konverziója eldobja azokat a qubiteket, amelyeken nincs
 művelet (TR-000, M3). Ezt a hibát itt nem ismételjük meg: minden qubitre
 ``cirq.I`` kerül, így az áramkör szélessége megmarad.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

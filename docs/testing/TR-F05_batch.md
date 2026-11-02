@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.1.0 (7. pont: 5.H hardveres mérés) |
 | **Dátum** | 2026-09-25 (batch-futtatás) · 2026-11-02 (lezárás, 5.H) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 5 — Batch-futtatás, aktív tér, statisztikai módszertan |
 | **Tesztterv** | [`TP-F05`](TP-F05_batch.md) |
 | **Terv / döntés** | [`phase_05.md`](../plan/phase_05.md) · [`ADR-0007`](../adr/ADR-0007-batch-statisztika.md) |
@@ -309,4 +309,4 @@ $RUN python -W ignore scripts/gen_report_figures.py --only hibakoltsegvetes
 
 Windows / Git Bash alatt a `MSYS_NO_PATHCONV=1` előtag kell.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

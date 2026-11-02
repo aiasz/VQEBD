@@ -7,7 +7,7 @@ pontossághoz?”) **mért** válaszát rögzíti tesztként:
 - a torzítást az ismétlés nem csökkenti (AC-5.6);
 - a független újramintavételezés torzítatlan végső energiát ad (AC-5.8).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

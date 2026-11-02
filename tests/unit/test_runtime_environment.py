@@ -4,7 +4,7 @@ Ezek a tesztek a **szállított image**-et validálják. A gazdagépen futtatva 
 konténer-specifikus állítások (nem-root futás, ``PYTHONHASHSEED``) kihagyásra
 kerülnek, mert ott nem értelmezhetők.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

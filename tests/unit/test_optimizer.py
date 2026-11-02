@@ -4,7 +4,7 @@ Ezek a tesztek **analitikus célfüggvényeken** futnak, nem kvantumszimuláció
 így gyorsak, és a burkolat hibáit elkülönítik a fizika hibáitól. Ha egy VQE-futás
 rossz eredményt ad, ezekből tudni fogjuk, hogy nem az optimalizáló a hibás.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

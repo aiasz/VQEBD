@@ -6,7 +6,7 @@ a ``CITATION.cff``-ben és a kiadási útmutatóban jelölve van, a nyilatkozat 
 kimondja, mi nem ellenőrzött; (3) a Fázis 11 hardveres ütemezése a rögzített keretszabályon belül
 marad.
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

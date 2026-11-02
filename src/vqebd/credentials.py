@@ -24,7 +24,7 @@ Betöltési sorrend
 Az első találat nyer; a sorrend szándékos, mert a környezeti változó a
 legszűkebb hatókörű és a legkönnyebben felülírható.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

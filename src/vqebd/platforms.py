@@ -11,7 +11,7 @@ marad.
 
 Lásd: ``docs/adr/ADR-0006-tobbplatformos-architektura.md``.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

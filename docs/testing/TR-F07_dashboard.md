@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 7 — Dashboard |
 | **Tesztterv** | [`TP-F07`](TP-F07_dashboard.md) |
 | **Terv / döntés** | [`phase_07.md`](../plan/phase_07.md) · [`ADR-0009`](../adr/ADR-0009-dashboard-architektura.md) |
@@ -119,4 +119,4 @@ docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
 Windows / Git Bash alatt a `MSYS_NO_PATHCONV=1` előtag kell. A `VQEBD_REPO_ROOT` a repó-hatókörű és a valódi
 adatot használó dashboard-tesztekhez kell (a szállított image nem tartalmazza a `docs/` mappát).
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

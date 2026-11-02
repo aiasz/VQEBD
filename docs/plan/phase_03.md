@@ -55,4 +55,4 @@ src/vqebd/mitigation/
 | **AC-3.6** | A `MitigationResult` tartalmazza a skálafaktorokat, a nyers és mitigált energiákat és az illesztési maradékokat | egységteszt |
 | **AC-3.7** | A CLI és a `run_vqe` támogatja a `--mitigation` és `--extrapolator` kapcsolókat | integrációs teszt |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

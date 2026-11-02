@@ -17,7 +17,7 @@ Kilépési kód: ``0`` minden rendben · ``1`` részleges hiba (tárolva) · ``2
 Valódi QPU-t csak ``--allow-hardware`` + ``VQEBD_ALLOW_HARDWARE=true`` mellett indít,
 és hardveres futásra a próbálkozások száma alapértelmezésben 1 (ADR-0008).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

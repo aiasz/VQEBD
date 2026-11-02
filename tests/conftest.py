@@ -12,7 +12,7 @@ A tesztek két hatókörben futnak:
     kerül bele a ``docs/``, a ``LICENSE`` és a ``.gitignore`` — automatikusan
     kihagyásra kerülnek, egyértelmű indoklással.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

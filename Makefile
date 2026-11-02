@@ -1,6 +1,6 @@
 # =============================================================================
 # VQEBD — fejlesztői parancsok
-# Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+# Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 # =============================================================================
 # Minden parancs KONTÉNERBEN fut. Indok: a PySCF nem támogatja natívan a Windowst,
 # és a lebegőpontos determinizmus is rögzített környezetet igényel (ADR-0005).

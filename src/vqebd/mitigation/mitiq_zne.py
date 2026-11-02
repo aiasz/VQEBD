@@ -10,7 +10,7 @@ Fontos architekturális megjegyzések (ADR-0003):
 2. **Logikai szintű hajtogatás:** A Mitiq a transzpilálás előtti logikai áramkört
    hajtogatja, megkerülve a fizikai layout M3 qubit-vesztési hibáját.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

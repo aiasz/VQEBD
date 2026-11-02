@@ -3,7 +3,7 @@
 A függvényeket **ismert eloszláson** ellenőrizzük: ahol a helyes válasz
 analitikusan ismert (CI-lefedettség, σ/√N skálázás), a teszt azt méri.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

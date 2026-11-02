@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/references.md` |
 | **Dokumentum-verzió** | 1.2.0 |
 | **Dátum** | 2026-11-02 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Generálta** | `scripts/gen_references.py` |
 | **Tételek** | 59 db, ebből **57** gépileg DOI-validált |
 
@@ -370,4 +370,4 @@ eredményrekord `*_version` mezői rögzítik. Az indoklást lásd:
 | 1.1.0 | 2026-09-25 | Fázis 5: +2 tétel (student1908, wecker2015) — statisztika és mérési módszertan. |
 | 1.2.0 | 2026-11-02 | Szakirodalmi pozicionálás: +20 tétel (VQE-összefoglalók, hibaenyhítés és kiolvasás, optimalizálás zajban, zajmodellek, benchmark-platformok). |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

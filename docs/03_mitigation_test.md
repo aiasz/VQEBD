@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-09-23 · 2026-09-25 |
 | **Projektverzió** | 0.7.1 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 3 — Hibaenyhítés (ZNE & Mitiq) |
 
 ---

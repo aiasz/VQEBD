@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
 | **Projektverzió** | 1.0.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 5 — Batch-futtatás, aktív tér, statisztikai módszertan |
 | **Háttér** | [`phase_05.md`](plan/phase_05.md) · [`ADR-0007`](adr/ADR-0007-batch-statisztika.md) · [`TR-F05`](testing/TR-F05_batch.md) |
 
@@ -193,4 +193,4 @@ A VQE-útvonalra (`run_vqe`, `python -m vqebd --backend ibm_qpu`) ugyanez
 | K8 | A qsim (`complex64`) a LiH (2e,5o) 1.595 Å-nél 2.8·10⁻⁵ Ha-val tér el, a névleges tűrés (10⁻⁵ Ha) fölött; a kémiai pontosság 1.8%-a. Az ok megmérve: a `complex64` aritmetika, nem a Powell (a Powell `complex128`-on 9·10⁻¹² Ha-ra konvergál). A tűrés a (2e,3o) terekre igaz, 24 paraméteren nem ([TR-F05](testing/TR-F05_batch.md) 3.2) |
 | 5.H | Hardveres H₂ görbe: lefutott (2026-11-02), a hardver nem éri el a kémiai pontosságot; pontonként egyetlen futás ([TR-F05](testing/TR-F05_batch.md) 7.) |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

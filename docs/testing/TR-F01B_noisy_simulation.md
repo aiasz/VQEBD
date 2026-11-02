@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.1.0 (javítási melléklet: 6. szakasz) |
 | **Dátum** | 2026-09-23 · 2026-09-25 (6. szakasz, v0.7.1) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1b — Véges lövésszámú és zajos szimuláció (L3a / L3b) |
 | **Vizsgált verzió** | `0.3.0` |
 | **Tesztterv** | [`TP-F01B`](TP-F01B_noisy_simulation.md) |
@@ -110,4 +110,4 @@ Konfiguráció (a v0.7.0 image-ben pontosan reprodukálva):
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -15,7 +15,7 @@ Használat
 Hálózati hozzáférést igényel. A nyers API-válaszokat a
 ``docs/testing/refs_crossref_raw.json`` fájlba menti provenance céljából.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 
@@ -636,7 +636,7 @@ def render(records: dict[str, Record], today: str) -> str:
     add("| **Dokumentum** | `docs/references.md` |")
     add(f"| **Dokumentum-verzió** | {DOC_VERSION} |")
     add(f"| **Dátum** | {today} |")
-    add("| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |")
+    add("| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |")
     add("| **Generálta** | `scripts/gen_references.py` |")
     add(f"| **Tételek** | {len(ENTRIES)} db, ebből **{n_doi}** gépileg DOI-validált |\n")
     add("---\n")
@@ -712,7 +712,7 @@ def render(records: dict[str, Record], today: str) -> str:
     for version, date, change in CHANGELOG_ROWS:
         add(f"| {version} | {date} | {change} |")
     add("")
-    add("*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*")
+    add("*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*")
     return "\n".join(lines) + "\n"
 
 

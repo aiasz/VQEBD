@@ -7,7 +7,7 @@
 | **Dátum** | 2026-11-02 |
 | **Fázis** | 8 — Konténerizáció összeszerelése |
 | **Terv** | [`phase_08.md`](../plan/phase_08.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -48,4 +48,4 @@ A fázis része **minden README és dokumentum átvilágítása**: verziószámo
 Másik gépen vagy tiszta VM-en végzett telepítés; Windows-specifikus útvonalkezelés (a fejlesztés Windowson, Docker
 Desktoppal történt, de külön Windows-teszt nincs); hosszú távú (napokig tartó) futás.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

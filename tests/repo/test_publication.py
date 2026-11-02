@@ -4,7 +4,7 @@
 verziótáblázata egyezik a lockkal, a hivatkozások nem törnek el, és a ``CITATION.cff`` a
 ``VERSION``-nel konzisztens (AC-9.2 … AC-9.7, AC-9.9).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

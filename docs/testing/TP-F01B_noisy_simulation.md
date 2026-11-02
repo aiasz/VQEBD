@@ -43,4 +43,4 @@ kémiai pontossága.
   optimalizáló-kompatibilitási tesztnek buknia kell.
 - Ha a seed továbbítása elmarad, a determinisztikus tesztnek buknia kell.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

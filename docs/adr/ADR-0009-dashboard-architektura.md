@@ -6,7 +6,7 @@
 | **Cím** | A bemutatási réteg: a logika a `src`-ben, a UI vékony, az adat csak olvasható |
 | **Státusz** | **Elfogadott** (2026-11-02, a D1–D4 alapértelmezések jóváhagyásával; megvalósítva a v0.10.0-ban) |
 | **Dátum** | 2026-11-02 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 7, 8 (konténerizáció), 9 (publikálás) |
 | **Függ** | [ADR-0001](ADR-0001-technologiai-stack.md), [ADR-0004](ADR-0004-adattarolas.md), [ADR-0007](ADR-0007-batch-statisztika.md), [`phase_07.md`](../plan/phase_07.md) |
 | **Bizonyíték** | [`phase_07.md`](../plan/phase_07.md) 2. fejezet (M1–M8) |
@@ -75,4 +75,4 @@ a 26.0.0 NumPy ≥ 2-t követel). A Docker-build a `requirements.lock`-ot
   a szálváltás utáni `pyarrow.compute`-hívás (M9) csak a 7.2 lépés `AppTest`-jében bukott ki. A körméret levezetése a VQEBD alapértelmezett leképezésére épül; más leképezésű
   rekordnál (ha az export nem hordozza a `mapper`-t) a `size_assumed` jelzi a feltevést.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -6,7 +6,7 @@
 | **Típus** | Test Plan (tesztterv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1 — H2-VQE szimulátoron |
 | **Célverzió** | `v0.2.0` |
 | **Terv** | [`docs/plan/phase_01.md`](../plan/phase_01.md) |
@@ -163,4 +163,4 @@ illesztetlen observable-t kapna el.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

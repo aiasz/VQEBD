@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.1.0 (javított — lásd 7. szakasz) |
 | **Dátum** | 2026-09-23 (1.0.0) · 2026-09-25 (1. javítási kör, v0.7.1) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 3 — Hibaenyhítés (ZNE & Mitiq) |
 | **Tesztterv** | [`TP-F03`](TP-F03_mitigation.md) |
 | **Adatforrás** | [`docs/figures/data/mitigacio.json`](../figures/data/mitigacio.json) — `scripts/gen_report_figures.py --only mitigacio` |
@@ -181,4 +181,4 @@ zaja saját, `seeds.simulator`-ból indított generátorból származik.
 | J8 | `requirements-mitiq.txt` hiányzott (az ADR-0003 hivatkozott rá); a mitiq-ág soha nem futott. | TC-302 mindig kihagyódott. | Fájl létrehozva (mért hatás: +mitiq, +tabulate, `pip check` tiszta); CI-lépés. |
 | J9 | Az exponenciális extrapoláció hiba esetén **csendben** másodfokúra váltott, de „exponential” címkével tárolódott. | Hamis címke. | `RuntimeWarning` a tartalékágon. |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -21,7 +21,7 @@ importálható maradjon anélkül, hogy ``__main__``-ként is futna::
     docker run --rm vqebd:<verzió> python -m vqebd
     docker run --rm vqebd:<verzió> python -m vqebd --bond-length 1.2 --json
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

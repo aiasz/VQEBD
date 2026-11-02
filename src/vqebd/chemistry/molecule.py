@@ -8,7 +8,7 @@ Egységek
 Minden hosszúság **ångströmben** (Å) értendő, mert a PySCF és a Qiskit Nature
 alapértelmezett bemeneti egysége ez. Az energiák **Hartree-ban** (Ha).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

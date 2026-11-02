@@ -9,7 +9,7 @@
 | **Célverzió** | `v1.1.0` (ha a fázis lezárul) |
 | **Tesztterv** | [`TP-F11`](../testing/TP-F11_heron_modell.md) |
 | **Előzmény** | [`phase_09.md`](phase_09.md), [`TR-F05` 7.](../testing/TR-F05_batch.md), [`10_literature_positioning.md`](../10_literature_positioning.md), v1.0.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic) — a terv MI-vel készült, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a terv szövegét az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
 
 > **Fontos a tervről.** Ez a terv nem külső regiszterben (pl. OSF) előre regisztrált protokoll, hanem a repóban, git-commit
 > időbélyeggel rögzített **belső előzetes meghatározás** (a szerző a külső regisztert nem kérte). Az MI írta; a küszöbértékeket
@@ -218,4 +218,4 @@ A szerző közlése szerint a kód ~80%-át soronként átnézte ([`AI_DISCLOSUR
 **A jóváhagyás a tervre és a küszöbökre vonatkozik, nem egyetlen hardveres blokk beküldésére sem:** minden blokk előtt külön
 `--dry-run` és a szerző külön igenje kell.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

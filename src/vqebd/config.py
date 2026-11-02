@@ -14,7 +14,7 @@ folyamaton belül stabil, és a Python-verzióval is változhat.
 
 Lásd: ``docs/plan/phase_01.md`` 3.3, ``docs/adr/ADR-0005-determinizmus.md``.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

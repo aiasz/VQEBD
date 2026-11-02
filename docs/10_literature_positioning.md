@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/10_literature_positioning.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Hivatkozások** | [`docs/references.md`](references.md) 1.2.0 — a szögletes zárójeles kulcsok oda mutatnak |
 | **Státusz** | **Szisztematikus áttekintés NEM készült** — lásd az 1. fejezetet |
 
@@ -132,4 +132,4 @@ teljes szövegének emberi elolvasása, (c) szakértői megerősítés arról, h
 bővítése. A `tests/repo/test_literature_and_disclosure.py` ellenőrzi, hogy minden itt használt hivatkozáskulcs létezik a jegyzékben, és hogy a
 dokumentum kimondja a saját korlátait (S1–S6).
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

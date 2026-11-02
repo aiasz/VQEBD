@@ -7,7 +7,7 @@
 | **Dátum** | 2026-11-02 |
 | **Fázis** | 11 — Kalibrációból épített Heron-zajmodell validálása valódi hardveren |
 | **Terv** | [`phase_11.md`](../plan/phase_11.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic) — a terv MI-vel készült, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a terv szövegét az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
 | **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A megerősítő blokkok (11.C) és a végleges TR-F11 még nem készültek.** |
 
 ---
@@ -44,4 +44,4 @@
 Minden hardveres blokk (B0, C1…C8) előtt, sorrendben: (1) `--dry-run`; (2) a szerző külön igenje; (3) a futtató élő
 `usage()` ellenőrzése. A blokk után: a kimeneti fájl és a kvóta-állás ellenőrzése, a következő blokk csak ezek után.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -1,6 +1,6 @@
 # =============================================================================
 # VQEBD — Fázis 0 alap-image
-# Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+# Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 # =============================================================================
 # Terv: docs/plan/phase_00.md (3.2), docs/plan/phase_01.md (5.)
 #
@@ -23,7 +23,7 @@ FROM python:3.11-slim@sha256:da047cb8f9d1d98e5c070f5300ba9f7274e33b8fc0e5be5ed88
 # --- OCI címkék (Open Containers Initiative szabvány) ------------------------
 LABEL org.opencontainers.image.title="VQEBD" \
       org.opencontainers.image.description="VQE-alapú kvantumkémiai benchmark & dashboard" \
-      org.opencontainers.image.authors="Kormos Attila, Claude AI (Anthropic, Claude Opus 5)" \
+      org.opencontainers.image.authors="Kormos Attila (implemented with the AI tool Claude, Anthropic)" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://github.com/aiasz/VQEBD" \
       org.opencontainers.image.documentation="https://github.com/aiasz/VQEBD/tree/main/docs"

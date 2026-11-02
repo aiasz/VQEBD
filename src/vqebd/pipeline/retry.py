@@ -4,7 +4,7 @@ A visszalépés determinisztikus (nincs jitter), az idő injektálható (``sleep
 viselkedés valós várakozás nélkül tesztelhető. A próbálkozásszám az adatbázisban él
 (``run_failures``), ezért egy újraindított folyamat folytatja, nem kezdi elölről.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

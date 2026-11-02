@@ -20,7 +20,7 @@ Kilépési kód
 ``0`` akkor és csak akkor, ha az eredmény kémiai pontosságon belül van **és** a
 variációs elv teljesül. Így a parancs gépi ellenőrzésre (CI, dry run) is alkalmas.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

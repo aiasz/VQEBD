@@ -3,7 +3,7 @@
 A formátum a Fázis 5 óta változatlan: a ``docs/figures/data/f5_*.json`` fájlokat ez
 állítja elő. Itt él, hogy a CLI és a pipeline bitre azonos exportot adjon.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

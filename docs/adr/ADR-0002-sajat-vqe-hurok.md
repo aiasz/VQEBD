@@ -6,7 +6,7 @@
 | **Cím** | A VQE optimalizáló-hurok saját implementációja V2 primitívekkel |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-22 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 1, 1b, 2, 3, 5 |
 | **Függ** | [ADR-0001](ADR-0001-technologiai-stack.md) |
 | **Bizonyíték** | [`docs/testing/TR-000_spike.md`](../testing/TR-000_spike.md), 1. kör / 7. lépés |
@@ -140,4 +140,4 @@ a kémiai pontosság (1.6 mHa) alatt.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

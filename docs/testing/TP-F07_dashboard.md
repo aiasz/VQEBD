@@ -8,7 +8,7 @@
 | **Fázis** | 7 — Dashboard |
 | **Terv** | [`phase_07.md`](../plan/phase_07.md) |
 | **Döntés** | [`ADR-0009`](../adr/ADR-0009-dashboard-architektura.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -62,4 +62,4 @@
 
 Vizuális megjelenés (böngésző, képernyőkép): az `AppTest` a JS-ben renderelt Plotly-t nem futtatja (TR-F07 5., L1).
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

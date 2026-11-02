@@ -20,7 +20,7 @@ Használat::
     python scripts/run_heron_blocks.py --block B0 --dry-run
     VQEBD_ALLOW_HARDWARE=true python scripts/run_heron_blocks.py --block C1
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

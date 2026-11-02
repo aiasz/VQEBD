@@ -31,7 +31,7 @@ Az L1 sűrű mátrixot épít: a memóriaigény ``4^n`` komplex szám ``n`` qubi
 :data:`MAX_EXACT_DIAGONALIZATION_QUBITS` korlát fölött a függvény hibát dob,
 nem pedig lefagyasztja a gépet.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

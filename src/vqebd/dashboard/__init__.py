@@ -4,7 +4,7 @@ Rétegek: ``data`` (pandas, tiszta), ``figures`` (Plotly, tiszta), ``app`` (Stre
 A csomag ``__init__``-je szándékosan nem importál semmit: az adat- és ábrarétegek a
 Streamlit nélkül is használhatók és tesztelhetők.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

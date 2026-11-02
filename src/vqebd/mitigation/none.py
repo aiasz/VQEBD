@@ -3,7 +3,7 @@
 A nyers (λ=1) kiértékelést adja vissza, biztosítva az egységes felületet
 és az összehasonlíthatóságot a mitigált szintekkel.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

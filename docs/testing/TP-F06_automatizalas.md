@@ -8,7 +8,7 @@
 | **Fázis** | 6 — Automatizálás, strukturált hibatárolás, újrapróbálkozás |
 | **Terv** | [`phase_06.md`](../plan/phase_06.md) |
 | **Döntés** | [`ADR-0008`](../adr/ADR-0008-hibakezeles-es-utemezes.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -59,4 +59,4 @@
 | Migrált v3 | friss v3 adatbázis | azonos oszlopok (sorrenddel, típussal) |
 | Konténeres futás | helyi futás | azonos kilépési kód, naplólépések, a volume-jogosultság rendben |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

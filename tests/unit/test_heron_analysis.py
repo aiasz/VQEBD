@@ -3,7 +3,7 @@
 Pozitív és negatív kontroll: ismert eltolást ki kell mutatni, eltolás nélkül egyenértékűséget kell
 adni. Az elemzést a mérések előtt teszteltük, hogy a döntési szabály ne az adat szerint alakuljon.
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

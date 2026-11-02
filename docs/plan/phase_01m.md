@@ -5,7 +5,7 @@
 | **Fázis** | 1M (új — nem szerepel az alaptervben) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Státusz** | **Elfogadott — végrehajtás alatt** |
 | **Célverzió** | `v0.3.0` |
 | **Előzmény** | [`phase_01.md`](phase_01.md), [`TR-F01`](../testing/TR-F01_vqe_mag.md), [ADR-0006](../adr/ADR-0006-tobbplatformos-architektura.md) |
@@ -272,4 +272,4 @@ tényleges mérési eredmény, így nem csúszhatnak el a valóságtól.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -9,7 +9,7 @@ Használat::
     python scripts/analyze_heron.py                # a nyers eredmény JSON-ként a stdout-ra
     python scripts/analyze_heron.py --out docs/figures/data/f11/analysis.json
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

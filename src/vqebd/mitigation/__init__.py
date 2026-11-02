@@ -5,7 +5,7 @@ A VQEBD hibaenyhítési rétege több független módszert biztosít a zajcsökk
 - ``zne_local``: Saját, ISA- és layout-biztos ZNE (:class:`ZneLocalMitigation`).
 - ``zne_mitiq``: Opcionális Mitiq ZNE referencia (:class:`MitiqZneMitigation`).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

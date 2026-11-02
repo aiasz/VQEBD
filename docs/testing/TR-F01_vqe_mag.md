@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1 — H2-VQE szimulátoron |
 | **Vizsgált verzió** | `0.2.0` |
 | **Tesztterv** | [`TP-F01`](TP-F01_vqe_mag.md) |
@@ -449,4 +449,4 @@ feltétel teljesült:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

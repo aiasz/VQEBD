@@ -2,7 +2,7 @@
 
 Szándékosan vékony: a teljes logika a ``vqebd.dashboard`` csomagban él (ADR-0009, 1. döntés).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from vqebd.dashboard.app import main

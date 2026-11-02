@@ -9,7 +9,7 @@
 | **Célverzió** | `v0.9.0` |
 | **Előzmény** | [`phase_05.md`](phase_05.md), [`00_master_plan.md`](00_master_plan.md) 7. fejezet, v0.8.1 ([`CHANGELOG`](../../CHANGELOG.md)) |
 | **Új ADR** | [`ADR-0008`](../adr/ADR-0008-hibakezeles-es-utemezes.md) — hibamodell, újrapróbálkozás, hardveres ütemezés |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -251,4 +251,4 @@ tesztkészlet) zöldek.
 | 1.0.0 | 2026-11-02 | Első változat, a jelenlegi hibakezelés előmérése (2. fejezet) alapján |
 | 1.1.0 | 2026-11-02 | Megvalósítva; a D1–D4 jóváhagyva az alapértelmezésekkel. A batch szintű kvótakapu (4.6) a megvalósítás során pótolva (TR-F06 3.) |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

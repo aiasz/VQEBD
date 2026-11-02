@@ -41,4 +41,4 @@ kémiai pontosságot ($|\Delta| < 1.6\ \text{mHa}$).
 - 1-nél kevesebb vagy duplikált skálázási pont esetén az extrapolátor hibát dob.
 - Érvénytelen extrapolátor név esetén egyértelmű `ValueError`.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

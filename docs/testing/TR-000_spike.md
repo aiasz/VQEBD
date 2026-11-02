@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Státusz** | **Lezárva — a mérések alapján az ADR-0001…0005 elfogadva** |
 | **Szkriptek** | [`scripts/spike/`](../../scripts/spike/) |
 
@@ -349,4 +349,4 @@ docker run --rm -v "$PWD:/spike" -w /spike vqebd-spike:py311 python spike_test4.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
 | **Projektverzió** | 1.0.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 9 — Dokumentáció, validálás, publikálás |
 | **Háttér** | [`phase_09.md`](plan/phase_09.md) · [`TR-F09`](testing/TR-F09_publikalas.md) |
 
@@ -135,4 +135,4 @@ A szemantikus verziózás szerint a **MINOR** a fázislezárásoknál lép (mest
 | L2 | A Zenodo felületének leírása (2. pont) **nem volt ellenőrizhető** az asszisztens számára; a felület változhat |
 | L3 | A `CITATION.cff` leírása kétnyelvű, de a Zenodo-rekord többi része (pl. a kulcsszavak) angol; magyar nyelvű metaadat külön nincs |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

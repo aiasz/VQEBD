@@ -2,7 +2,7 @@
 
 Az órát és az alvást a teszt injektálja: valós várakozás és valós pipeline nélkül fut.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

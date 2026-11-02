@@ -9,7 +9,7 @@ Ez a modul valósítja meg a VQEBD natív ZNE eljárását:
 3. A kiválasztott extrapolációs modellel (Richardson, lineáris, polinom, exponenciális)
    meghatározza a zajmentes határértéket ($\lambda \to 0$).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

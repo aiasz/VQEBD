@@ -4,7 +4,7 @@ Az IBM-hibák osztályait **nem** valódi IBM-hívás adja: a megfigyelt hibák
 (``RequestsApiError`` 403, ``InvalidAccountError``) és a feltételezett átmeneti hibák
 (hálózat, 429/5xx) szimulált megfelelői tesztelik a szabálytáblát.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

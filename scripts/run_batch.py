@@ -15,7 +15,7 @@ A futás folytatható: újraindítva a már tárolt futásokat kihagyja. A siker
 futások a ``run_failures`` táblába kerülnek (Fázis 6); újrapróbálkozáshoz és
 ütemezéshez a ``scripts/run_pipeline.py`` való.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

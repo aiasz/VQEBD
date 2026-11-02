@@ -7,7 +7,7 @@
 | **Dátum** | 2026-11-02 |
 | **Terv / tesztterv** | [`phase_11.md`](../plan/phase_11.md), [`TP-F11_heron_modell.md`](TP-F11_heron_modell.md) |
 | **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0 futtatását 2026-11-02-án külön jóváhagyta) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic) — a kódot és a szöveget az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a kódot és a szöveget az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
 | **Státusz** | **Előzetes.** Csak a pilot (B0) futott le; a megerősítő blokkok (C1…C8) még nem. **A B0 nem megerősítő adat**, a H1–H4 szerinti döntés belőle nem hozható. |
 
 ## 1. Mi futott le
@@ -125,4 +125,4 @@ pilot egy blokkja nem dönti el.)
   (a `b0.json` és a `hardver_pes.json` alapján; a különbség / √(σ₁² + σ₂²), a σ a blokkon belüli ensemble hiba).
 - Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

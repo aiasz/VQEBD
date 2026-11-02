@@ -9,7 +9,7 @@ Ez az implementáció **ISA- és layout-biztos**:
    (elkerülve a Mitiq M3-as hibáját).
 2. A kétqubites kapuk száma szigorúan λ-szorosára növekszik.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

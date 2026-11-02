@@ -11,7 +11,7 @@
 - **Nincs kvótafogyasztás:** ``ibm_qpu`` backendet tartalmazó batchet csak
   ``VQEBD_ALLOW_HARDWARE=true`` mellett indít (``phase_05.md`` 6.4).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

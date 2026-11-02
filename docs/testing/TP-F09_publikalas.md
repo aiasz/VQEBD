@@ -7,7 +7,7 @@
 | **Dátum** | 2026-11-02 |
 | **Fázis** | 9 — Dokumentáció, validálás, publikálás |
 | **Terv** | [`phase_09.md`](../plan/phase_09.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -46,4 +46,4 @@
 - **A Zenodo felületének működése** (nem érhető el az asszisztens számára).
 - Böngészős vizuális ellenőrzés, Windows- és macOS-specifikus telepítés.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

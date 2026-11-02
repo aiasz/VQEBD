@@ -25,7 +25,7 @@ becsülnek gradienst, ami **zajos** célfüggvényen félrevezető. A Fázis 1b-
 ezért a ``COBYLA`` vagy az ``SPSA`` [spall1992] lesz az ajánlott választás; a
 Fázis 1 zajmentes esetében az ``SLSQP`` a leghatékonyabb.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

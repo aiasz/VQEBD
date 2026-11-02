@@ -6,7 +6,7 @@
 | **Típus** | Test Plan (tesztterv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 0 — Alapinfrastruktúra és repó-szerkezet |
 | **Célverzió** | `v0.1.0` |
 | **Terv** | [`docs/plan/phase_00.md`](../plan/phase_00.md) |
@@ -136,4 +136,4 @@ A fázis akkor zárható le, ha **mind** teljesül:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

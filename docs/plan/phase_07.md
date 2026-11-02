@@ -9,7 +9,7 @@
 | **Célverzió** | `v0.10.0` |
 | **Előzmény** | [`phase_06.md`](phase_06.md), [`00_master_plan.md`](00_master_plan.md) 7. fejezet, v0.9.0 ([`CHANGELOG`](../../CHANGELOG.md)) |
 | **Új ADR** | [`ADR-0009`](../adr/ADR-0009-dashboard-architektura.md) — Streamlit + Plotly, tiszta adat- és ábraréteg, csak olvasás |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -204,4 +204,4 @@ CHANGELOG, `v0.10.0`; minőségi kapuk (ruff, mypy strict, teljes tesztkészlet)
 | 1.2.0 | 2026-11-02 | Megvalósítva és lezárva; D1–D4 jóváhagyva az alapértelmezésekkel |
 | 1.1.0 | 2026-11-02 | **Javítás (M9):** a `pyarrow==25.0.0` pin hibás volt; a 25.0.0 szálváltás után szegmentációs hibával omlik össze, a helyes pin 24.0.0. Az első mérés (M3) csak táblát hozott létre, a `pyarrow.compute`-ot és a szálváltást nem tesztelte |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -17,7 +17,7 @@ Használat::
 A job azonosítóját alapértelmezésben az adatfájl ``job_id`` mezőjéből veszi.
 A tokent és a CRN-t nem írja ki.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

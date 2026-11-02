@@ -6,7 +6,7 @@ Ez a teszt szándékosan *konkrét* fájllistát ellenőriz, nem mintákat: a F�
 terméke maga a szerkezet, így a szerkezet megváltozása tudatos döntés kell legyen,
 nem véletlen mellékhatás.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

@@ -6,7 +6,7 @@
 | **Cím** | A hiba is adat: tárolt hibák, osztályozott újrapróbálkozás, nem ütemezett hardver |
 | **Státusz** | **Elfogadott** (2026-11-02, a D1–D4 alapértelmezések jóváhagyásával; megvalósítva a v0.9.0-ban) |
 | **Dátum** | 2026-11-02 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 6, 7 (dashboard: hibák megjelenítése), 8 (konténerizáció) |
 | **Függ** | [ADR-0004](ADR-0004-adattarolas.md), [ADR-0005](ADR-0005-determinizmus.md), [`phase_06.md`](../plan/phase_06.md) |
 | **Bizonyíték** | [`phase_06.md`](../plan/phase_06.md) 2. fejezet (előmérés), K7 ([CHANGELOG 0.8.1](../../CHANGELOG.md)), TR-F05 7. |
@@ -73,4 +73,4 @@ tervezett, rögzített mérésekben van (5.H), nem az ismétlésben.
   pipeline előellenőrzésében él; a futásonkénti védelem (K7) ettől függetlenül minden futásnál
   lefut (TR-F06 3.).
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

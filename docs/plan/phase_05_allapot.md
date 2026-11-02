@@ -13,7 +13,7 @@
 | **Kódállapot** | `VERSION` = `0.8.0` — **T1–T7 kész (2026-11-02); hátra: commit, címke, 5.H** |
 | **Utolsó lezárt kiadás** | `v0.7.1` (javítókör) |
 | **Terv** | [`phase_05.md`](phase_05.md) · [`ADR-0007`](../adr/ADR-0007-batch-statisztika.md) · [`TP-F05`](../testing/TP-F05_batch.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 Ez a jegyzet azért készült, hogy a munka egy megszakítás után **kontextusvesztés
 nélkül** folytatható legyen. Minden állítás mögött fájl, parancs vagy mérés áll.
@@ -263,4 +263,4 @@ optimalizálás annyi jobot küld be, amennyi kiértékelést az optimalizáló 
   commit idején még futott (38/50). Ha a helyi futás végigér, az export a
   munkakönyvtárban megjelenik, és a következő commitba kerül (T1 kész).
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

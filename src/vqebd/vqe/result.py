@@ -12,7 +12,7 @@ csomagverziókat. Ha a Fázis 1 csak ``float``-ot adna vissza, a Fázis 4-ben a
 teljes hívási láncot át kellene írni — ez pedig sértené az alapterv „nem lépünk
 tovább félig működő alapokon" elvét.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

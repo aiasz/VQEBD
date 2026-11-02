@@ -9,7 +9,7 @@
 | **Célverzió** | `v0.8.0` |
 | **Előzmény** | [`phase_04.md`](phase_04.md), [`00_master_plan.md`](00_master_plan.md) 7. fejezet, v0.7.1 javítókör ([`CHANGELOG`](../../CHANGELOG.md)) |
 | **Új ADR** | [`ADR-0007`](../adr/ADR-0007-batch-statisztika.md) — ismétlés, aggregálás, hibaköltségvetés |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -360,4 +360,4 @@ AC-5.1 … AC-5.10 teljesül; TP-F05 és TR-F05 elkészült; README (HU/EN), CHA
 |---|---|---|
 | 1.0.0 | 2026-09-25 | Első változat, az aktívtér-előmérés (2. fejezet) alapján |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -1,6 +1,6 @@
 """Batch-futtatás konfigurációs mátrixon (Fázis 5, ``docs/plan/phase_05.md``).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

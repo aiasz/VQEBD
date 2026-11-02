@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 6 — Automatizálás |
 | **Tesztterv** | [`TP-F06`](TP-F06_automatizalas.md) |
 | **Terv / döntés** | [`phase_06.md`](../plan/phase_06.md) · [`ADR-0008`](../adr/ADR-0008-hibakezeles-es-utemezes.md) |
@@ -115,4 +115,4 @@ docker compose -f docker/docker-compose.yml run --rm scheduler python -W ignore 
 
 Windows / Git Bash alatt a `MSYS_NO_PATHCONV=1` előtag kell.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

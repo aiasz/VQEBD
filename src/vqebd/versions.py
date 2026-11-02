@@ -9,7 +9,7 @@ minden eredményrekord tárolja.
 
 Lásd: ``docs/plan/00_master_plan.md`` 4.4, ``docs/adr/ADR-0004-adattarolas.md``.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

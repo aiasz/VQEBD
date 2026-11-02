@@ -8,7 +8,7 @@
 | **Fázis** | 5 — Batch-futtatás, aktív tér, statisztikai módszertan |
 | **Terv** | [`phase_05.md`](../plan/phase_05.md) |
 | **Döntés** | [`ADR-0007`](../adr/ADR-0007-batch-statisztika.md) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -64,4 +64,4 @@
 | SEM(N) | elméleti σ/√N | log-log meredekség −½ |
 | Séma v2 | friss ↔ migrált adatbázis | azonos oszlopok, sorrenddel |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

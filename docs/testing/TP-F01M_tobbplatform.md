@@ -6,7 +6,7 @@
 | **Típus** | Test Plan (tesztterv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1M — Többplatformos validáció |
 | **Célverzió** | `v0.3.0` |
 | **Terv** | [`docs/plan/phase_01m.md`](../plan/phase_01m.md) |
@@ -150,4 +150,4 @@ derült ki, hogy szükség van rá. A felfedezés utólag beépült a tervbe és
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

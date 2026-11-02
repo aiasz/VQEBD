@@ -59,4 +59,4 @@ feladata; itt reprodukálható, nyers alapvonal készül hozzá.
 - ZNE és mérési hibaenyhítés (Fázis 3);
 - `qsim_noisy`, amíg a csatorna-mintavételezés külön nem validált.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

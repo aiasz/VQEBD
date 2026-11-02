@@ -25,7 +25,7 @@ Támogatott leképezések
 **A három leképezésnek ugyanazt a spektrumot kell adnia.** Ez a Fázis 1 egyik
 keresztvalidációs tesztje (AC-1.7).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

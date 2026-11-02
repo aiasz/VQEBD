@@ -7,7 +7,7 @@ hibaenyhítés), nem a ``config_hash``-ből, mert az a seedet is tartalmazza.
 A végső energia zajos szinten az újramintavételezett átlag (``reestimate_mean_ha``),
 ha van; különben a futás ``energy_ha`` értéke (``phase_05.md`` 5.5).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

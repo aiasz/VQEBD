@@ -11,7 +11,7 @@ adatszerkezetbe. A burkolásnak két oka van:
 
 .. _Qiskit Nature: https://qiskit-community.github.io/qiskit-nature/
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

@@ -6,7 +6,7 @@
 | **Cím** | A platform mint önálló benchmark-dimenzió: Qiskit ↔ Cirq ↔ qsim |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-22 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 1M (új), 1b, 2, 3, 4, 5, 7 |
 | **Függ** | [ADR-0001](ADR-0001-technologiai-stack.md), [ADR-0002](ADR-0002-sajat-vqe-hurok.md) |
 | **Bizonyíték** | [`TR-000`](../testing/TR-000_spike.md) 5–6. kör, [`TR-F01M`](../testing/TR-F01M_tobbplatform.md) |
@@ -297,4 +297,4 @@ Ezt az ADR-t újra kell tárgyalni, ha:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

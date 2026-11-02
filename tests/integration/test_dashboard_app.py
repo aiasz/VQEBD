@@ -4,7 +4,7 @@ Minden belső lépés (7.1 … 7.4) saját tesztblokkot kap; a következő lép�
 változatlanul átengedi (AC-7.8). Az ``AppTest`` a JS-ben renderelt Plotly-t nem futtatja,
 ezért az ábrákat adatszinten ellenőrizzük (a trace-ek ``x``/``y``/``z`` értékei).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

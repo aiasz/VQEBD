@@ -1,6 +1,6 @@
 # =============================================================================
 # VQEBD — docker-compose (Fázis 0)
-# Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+# Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 # =============================================================================
 # Fázis 0-ban SZÁNDÉKOSAN csak egyetlen szolgáltatás volt. A `scheduler` a Fázis 6-tól,
 # a `dashboard` a Fázis 8-tól van itt.

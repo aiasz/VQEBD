@@ -18,7 +18,7 @@ L2     VQE zajmentes állapotvektoron       az ansatz és az optimalizáló jó
 Ha L2 eltér L0-tól, a lánc megmondja, **hol** a hiba: ha már L1 is eltér, a
 leképezés a bűnös; ha csak L2, akkor az ansatz vagy az optimalizáló.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

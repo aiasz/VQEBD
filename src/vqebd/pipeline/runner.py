@@ -6,7 +6,7 @@ a naplóba és a hibatáblába csak titoktalanított szöveg kerül (ADR-0008).
 Kilépési kódok: ``0`` minden futás rendben · ``1`` részleges hiba (a hibák tárolva) ·
 ``2`` végzetes (konfiguráció, adatbázis, engedély).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

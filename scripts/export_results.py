@@ -7,7 +7,7 @@ Ez a szkript:
 2. Determinisztikusan exportálja az adatbázis tartalmát CSV és JSON formátumba
    (`data/exports/results_v1.csv`).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

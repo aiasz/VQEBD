@@ -36,7 +36,7 @@ A kezdőpont
 - **fizikailag motivált** (a legjobb egydetermináns-közelítés),
 - és **automatikusan ellenőrizhető**: az AC-1.8 teszt pontosan ezt méri.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

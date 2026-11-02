@@ -3,7 +3,7 @@
 Az ábrákat az UI-tól függetlenül, adatszinten teszteljük (``trace.x`` / ``trace.y`` / ``trace.z``):
 az ``AppTest`` a JS-ben renderelt Plotly-t nem futtatja.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

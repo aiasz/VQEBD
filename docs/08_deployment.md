@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
 | **Projektverzió** | 1.0.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 8 — Konténerizáció összeszerelése |
 | **Háttér** | [`phase_08.md`](plan/phase_08.md) · [`TR-F08`](testing/TR-F08_konteneres_rendszer.md) |
 
@@ -145,4 +145,4 @@ Nem szükséges (a dashboard a saját gépen fut), de a követelmények:
 | L3 | A konténer frissítéséhez újra kell építeni (`--build`); automatikus frissítés nincs |
 | L4 | Nincs hitelesítés, TLS és többfelhasználós működés; a hurokcím-kötés a védelem |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

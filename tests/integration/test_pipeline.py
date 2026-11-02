@@ -3,7 +3,7 @@
 Szimulátoron fut; valódi QPU-t egyik teszt sem ér el (a hardveres ágat a ``run_vqe``
 lecserélése és az engedély hiánya zárja ki).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

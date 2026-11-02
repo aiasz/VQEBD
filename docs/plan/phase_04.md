@@ -48,4 +48,4 @@ src/vqebd/storage/
 | **AC-4.6** | Érvénytelen séma vagy hiányzó kötelező mező esetén az adatbázis `sqlite3.IntegrityError` hibát dob | egységteszt |
 | **AC-4.7** | A dokumentáció (`docs/04_data_schema.md`) mezőnként definiálja a típusokat, mértékegységeket és szemantikát | dokumentáció-audit |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

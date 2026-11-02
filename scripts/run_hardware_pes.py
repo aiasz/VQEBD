@@ -21,7 +21,7 @@ Használat::
     python scripts/run_hardware_pes.py --dry-run
     VQEBD_ALLOW_HARDWARE=true python scripts/run_hardware_pes.py
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

@@ -5,7 +5,7 @@
 | **Fázis** | 0 |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Státusz** | **Elfogadott — végrehajtás alatt** |
 | **Célverzió** | `v0.1.0` |
 | **Előzmény** | [`00_master_plan.md`](00_master_plan.md), [`TR-000_spike.md`](../testing/TR-000_spike.md) |
@@ -204,4 +204,4 @@ A fázis akkor **zárható le**, ha:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -8,7 +8,7 @@ A ``transient`` szabályok **feltevések**, amíg valódi IBM-hibákkal nem erő
 (``docs/plan/phase_06.md`` 2. fejezet); a megfigyelt IBM-hibák (403 lejárt token,
 ``InvalidAccountError``) mindkettő tartós volt.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

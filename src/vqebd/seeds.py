@@ -20,7 +20,7 @@ minden Python-verzióban ugyanazt adja.
 
 Lásd: ``docs/adr/ADR-0005-determinizmus.md``.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

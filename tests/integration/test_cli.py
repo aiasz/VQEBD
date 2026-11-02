@@ -4,7 +4,7 @@ Az alapterv előírja, hogy a kvantummodul **kézzel is futtatható és ellenőr
 legyen. Ezek a tesztek a teljes láncot végigviszik a CLI-n keresztül: molekula →
 Hamilton-operátor → VQE → kimenet → kilépési kód.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

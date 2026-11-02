@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.1.0 (2.1 javítási jegyzet) |
 | **Dátum** | 2026-09-23 · 2026-09-25 (v0.7.1) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 4 — Adatséma és tárolás |
 | **Tesztterv** | [`TP-F04`](TP-F04_storage.md) |
 | **Státusz** | **Lezárva — mind a 7 elfogadási kritérium teljesült** |
@@ -78,4 +78,4 @@ meglévő `run_id`-kat nem írja felül. Ilyenkor friss adatbázisba kell export
 | **TC-406** | AC-4.6 | Integritás: duplikált run_id IntegrityError hibát ad | ✅ Teljesült |
 | **TC-407** | AC-4.7 | Dokumentáció (`docs/04_data_schema.md`) teljes körű | ✅ Teljesült |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

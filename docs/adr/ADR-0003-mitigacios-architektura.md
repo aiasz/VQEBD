@@ -6,7 +6,7 @@
 | **Cím** | Pluginalapú hibaenyhítési architektúra, saját ISA-biztos ZNE-implementációval |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-22 · **1. kiegészítés: 2026-09-25 (v0.7.1)** |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 3, 5, 6, 7 |
 | **Függ** | [ADR-0001](ADR-0001-technologiai-stack.md), [ADR-0002](ADR-0002-sajat-vqe-hurok.md) |
 | **Bizonyíték** | [`docs/testing/TR-000_spike.md`](../testing/TR-000_spike.md), 2–3. kör |
@@ -243,4 +243,4 @@ ellenőrizhető: a két implementáció torzítása +0.23 és +0.37 mHa, az elt�
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

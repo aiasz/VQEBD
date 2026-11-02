@@ -11,7 +11,7 @@ munkakönyvtárban lévő fájlokat nem javítja visszamenőleg — ezért kell 
 keletkezett, mert Windowson a ``Path.write_text()`` alapértelmezésben ``os.linesep``-re
 fordítja a ``\\n``-t. A javítás: minden generátor explicit ``newline="\\n"``-nel ír.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

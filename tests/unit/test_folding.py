@@ -1,6 +1,6 @@
 """Unitáris áramkör-hajtogatás egységtesztjei (AC-3.1, ADR-0003).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

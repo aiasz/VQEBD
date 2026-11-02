@@ -11,7 +11,7 @@ Blokk-rekord (a hardveres futtató kimenete; hibák mHa-ban a Full CI-hez képes
      "hardware_mha": {"raw": {"0.735": 22.2, ...}, "trex": {...}},
      "model_mha": {"readout": {"0.735": 21.9, ...}, "no_readout": {...}}}
 
-Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

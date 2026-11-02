@@ -8,7 +8,7 @@
 | **Státusz** | **Megvalósítva és lezárva (2026-11-02)** — mind a 10 elfogadási kritérium teljesült: [`TR-F09`](../testing/TR-F09_publikalas.md). A `v1.0.0` GitHub Release és a Zenodo-archívum létrejött, DOI: `10.5281/zenodo.23886002` |
 | **Célverzió** | `v1.0.0` (a mesterterv 8.1: „Fázis 9 lezárva = első publikált release, DOI") |
 | **Előzmény** | [`phase_08.md`](phase_08.md), [`00_master_plan.md`](00_master_plan.md) 7–8. fejezet, v0.11.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 
 ---
 
@@ -127,4 +127,4 @@ AC-9.1 … AC-9.10 teljesül; TP-F09 és TR-F09 elkészült; `v1.0.0`; a DOI be�
 |---|---|---|
 | 1.0.0 | 2026-11-02 | Első változat; az előmérés (2. fejezet) és a kiadás kifelé ható jellege alapján |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

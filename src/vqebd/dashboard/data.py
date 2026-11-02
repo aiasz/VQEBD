@@ -11,7 +11,7 @@ Források (``docs/plan/phase_07.md`` 4.2):
 Az adatbázist **csak olvasásra** nyitjuk. Hibás vagy hiányzó adatra :class:`DataLoadError`
 (érthető, felhasználónak szánt üzenettel) a nyers kivétel helyett.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

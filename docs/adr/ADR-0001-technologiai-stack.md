@@ -6,7 +6,7 @@
 | **Cím** | Technológiai stack rögzítése Qiskit 1.4.6-ra (a Mitiq-kompatibilis metszet) |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-22 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 0–10 (teljes projekt) |
 | **Bizonyíték** | [`docs/testing/TR-000_spike.md`](../testing/TR-000_spike.md), 1–3. kör |
 
@@ -165,4 +165,4 @@ Ezt az ADR-t újra kell tárgyalni, ha:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

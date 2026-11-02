@@ -1,6 +1,6 @@
 """Automatizálás: hibaosztályozás, újrapróbálkozás, pipeline (Fázis 6, ``docs/plan/phase_06.md``).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

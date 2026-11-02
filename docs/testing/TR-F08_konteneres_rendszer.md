@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 8 — Konténerizáció összeszerelése |
 | **Tesztterv** | [`TP-F08`](TP-F08_konteneres_rendszer.md) |
 | **Terv** | [`phase_08.md`](../plan/phase_08.md) |
@@ -92,4 +92,4 @@ docker port vqebd-dashboard                                                 # AC
 docker compose -f docker/docker-compose.yml down                            # AC-8.8: a volume megmarad
 ```
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

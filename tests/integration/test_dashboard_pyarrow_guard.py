@@ -5,7 +5,7 @@ a következő futás (a Streamlit minden futást új szálban végez) pedig ``py
 (pl. a pandas ``Series.unique()``-ját az ``str`` oszloptípuson). Egy szegmentációs hiba a
 tesztfolyamatot is megölné, ezért a próba **alfolyamatban** fut.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

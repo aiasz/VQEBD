@@ -4,7 +4,7 @@ Minden eredményrekord magával hordozza a futáskori csomagverziókat. Enélkü
 benchmark-adat később nem lenne értelmezhető: ugyanaz a kód más Qiskit-verzióval
 más eredményt adhat.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

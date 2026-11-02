@@ -33,7 +33,7 @@ A Qiskit 2.0 eltávolította a V1 primitíveket. A V2 primitívek (``Statevector
 ``BackendEstimatorV2``, ``EstimatorV2``) a Qiskit 1.4-ben és 2.x-ben egyaránt
 léteznek, így az itt írt kód **előre-hordozható** (ADR-0002).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

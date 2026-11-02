@@ -6,7 +6,7 @@
 | **Cím** | Zajos eredmény = eloszlás: ismétlés, újramintavételezés, t-alapú CI, hibaköltségvetés |
 | **Státusz** | **Elfogadott** |
 | **Dátum** | 2026-09-25 |
-| **Döntéshozók** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Döntéshozó** | Kormos Attila (az MI javaslatokat tett) |
 | **Érinti** | Fázis 5, 6, 7 (dashboard), 9 (publikálás) |
 | **Függ** | [ADR-0004](ADR-0004-adattarolas.md), [ADR-0005](ADR-0005-determinizmus.md), [ADR-0006](ADR-0006-tobbplatformos-architektura.md) |
 | **Bizonyíték** | TR-F01B 6., TR-F03 v1.1.0, [`phase_05.md`](../plan/phase_05.md) 2–3. fejezet, TR-F05 |
@@ -130,4 +130,4 @@ precizitásnyereséget színlelne, ami nem létezik.
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

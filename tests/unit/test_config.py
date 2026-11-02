@@ -3,7 +3,7 @@
 Ezek a tesztek **nem igénylik a kvantum-stacket**: a ``vqebd.config`` modul
 szándékosan függőségmentes, hogy a konfiguráció bárhol validálható legyen.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

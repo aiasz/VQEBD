@@ -33,7 +33,7 @@ Használat
 
 Kilépési kód: 0 siker, 2 hitelesítési vagy kapcsolati hiba.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

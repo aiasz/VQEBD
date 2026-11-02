@@ -3,7 +3,7 @@
 A Compose-fájlt szövegként vizsgáljuk (a PyYAML nincs a rögzített stackben); a tényleges
 érvényességet a ``docker compose config`` és a konténeres indítás igazolja (TR-F08).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

@@ -6,7 +6,7 @@
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
 | **Projektverzió** | 1.0.0 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 6 — Automatizálás |
 | **Háttér** | [`phase_06.md`](plan/phase_06.md) · [`ADR-0008`](adr/ADR-0008-hibakezeles-es-utemezes.md) · [`TR-F06`](testing/TR-F06_automatizalas.md) |
 
@@ -178,4 +178,4 @@ fájlból jön, **soha** nem kerül a repóba.
 | L4 | Nincs GitHub Actions ütemezés (D3, a push utánra halasztva) |
 | L5 | A `scrub_secrets` 3. rétege a 40+ karakteres azonosítókat is maszkolja |
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

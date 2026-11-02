@@ -1,6 +1,6 @@
 """Fázis 5 — batch-specifikáció és kifejtés egységtesztjei (AC-5.4, TP-F05).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations

@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.1.0 (javított — lásd 6. szakasz) |
 | **Dátum** | 2026-09-23 (mérés) · 2026-09-25 (1. javítási kör) |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 2 — Valódi hardveres futtatás |
 | **Célhardver** | `ibm_kingston` (IBM Heron r2, 156 qubit) |
 | **Job ID** | `dapq25kak42c73cj1hu0` |
@@ -158,4 +158,4 @@ szinten, 8192 lövéssel, 2 jobban (57 QPU-s). Az R = 0.735 Å-nél a TREX-es hi
 nem feloldó) változatlanok. A teljes görbe és az értelmezés:
 [TR-F05 7. pont](TR-F05_batch.md), `fig10_hardver_pes.png`.
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

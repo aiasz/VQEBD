@@ -10,7 +10,7 @@ Valódi QPU-t egyszeri, kézi futtatás indíthat (ADR-0008, 3. döntés).
 A zár **kizárólag időalapú** elavulást ismer (nincs PID-ellenőrzés): Windowson az
 ``os.kill(pid, 0)`` a folyamatot megszüntetné, ezért nem használjuk.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

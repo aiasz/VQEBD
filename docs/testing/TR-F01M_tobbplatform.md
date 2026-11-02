@@ -6,7 +6,7 @@
 | **Típus** | Test Report (mérési jegyzőkönyv) |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-09-22 |
-| **Készítők** | Kormos Attila, Claude AI (Anthropic, Claude Opus 5) |
+| **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 1M — Többplatformos validáció (Qiskit ↔ Cirq ↔ qsim) |
 | **Vizsgált verzió** | `0.3.0` |
 | **Tesztterv** | [`TP-F01M`](TP-F01M_tobbplatform.md) |
@@ -377,4 +377,4 @@ Mind a hat kilépési feltétel teljesült:
 
 ---
 
-*Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc*
+*Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

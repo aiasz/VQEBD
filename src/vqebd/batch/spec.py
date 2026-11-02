@@ -8,7 +8,7 @@ a független ismétléseket kezeli egy eloszlásként.
 
 A mátrix-választás mért indoklása: ``docs/plan/phase_05.md`` 2. és 6. fejezet.
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5)
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)
 Licenc: MIT
 """
 

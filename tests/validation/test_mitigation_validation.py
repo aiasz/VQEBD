@@ -1,6 +1,6 @@
 """Fázis 3 validációs tesztek — Hibaenyhítés és ZNE (AC-3.2, AC-3.4, TP-F03).
 
-Készítők: Kormos Attila, Claude AI (Anthropic, Claude Opus 5) — MIT licenc
+Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
 
 from __future__ import annotations
