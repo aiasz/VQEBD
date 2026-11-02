@@ -36,6 +36,7 @@ __all__ = [
     "EvaluationBudgetExceededError",
     "HardwareNotAllowedError",
     "QuotaExhaustedError",
+    "assert_block_within_budget",
     "assert_hardware_allowed",
     "assert_quota_available",
     "connect_service",
@@ -110,6 +111,38 @@ def assert_quota_available(usage: Mapping[str, Any], required_seconds: float) ->
         raise QuotaExhaustedError(
             f"a hátralévő kvóta ({remaining} s) kevesebb a becsült igénynél "
             f"({required_seconds:.0f} s)"
+        )
+
+
+def assert_block_within_budget(
+    usage: Mapping[str, Any],
+    required_seconds: float,
+    *,
+    max_used_fraction: float = 0.80,
+) -> None:
+    """Megtagadja a blokkot, ha a használat a kerethányad fölé menne (Fázis 11, 4. fejezet).
+
+    A ``assert_quota_available`` csak azt nézi, hogy a hátralévő kvóta fedezi-e az igényt. A
+    Fázis 11 blokkjainál ennél szigorúbb szabály él: a már használt + a tervezett idő sem
+    haladhatja meg a keret ``max_used_fraction`` részét (alapértelmezés 80% = 480 s), hogy
+    mindig maradjon tartalék.
+
+    Raises:
+        QuotaExhaustedError: Ha a keret vagy a használat ismeretlen, vagy a határ átlépődne.
+    """
+    consumed = usage.get("usage_consumed_seconds")
+    limit = usage.get("usage_limit_seconds")
+    if consumed is None or limit is None:
+        raise QuotaExhaustedError("a kvótaállás nem ismert — beküldés megtagadva")
+    if not 0.0 < max_used_fraction <= 1.0:
+        raise ValueError(f"max_used_fraction (0, 1] közé essen, kapott: {max_used_fraction}")
+    ceiling = float(limit) * max_used_fraction
+    projected = float(consumed) + required_seconds
+    if projected > ceiling:
+        raise QuotaExhaustedError(
+            f"a blokk után {projected:.1f} s volna használva, a {max_used_fraction:.0%}-os határ "
+            f"{ceiling:.1f} s (használt: {float(consumed):.1f} s, a blokk igénye: "
+            f"{required_seconds:.1f} s) — beküldés megtagadva"
         )
 
 

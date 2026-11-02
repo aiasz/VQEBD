@@ -43,8 +43,10 @@ használja, ami **nem pontos** minden commitra. A pontos modell-hozzárendelés 
 
 1. **Nincs független szakértői lektorálás** a fizikai/kémiai állításokról, a módszertanról vagy a kódról.
 2. **Nincs külső replikáció.** A „külső személyes" telepítési próbát (TR-F09 AC-9.8) is az MI végezte ugyanazon a gépen.
-3. **A szerző kódátnézésének mértékét ez a nyilatkozat nem állítja.** A fejlesztés a fázisonkénti jóváhagyásra épült, nem
-   dokumentált soronkénti emberi átnézésre. Aki a kódot használja, ezt vegye figyelembe.
+3. **Emberi kódátnézés — a szerző közlése szerint a kód körülbelül 80%-át soronként átnézte** (2026-11-02, a munkamenetben
+   elmondva). Ez **önbevallás**: nincs róla dokumentáció, és nem rögzített, melyik 80% (fájlok, sorok), ezért ez a nyilatkozat
+   **nem állítja**, hogy a kód egésze vagy egy meghatározott része átnézett. Az átnézés nem független szakértői lektorálás.
+   Aki a kódot használja, ezt vegye figyelembe.
 4. **A szakirodalmi pozicionálást** ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)) az MI végezte
    egy keresési menetben, kivonat- és metaadat-szinten; nem szisztematikus áttekintés, és a hivatkozott művek teljes
    szövegét senki nem olvasta végig.
@@ -119,8 +121,10 @@ every commit**. The exact model attribution cannot be fully reconstructed.
 
 1. **No independent expert review** of the physics/chemistry claims, the methodology or the code.
 2. **No external replication.** The "outside person" installation trial (TR-F09 AC-9.8) was also performed by the AI on the same machine.
-3. **This statement does not claim any particular degree of line-by-line human code review.** Development relied on
-   per-phase approval, not on documented line-by-line human review. Users of the code should take this into account.
+3. **Human code review — according to the author, roughly 80% of the code was reviewed line by line** (stated in the session,
+   2026-11-02). This is **self-reported**: it is not documented, and which 80% (files, lines) is not recorded, so this statement
+   **does not claim** that all of the code, or any specific part of it, has been reviewed. The review is not an independent
+   expert review. Users of the code should take this into account.
 4. **The literature positioning** ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)) was done by the AI
    in a single search pass at abstract/metadata level; it is not a systematic review, and nobody has read the full text of the cited works.
 5. **The hardware results** are single runs per point on one device, for one small molecule (H₂). No general conclusion follows.

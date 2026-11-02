@@ -94,6 +94,8 @@ REQUIRED_FILES: tuple[str, ...] = (
     "docs/testing/TP-F04_storage.md",
     "docs/testing/TR-F04_storage.md",
     "scripts/gen_references.py",
+    "scripts/run_heron_blocks.py",
+    "scripts/analyze_heron.py",
     "scripts/negative_test_harness.py",
     "scripts/check_ibm_access.py",
     "scripts/run_hardware_vqe.py",

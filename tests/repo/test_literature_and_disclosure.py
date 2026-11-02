@@ -95,9 +95,12 @@ def test_ai_disclosure_is_bilingual_and_states_what_was_not_verified(repo_root: 
         assert required in text, required
 
 
-def test_ai_disclosure_does_not_claim_line_by_line_human_review(repo_root: Path) -> None:
+def test_ai_disclosure_records_the_code_review_as_self_reported(repo_root: Path) -> None:
+    """A szerző közlése (kb. 80% soronként átnézve) önbevallásként, korlátokkal szerepel."""
     text = _read(repo_root, "AI_DISCLOSURE.md")
-    assert "nem állítja" in text  # HU: a nyilatkozat nem állít soronkénti emberi átnézést
+    assert "80%" in text
+    assert "önbevallás" in text and "self-reported" in text
+    assert "nem állítja" in text  # HU: nem állítja, hogy a kód egésze átnézett
     assert "does not claim" in text  # EN
 
 

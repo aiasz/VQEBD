@@ -453,6 +453,7 @@ class IBMQpuEnergyEvaluator(IsaEnergyEvaluator):
         backend_name: str | None = None,
         shots: int = 8192,
         resilience_level: int = IBM_DEFAULT_RESILIENCE_LEVEL,
+        initial_layout: Sequence[int] | None = None,
     ) -> None:
         import os
 
@@ -497,11 +498,13 @@ class IBMQpuEnergyEvaluator(IsaEnergyEvaluator):
         self._target = self._backend
         self._logical_observable = observable
 
+        self._initial_layout = list(initial_layout) if initial_layout is not None else None
         self._isa_circuit = transpile(
             circuit,
             backend=self._backend,
             optimization_level=3,
             seed_transpiler=seeds.transpiler,
+            initial_layout=self._initial_layout,
         )
         self._isa_observable = (
             observable.apply_layout(self._isa_circuit.layout)
@@ -520,6 +523,17 @@ class IBMQpuEnergyEvaluator(IsaEnergyEvaluator):
     @property
     def kind(self) -> BackendKind:
         return "ibm_qpu"
+
+    @property
+    def backend(self) -> Any:
+        """A használt IBM-backend (kalibrációs pillanatképhez; csak olvasásra)."""
+        return self._backend
+
+    @property
+    def physical_qubits(self) -> list[int]:
+        """Az ISA-áramkör által ténylegesen használt fizikai qubitek (rendezve)."""
+        circuit = self._isa_circuit
+        return sorted({circuit.find_bit(q).index for inst in circuit.data for q in inst.qubits})
 
     @property
     def last_job_id(self) -> str | None:

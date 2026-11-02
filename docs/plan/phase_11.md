@@ -3,16 +3,17 @@
 | | |
 |---|---|
 | **Fázis** | 11 *(a mesterterv 10. „közösségi visszacsatolás" fázisától független, kísérleti ág; a számozás nem jelent időrendet)* |
-| **Dokumentum-verzió** | 1.0.0 |
+| **Dokumentum-verzió** | 1.2.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **TERV — jóváhagyásra vár. Semmilyen hardveres futtatás nem indult, és nem is indítható a jóváhagyás nélkül.** |
+| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a befagyasztás (`FROZEN`, címke) a szerzőre vár. Semmilyen hardveres futtatás nem indult; a blokkokat a szerző blokkonként külön hagyja jóvá.** |
 | **Célverzió** | `v1.1.0` (ha a fázis lezárul) |
+| **Tesztterv** | [`TP-F11`](../testing/TP-F11_heron_modell.md) |
 | **Előzmény** | [`phase_09.md`](phase_09.md), [`TR-F05` 7.](../testing/TR-F05_batch.md), [`10_literature_positioning.md`](../10_literature_positioning.md), v1.0.0 |
 | **Készítők** | Kormos Attila, Claude AI (Anthropic) — a terv MI-vel készült, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
 
 > **Fontos a tervről.** Ez a terv nem külső regiszterben (pl. OSF) előre regisztrált protokoll, hanem a repóban, git-commit
-> időbélyeggel rögzített **belső előzetes meghatározás**. Az MI írta; a küszöbértékek (különösen a 3. fejezet δ-ja) **javaslatok**,
-> amelyeket a szerzőnek jóvá kell hagynia vagy módosítania, *mielőtt* az első megerősítő mérés lefut.
+> időbélyeggel rögzített **belső előzetes meghatározás** (a szerző a külső regisztert nem kérte). Az MI írta; a küszöbértékeket
+> (3. fejezet) a szerző a 8. fejezet szerint jóváhagyta.
 
 ---
 
@@ -42,6 +43,11 @@ Mind **kvóta nélkül** futott (csak olvasás a szolgáltatótól + helyi szimu
 | M6 | A mérés időigénye | 5 geometria × 14 kiértékelés ≈ **185 s** helyi számítás | Kvóta nélkül, percek alatt ismételhető |
 | M7 | IBM Open Plan kvóta | **600 s / 28 nap**, ebből 57 s használt, **543 s hátravan**; költség: **~4,8 s/PUB** (nyers), **~6,6 s/PUB** (TREX) | A hardveres terv költségvetése (4. fejezet) innen jön |
 | M8 | Kalibrációs pillanatkép | **jelenleg nem mentjük** a futásokhoz | Pótlandó (11.A): a modellt a *mérés idejének* kalibrációjával kell építeni |
+| M9 | *(11.A szárazfutás, 2026-11-02)* A B0 blokk szárazfutása (0 QPU-s) | A transzpiler a mai kalibrációval a **[11, 12]** qubitpárt választotta (kiolvasási hiba 1,75% és 3,67%), nem az 5.H-ban használt [1, 2]-t (1,09% és 0,92%). A modell [11,12]-n ≈ +51 mHa-t, [1,2]-n ≈ +24 mHa-t jósolt (0,735 Å) | **Eltérés a jóváhagyott tervtől (D-1):** a qubitpár nem a pilotból, hanem **előre, a protokollban rögzített: [1, 2]** (a szerző jóváhagyta, 2026-11-02). Indok: összevethető az 5.H adatokkal, és a választás nem a hardveres kimenetelen, hanem a kalibráción és a korábbi méréseken alapul |
+| M10 | Ugyanaz a szárazfutás, két kalibráció | A [1, 2] párra a modell-előrejelzés a 14:46-os és a 15:05-ös kalibrációból: 0,5 Å: +31,8 → **+35,6**; 0,735 Å: +23,2 → +25,9; 1,0 Å: +18,6 → +18,2; 1,5 Å: +12,4 → +13,4; 2,0 Å: +11,9 → +13,5 mHa (SE ≈ 0,5–1,5) | **Egy napon belül, ~20 perc alatt 1–4 mHa-t mozdult a modell**: a kalibrációs drift (R1) nem elhanyagolható a δ = 3,0 mHa mellett. A kalibrációs pillanatkép blokk előtt **és** után, valamint H4 ezért nem opcionális |
+| M11 | A kiolvasási hiba hatása a modellben (15:05-ös kalibráció) | kiolvasással: +35,6 / +25,9 / +18,2 / +13,4 / +13,5; **anélkül**: +11,9 / +9,1 / +5,8 / +3,9 / +3,3 mHa | A modellben a nyers hibának ~60–75%-a a kiolvasási hiba (felderítő) |
+| M12 | A kvóta ablaka | `usage_period` = a lekérdezés pillanatától visszaszámolt **28 nap** (a `start_time`/`end_time` a lekérdezéssel együtt mozog) | Gördülő ablak: a mai 57 s kb. 2026-11-30-ig számít bele |
+| M13 | Hiba a saját kódban (a szárazfutás fedte fel) | `AerSimulator.from_backend(b, readout_error=False)` a kulcsszót **elnyeli**: a „kiolvasás nélküli" modell azonos volt a kiolvasásossal | Javítva: a zajmodell közvetlenül a `NoiseModel.from_backend(b, readout_error=…)`-ből épül; regressziós teszt védi |
 
 **Mit NEM mutat M1–M6.** (a) A hardveres görbe már ismert volt a modellillesztéskor *(a modellnek nem voltak szabad paraméterei,
 de a döntéseket — pl. hogy a `BackendEstimatorV2` utat nézzük — az eredmény ismeretében is hozhattuk)*, ezért ez
@@ -65,7 +71,7 @@ A 0,5 és 1,0 Å a *pilotban* (11.B) szerepel, de a megerősítő végpontokban 
 | **H2** | A kiolvasási hiba modellezése lényeges | a Δ_g négyzetes hibája kiolvasással vs. **kiolvasás nélkül** (azonos modell, `readout_error` kikapcsolva), páros különbség blokkonként | H2 igaz, ha a kiolvasásos modell blokkokon átlagolt négyzetes hibája kisebb, a páros különbség 95% CI-je kizárja a nullát |
 | **H3** *(másodlagos, felderítő)* | A TREX-szel enyhített hardver ≈ a modell **kiolvasási hiba nélkül** | ugyanaz a TOST, δ = 3,0 mHa | **Nem** hozhat megerősítő állítást: a TREX-et a modell nem szimulálja, a kiolvasás-nélküli modell csak közelítés |
 | **H4** *(másodlagos)* | A blokkonkénti (friss) kalibráció pontosabb, mint egy rögzített | páros különbség a blokkonkénti-kalibrációs és a pilot-kalibrációs modell négyzetes hibájában | csak leíró; ha a kalibráció a blokkok közt alig változik, nincs teljesítménye |
-| **H5** *(opcionális, 11.D)* | A modell a θ-függést is jól adja (nem csak θ\*-nál) | 1D θ-scan: modell vs. hardver görbe, reziduumok | csak leíró (nincs elfogadási küszöb) |
+| ~~**H5**~~ *(elhagyva, döntés 4.)* | A modell a θ-függést is jól adja (nem csak θ\*-nál) | 1D θ-scan: modell vs. hardver görbe, reziduumok | csak leíró (nincs elfogadási küszöb) |
 
 **A döntés következménye (előre kimondva):**
 
@@ -97,7 +103,7 @@ tapadjon):
 |---|---|---|
 | **Pilot (B0)** | 5 geometria × (nyers + TREX), a *fix* qubitpáron; **kalibrációs pillanatkép** | 5 × (4,8 + 6,6) = **57 s** |
 | **Megerősítő (C1…C8)** | 3 geometria × (nyers + TREX) | 3 × (4,8 + 6,6) = **34,2 s** |
-| **θ-scan (D)** | 0,735 Å-nél 15 θ-pont egyetlen jobban, nyers | 15 × 4,8 = **72 s** |
+| ~~θ-scan (D)~~ *(elhagyva)* | 0,735 Å-nél 15 θ-pont egyetlen jobban, nyers | 15 × 4,8 = **72 s** |
 
 **Ütemezés** (a napok a **jóváhagyás utáni 0. naphoz** viszonyítva; az „ablak" az IBM gördülő 28 napos keretére vonatkozik, a valódi
 szabad keretet a futtatás előtt mindig az élő `usage()` adja):
@@ -114,7 +120,7 @@ szabad keretet a futtatás előtt mindig az élő `usage()` adja):
 | C6 | 12 | 34,2 s | 319 / 600 = 53% | |
 | C7 | 14 | 34,2 s | 353 / 600 = 59% | |
 | C8 | 16 | 34,2 s | 388 / 600 = 65% | **A megerősítő szakasz vége; a H1–H4 kiértékelése** |
-| D θ-scan | ≥ 30 (új ablak) | 72 s | az akkor élő `usage()` szerint | a 2. ablakban, amikor a nov. 2-i 57 s és a B0 már kikopott |
+| ~~D θ-scan~~ | — | — | — | **elhagyva** (döntés 4.) |
 
 - Az 1. ablak összes használata: 57 s (meglévő) + 57 s (B0) + 8 × 34,2 s = **~388 s ≤ 480 s** (a 80% küszöb). **A tartalék ≥ 212 s.**
 - Ha a pilot a **per-PUB költséget > 20%-kal eltérőnek** mutatja a becsléstől (kisebb jobok költsége nem biztos, hogy lineáris), a
@@ -142,7 +148,7 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 | C1 | Új szimulátor-útvonal: **kiolvasást is modellező** becslő (`BackendEstimatorV2` + `AerSimulator.from_backend(backend)`), a mostani `qiskit_aer_noisy` (FakeManila, readout nélküli Aer-becslő) **mellett**, nem helyett | az ADR-0003 1. kiegészítése (K1) szerint az Aer `EstimatorV2` nem modellez kiolvasási hibát |
 | C2 | A modell a **tényleges backendből** (`NoiseModel.from_backend`) építhető, a kalibráció-időbélyeg rögzítve | a DB-sémában új mező (v4) vagy a `metadata` JSON |
 | C3 | **Kalibrációs pillanatkép** minden hardveres blokkhoz: időbélyeg, a használt qubitek T1/T2/readout/kapuhibái, `last_update_date` | csak olvasás, QPU-idő nélkül; fájlba (`docs/figures/data/f11/`) |
-| C4 | **Fix fizikai qubitpár** (`initial_layout`) a pilotból; a transzpiler `seed`-je rögzítve | különben a blokkok nem összehasonlíthatók (az optimalizált layout a kalibrációtól függ) |
+| C4 | **Fix fizikai qubitpár** (`initial_layout` = **[1, 2]**, a protokollban előre rögzítve — lásd M9, D-1); a transzpiler `seed`-je rögzítve | különben a blokkok nem összehasonlíthatók (az optimalizált layout a kalibrációtól függ) |
 | C5 | `scripts/run_heron_blocks.py` — blokkonkénti futtató: `--block B0|C1…C8|D`, `--dry-run`, kapu, **nyers job-adatok mentése** (job-azonosító, eredmények, időbélyeg) | a meglévő `run_hardware_pes.py` mintájára |
 | C6 | **Elemző szkript**, a mérések előtt megírva és **szintetikus adaton tesztelve** (TOST, blokk-szintű t-CI, páros különbségek) | az elemzési rugalmasság ellen |
 | C7 | Dashboard-nézet (opcionális, 11.F) | |
@@ -157,13 +163,13 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 | **11.A-fagyasztás** | git-címke `protocol-f11-frozen`; a δ és a geometriák végleges jóváhagyása | 0 s | **szerző** |
 | **11.B** | B0 pilot (+ költség-újramérés) | 57 s | **szerző, blokk előtt** |
 | **11.C** | C1…C8 | 8 × 34,2 s | **szerző, blokkonként** |
-| **11.D** | θ-scan *(opcionális)* | 72 s | szerző |
+| ~~11.D~~ | ~~θ-scan~~ — **elhagyva** (döntés 4.) | 0 s | — |
 | **11.E** | nagyobb rendszerek **szimulálva** — *csak ha H1 egyenértékű* | 0 s | szerző |
 | **11.F** | TR-F11, README/CHANGELOG, `v1.1.0` | 0 s | szerző |
 
 | AC | Kritérium |
 |---|---|
-| AC-11.1 | A readout-aware útvonal 0,735 Å-nél reprodukálja az M4 értékét (+22 ± ~2 mHa) a konténerben |
+| AC-11.1 | A `build_simulator(readout=True)` bitre azonos a felderítő `AerSimulator.from_backend` + `BackendEstimatorV2` útvonallal (azonos kalibráció és seedek mellett); a `readout=False` attól mérhetően eltér ✅ *(0,735 Å: +24,03 ± 1,02 vs. +24,03 ± 1,02; kiolvasás nélkül +8,20 ± 0,97 mHa)* |
 | AC-11.2 | A kalibrációs pillanatkép minden hardveres blokkhoz mentve, a modell *ebből* épül |
 | AC-11.3 | Az elemző szkript szintetikus adaton: ismert eltolást (pl. 5 mHa) kimutat; eltolás nélkül TOST-egyenértékűséget ad (negatív kontroll is) |
 | AC-11.4 | Egyetlen blokk sem lépi át a 80%-os használatot; a kapu tesztelt (`--dry-run`, kimerült kvóta, hiányzó engedély) |
@@ -172,6 +178,17 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 | AC-11.7 | A TR-F11 minden korlátot kimond (egy eszköz, 2 qubit, H₂, ~8 blokk, MI-vel készített terv, nincs külső regisztráció) |
 
 ---
+
+### 6.1 A 11.A állapota (2026-11-02)
+
+| AC | Állapot |
+|---|---|
+| AC-11.1 | ✅ élő olvasással igazolva (fent) |
+| AC-11.2 | ✅ a futtató blokk előtt és után menti a pillanatképet; a modell a blokk kalibrációjából épül (a blokk végén nem épül újra) |
+| AC-11.3 | ✅ `tests/unit/test_heron_analysis.py` (5 mHa eltolás kimutatva, eltolás nélkül egyenértékű, döntési szabály) |
+| AC-11.4 | ✅ `tests/unit/test_heron_model.py` (80% kapu, ütemterv-összeg, hiányzó engedély, hiányzó `FROZEN`); a szárazfutás **0 QPU-s** |
+| AC-11.5 | ⬜ a szerzőre vár (`FROZEN` + címke) |
+| AC-11.6–7 | ⬜ a mérések után |
 
 ## 7. Kockázatok és korlátok
 
@@ -187,12 +204,18 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 
 ---
 
-## 8. Nyitott kérdések a szerzőnek (a jóváhagyáshoz)
+## 8. A szerző döntései (2026-11-02)
 
-1. **δ = 3,0 mHa** elfogadható? (Szigorúbb δ = 1,6 mHa csak sokkal több blokkal lenne megvalósítható; lásd a teljesítmény-becslést.)
-2. A megerősítő geometriák **{0,735; 1,5; 2,0} Å** jók?
-3. Jó-e a **8 megerősítő blokk / 2 naponként** ütem, vagy más ritmus kell (pl. hétvégék nélkül)?
-4. Kéri-e az **opcionális θ-scant (11.D)**?
-5. Kéri-e a protokollt **külső regiszterben** (pl. OSF) is rögzíteni a `protocol-f11-frozen` címke mellett?
+| # | Kérdés | Döntés |
+|---|---|---|
+| 1 | δ = 3,0 mHa egyenértékűségi küszöb | **Igen** |
+| 2 | Megerősítő geometriák {0,735; 1,5; 2,0} Å | **Igen** |
+| 3 | 8 megerősítő blokk, 2 naponként | **Igen** |
+| 4 | Opcionális θ-scan (11.D, H5) | **Nem** — a 11.D és a H5 elmarad; a tervben csak tájékoztató jelleggel maradt |
+| 5 | Külső regiszter (OSF) | **Nem** — a `protocol-f11-frozen` git-címke a rögzítés |
+
+A szerző közlése szerint a kód ~80%-át soronként átnézte ([`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) 3. pont, önbevallás).
+**A jóváhagyás a tervre és a küszöbökre vonatkozik, nem egyetlen hardveres blokk beküldésére sem:** minden blokk előtt külön
+`--dry-run` és a szerző külön igenje kell.
 
 *Készítők: Kormos Attila, Claude AI (Anthropic) — MIT licenc*
