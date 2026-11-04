@@ -1,14 +1,14 @@
-# TR-F11 — Fázis 11 jegyzőkönyv (a Heron-zajmodell validálása) — ELŐZETES: B0 pilot
+# TR-F11 — Fázis 11 jegyzőkönyv (a Heron-zajmodell validálása) — ELŐZETES: B0 pilot és C1
 
 | | |
 |---|---|
 | **Azonosító** | TR-F11 |
-| **Dokumentum-verzió** | 0.1.0 (előzetes: csak a B0 pilot) |
-| **Dátum** | 2026-11-02 |
+| **Dokumentum-verzió** | 0.2.0 (előzetes: B0 pilot + C1; a 6. szakasz a C1-et tartalmazza) |
+| **Dátum** | 2026-11-02 (B0), 2026-11-04 (C1) |
 | **Terv / tesztterv** | [`phase_11.md`](../plan/phase_11.md), [`TP-F11_heron_modell.md`](TP-F11_heron_modell.md) |
-| **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0 futtatását 2026-11-02-án külön jóváhagyta) |
+| **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0-t 2026-11-02-án, a C1-et 2026-11-04-én külön jóváhagyta) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a kódot és a szöveget az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **Előzetes.** Csak a pilot (B0) futott le; a megerősítő blokkok (C1…C8) még nem. **A B0 nem megerősítő adat**, a H1–H4 szerinti döntés belőle nem hozható. |
+| **Státusz** | **Előzetes.** A pilot (B0) és az első megerősítő blokk (C1) futott le; C2…C8 még nem. **A B0 nem megerősítő adat; a C1 megerősítő, de egyetlen blokk** (n = 1), a H1–H4 szerinti döntés belőle nem hozható (legalább 2 blokk kell a szórás becsléséhez, a terv szerint 8). |
 
 ## 1. Mi futott le
 
@@ -123,6 +123,93 @@ pilot egy blokkja nem dönti el.)
   a `b0.json` a teljes mérést tartalmazza.
 - A 2.3 szakasz összehasonlítása és a z-értékek **nem előre kimondott** vizsgálatok, hanem a pilot utáni leíró számítások
   (a `b0.json` és a `hardver_pes.json` alapján; a különbség / √(σ₁² + σ₂²), a σ a blokkon belüli ensemble hiba).
+- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+
+## 6. C1 — az első megerősítő blokk (2026-11-04)
+
+**Megerősítő adat, de n = 1:** a blokk-közi szórást nem lehet becsülni, ezért a TOST és a H1–H4 nem értékelhető. Az alábbi számok
+leíró jellegűek. A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a futás a tervtől nem tért el.
+
+### 6.1 Mi futott le, és mibe került
+
+| Elem | Érték |
+|---|---|
+| Blokk, geometriák | C1, R = 0,735; 1,5; 2,0 Å, nyers + TREX, `ibm_kingston`, qubitpár **[1, 2]**, 8192 lövés |
+| Előzetes lépések | friss `--dry-run` (0 QPU-s, a kapu elengedett), a szerző külön jóváhagyása, az élő `usage()` kapu (114 s + 42,7 s ≤ 480 s) |
+| Kimenet | [`c1.json`](../figures/data/f11/c1.json), [`c1.log`](../figures/data/f11/c1.log) |
+
+| Szint | Job | Beküldve (UTC) | Futás | Vége | QPU-s | Becslés |
+|---|---|---|---|---|---|---|
+| 1 (TREX) — a protokoll szerint C1-en ez az első | `dbleevm74qds73dqbib0` | 08:06:22 | 08:26:45 | 08:29:41 | **24** | 19,8 |
+| 0 (nyers) | `dblepul8mdtc73d61nng` | 08:29:46 | 08:29:48 | 08:35:03 | **15** | 14,4 |
+
+- **Összesen 39 QPU-s** a becsült 34,2 s helyett (**+14%**). A kvóta 114 → **153 / 600 s**; a 80%-os határ (480 s) alatt, a kapu
+  1,25-ös biztonsági szorzója (42,7 s) fedte a többletet.
+- **A költségbecslés nem pontos a TREX-nél:** 6,6 s/PUB (B0) helyett itt 8,0 s/PUB. A két méréspontból (B0: 5 PUB, C1: 3 PUB)
+  *hipotézisként* illeszkedik egy rögzített többlet + 4,5 s/PUB modell (nyers ≈ 1,5 s + 4,5·n, TREX ≈ 10,5 s + 4,5·n). Két pontból
+  ez nem igazolt; a következő blokkok megerősítik vagy cáfolják. Ha igaz, minden blokk **~39 s**.
+- **Hatás az ütemtervre:** a maradék 7 blokk × 39 s = 273 s → a végén **~426 s (71%)**, a 80% (480 s) alatt, a tartalék ~174 s (29%).
+  A korábbi terv 388 s-ot jósolt; a ≥ 20%-os tartalék teljesül, a ≥ 212 s-os nem (a 212 s a becsült költséggel számolt cél volt).
+- Sorban állás: a TREX job 20 percet, a nyers 5 másodpercet várt; QPU-időt nem fogyaszt.
+- **Korrekció a munkamenetből:** a futás közben tévesen "nyers" jobként írtam le az elsőként sorban álló jobot; az a protokoll
+  szerint (`level_order("C1") = [1, 0]`) TREX volt. A kód a tervnek megfelelően működött.
+
+### 6.2 Kalibráció
+
+A blokk előtti és utáni pillanatkép azonos (`last_update_date` 2026-11-04T07:49:27Z, a pillanatképek 08:03 és 08:35 UTC-kor). A
+B0-hoz (2026-11-02T16:10Z) képest **változott** az [1, 2] pár kalibrációja: kiolvasási hiba q1 1,09% → 0,68%, q2 0,92% → 1,07%;
+T1 q1 394 → 178 µs; cz-hiba 0,113% → 0,099%. A modell-előrejelzés ennek megfelelően máshol van, mint a B0-nál (0,735 Å:
++25,9 → +23,0 mHa), tehát a modell reagál a kalibrációra. A szárazfutás (07:14Z kalibráció) és a valódi indítás (07:49Z) közti
+változás az [1, 2] párra nem hatott (azonos előrejelzés), vagyis a köztes frissítés feltehetően más qubiteket érintett (nem vizsgáltuk).
+
+### 6.3 Eredmény (mHa a Full CI-hez; z = különbség / blokkon belüli ensemble hiba)
+
+**Nyers hardver ↔ kiolvasást modellező Heron-modell:**
+
+| R (Å) | Hardver (nyers) | Modell (kiolvasással) | Különbség | z | B0 különbség (összevetésül) |
+|---|---|---|---|---|---|
+| 0,735 | 54,8 | 23,0 | **+31,8** | 9,1 | +14,1 |
+| 1,5 | 26,7 | 11,8 | **+14,9** | 6,2 | +3,5 |
+| 2,0 | 18,0 | 11,9 | **+6,1** | 3,9 | +2,4 |
+
+**TREX hardver ↔ kiolvasás nélküli modell:**
+
+| R (Å) | Hardver (TREX) | Modell (kiolvasás nélkül) | Különbség | z | B0 különbség (összevetésül) |
+|---|---|---|---|---|---|
+| 0,735 | 15,6 | 8,2 | +7,4 | 2,1 | −2,0 |
+| 1,5 | 9,2 | 3,6 | +5,6 | 2,2 | −1,1 |
+| 2,0 | 2,5 | 3,0 | −0,5 | −0,3 | −1,0 |
+
+**A kiolvasási hiba hozzájárulása** (nyers − TREX a hardveren, ill. kiolvasásos − kiolvasás nélküli a modellben):
+
+| R (Å) | Hardver C1 | Modell C1 | Arány C1 | Hardver B0 | Modell B0 | Arány B0 |
+|---|---|---|---|---|---|---|
+| 0,735 | 39,2 | 14,8 | 2,65 | 32,9 | 16,8 | 1,96 |
+| 1,5 | 17,5 | 8,2 | 2,13 | 14,1 | 9,5 | 1,49 |
+| 2,0 | 15,5 | 8,9 | 1,74 | 13,6 | 10,2 | 1,33 |
+
+### 6.4 Értelmezés – és ami NEM következik belőle
+
+- **A C1 a B0 irányát erősíti és élesíti:** a nyers hardverhibát a kalibrációból épített, kiolvasást modellező modell mindhárom
+  geometrián jelentősen alulbecsülte (+6 … +32 mHa; a δ = 3,0 mHa sávon mindhárom kívül van), a különbség a rövid kötésnél a legnagyobb.
+- **A hiányzó rész nagyrészt a kiolvasáshoz társul:** a hardveren a nyers és a TREX közti különbség 1,3–2,7-szerese annak, amit a
+  modell a kiolvasási hibából jósol, mindkét blokkban és mindhárom geometrián. Ez *összhangban van* azzal, hogy a hardveren a
+  tényleges (a mérés pillanatában érvényes, esetleg korrelált) kiolvasási hiba nagyobb a kalibrációban szereplő, qubitenkénti
+  átlagos értéknél. **Ez hipotézis, nem ellenőrzött ok.**
+- **A TREX-es egyezés sem teljes:** a B0-nál a TREX-es hardver a kiolvasás nélküli modellel 1σ-n belül egyezett, a C1-en két pont
+  (0,735 és 1,5 Å) ~2,1–2,2σ-val magasabb. Ez egy blokkon nem megkülönböztethető a blokk-közi változékonyságtól.
+- **A hardver maga is változik:** a nyers hiba a B0-hoz képest 0,735 Å-nél 40,0 → 54,8 mHa, 1,5 Å-nél 16,9 → 26,7, 2,0 Å-nél 15,9 → 18,0
+  (két nap, más kalibráció). A TREX-es hiba is nőtt (7,1 → 15,6; 2,8 → 9,2; 2,4 → 2,5). A blokk-közi változékonyság tehát nagy;
+  pontosan ezt méri a terv. Nem tudjuk, mennyi a kalibráció változásának, mennyi a hardver pillanatnyi állapotának a hatása.
+- **Nem állítható:** a H1–H4 eldöntése (n = 1); az ok; általánosítás más eszközre, qubitpárra vagy molekulára.
+- **Várható irány (nem előrejelzés):** ha a C2…C8 is hasonlóan viselkedik, a H1 (egyenértékűség ±3,0 mHa-n belül) elutasított lesz.
+  A protokoll a küszöböt nem engedi módosítani; az elutasítás értékes, publikálandó eredmény ("a kalibrációból épített modell
+  nem jósolja a nyers hardverhibát, mert a kiolvasási hiba nagyobb a kalibrációnál").
+
+### 6.5 Megjegyzések
+
+- A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás); a TOST csak a megerősítő blokkok
+  teljes sorozatán értékelhető (`scripts/analyze_heron.py`, C8 után).
 - Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
 
 *Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -5,7 +5,7 @@
 | **Fázis** | 11 *(a mesterterv 10. „közösségi visszacsatolás" fázisától független, kísérleti ág; a számozás nem jelent időrendet)* |
 | **Dokumentum-verzió** | 1.2.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). A B0 pilot lefutott (2026-11-02, 57 QPU-s; kvóta 114/600 s), a megerősítő blokkok (C1…C8) még nem; a blokkokat a szerző blokkonként külön hagyja jóvá. Eredmény: [`TR-F11`](../testing/TR-F11_heron_modell.md) (előzetes).** |
+| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). A B0 pilot lefutott (2026-11-02, 57 QPU-s), a C1 is (2026-11-04, 39 QPU-s; kvóta 153/600 s), a C2…C8 még nem; a blokkokat a szerző blokkonként külön hagyja jóvá. Eredmény: [`TR-F11`](../testing/TR-F11_heron_modell.md) (előzetes).** |
 | **Célverzió** | `v1.1.0` (ha a fázis lezárul) |
 | **Tesztterv** | [`TP-F11`](../testing/TP-F11_heron_modell.md) |
 | **Előzmény** | [`phase_09.md`](phase_09.md), [`TR-F05` 7.](../testing/TR-F05_batch.md), [`10_literature_positioning.md`](../10_literature_positioning.md), v1.0.0 |
@@ -112,7 +112,7 @@ szabad keretet a futtatás előtt mindig az élő `usage()` adja):
 |---|---|---|---|---|
 | — (jelenlegi állapot) | — | — | 57 / 600 = 9,5% | 543 s hátravan |
 | B0 pilot | 0 | 57 s | 114 / 600 = 19% | kalibrációs pillanatkép; a költség/PUB újramérése |
-| C1 | 2 | 34,2 s | 148 / 600 = 25% | |
+| C1 | 2 | 34,2 s | 148 / 600 = 25% | **Lefutott 2026-11-04-én: tényleges 39 s (153 / 600 = 25,5%)**; a TREX 8,0 s/PUB (B0: 6,6) — a becslés +14%, lásd TR-F11 6.1 |
 | C2 | 4 | 34,2 s | 182 / 600 = 30% | |
 | C3 | 6 | 34,2 s | 217 / 600 = 36% | |
 | C4 | 8 | 34,2 s | 251 / 600 = 42% | **Köztes elemzés** (csak leíró; a végpont nem változik) |
