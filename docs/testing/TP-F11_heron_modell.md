@@ -8,7 +8,7 @@
 | **Fázis** | 11 — Kalibrációból épített Heron-zajmodell validálása valódi hardveren |
 | **Terv** | [`phase_11.md`](../plan/phase_11.md) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a terv szövegét az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A C1 (11.C) lefutott (2026-11-04); C2…C8 és a végleges TR-F11 még nem készültek.** |
+| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A C1 (11.C) lefutott (2026-11-04), a C2 is (2026-11-06/07); C3…C8 és a végleges TR-F11 még nem készültek.** |
 
 ---
 
@@ -36,6 +36,7 @@
 | **TC-1110** | AC-11.5 | a protokoll-ujjlenyomat módosításra változik; az eltérő `FROZEN` megtagadja a beküldést | ugyanott |
 | **TC-1111** | AC-11.4 | a protokoll a jóváhagyott értékeket tartalmazza (δ = 3,0 mHa; {0,735; 1,5; 2,0} Å; 8 blokk; 80%; qubitpár [1, 2]) | ugyanott |
 | **TC-1112** | AC-11.4 | `--dry-run` B0: 0 QPU-s, beküldés nélkül lefut, modell-előrejelzést ad | kézi végrehajtás, `phase_11.md` M9–M11; megismételve a B0 előtt (2026-11-02), ✅ |
+| **TC-1116** | AC-11.4 | a C2 valódi futtatása: a kapuk átengedik, a tényleges QPU-idő 39 s (a becslés 34,2 s, a kapu 42,7 s-mal számolt), a kvóta 153 → 192 s, a kimenet teljes | `c2.json`, `c2.log`, TR-F11 7. szakasz — ✅ |
 | **TC-1115** | AC-11.4 | a C1 valódi futtatása: a kapuk átengedik, a tényleges QPU-idő 39 s (a becslés 34,2 s, a kapu 42,7 s-mal számolt), a kvóta 114 → 153 s, a kimenet teljes | `c1.json`, `c1.log`, TR-F11 6. szakasz — ✅ |
 | **TC-1114** | AC-11.4 | a B0 valódi futtatása: a kapuk átengedik, a tényleges QPU-idő = a becsült (57 s), a kvóta 57 → 114 s, a kimenet teljes | `b0.json`, `b0.log`, TR-F11 1. szakasz — ✅ |
 | **TC-1113** | AC-11.6 | a mért adat H1–H4 szerinti kiértékelése, a feltáró és megerősítő adat külön jelölve | `scripts/analyze_heron.py` a mérések után (TR-F11) |
