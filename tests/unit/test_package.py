@@ -44,8 +44,8 @@ def test_version_was_actually_resolved() -> None:
 
 def test_authors_are_declared() -> None:
     """A készítők feltüntetése a projekt követelménye, nem esztétika."""
-    assert "Kormos Attila" in vqebd.AUTHORS
-    assert any("Claude" in author for author in vqebd.AUTHORS)
+    assert vqebd.AUTHORS == ("Kormos Attila",)
+    assert "Claude" in vqebd.IMPLEMENTED_WITH  # az MI-eszköz nem szerző, de a megvalósítás jelölt
 
 
 def test_license_is_mit() -> None:

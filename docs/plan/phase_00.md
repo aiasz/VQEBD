@@ -57,7 +57,7 @@ VQEBD/
 ├── .dockerignore
 ├── .gitignore
 ├── .env.example                    # minta; a valódi .env SOHA nem kerül be
-├── LICENSE                         # MIT — Kormos Attila, Claude AI
+├── LICENSE                         # MIT — Kormos Attila
 ├── README.md
 ├── CHANGELOG.md                    # Keep a Changelog 1.1.0
 ├── CITATION.cff                    # Citation File Format 1.2.0

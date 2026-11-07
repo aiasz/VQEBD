@@ -48,8 +48,8 @@ döntés, amelyet **a kiadás előtt** el kell dönteni, mert a rekordban utóla
 
 - **Szerzők.** A `CITATION.cff` egyetlen szerzőt sorol fel: *Kormos Attila* (**a felhasználó döntése, 2026-11-02**: az AI nem
   szerepel a Zenodo-rekord szerzői között). A Zenodo ezt a listát a rekord szerzőiként jeleníti meg. Az AI közreműködése
-  a README és a dokumentumok „Készítők" soraiban, valamint a `LICENSE` szerzői sorában továbbra is szerepel; ha ezt is
-  egységesíteni kell, az külön döntés.
+  a README és a dokumentumok szerzői sorában („Megvalósítás MI-eszközzel: Claude (Anthropic)") szerepel; a `LICENSE`
+  szerzői sora (2026-11-07 óta) is csak Kormos Attilát nevezi meg, a szerzői sor egységes az egész repóban.
 - **ORCID.** Ha van ORCID-azonosítód, a `CITATION.cff`-ben a szerzőhöz add meg (`orcid: "https://orcid.org/…"`), hogy a
   rekord hozzád kapcsolódjon.
 

@@ -31,9 +31,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-__all__ = ["AUTHORS", "LICENSE", "__version__"]
+__all__ = ["AUTHORS", "IMPLEMENTED_WITH", "LICENSE", "__version__"]
 
-AUTHORS: tuple[str, ...] = ("Kormos Attila", "Claude AI (Anthropic, Claude Opus 5)")
+# A szerző a kezdeményező és irányító ember; a megvalósítás MI-eszközzel készült
+# (lásd AI_DISCLOSURE.md).
+AUTHORS: tuple[str, ...] = ("Kormos Attila",)
+IMPLEMENTED_WITH: str = "Claude (Anthropic)"
 LICENSE: str = "MIT"
 
 _UNKNOWN_VERSION = "0.0.0+unknown"

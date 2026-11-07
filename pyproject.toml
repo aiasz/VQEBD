@@ -17,7 +17,6 @@ dynamic = ["version"]                   # igazságforrás: a VERSION fájl
 
 authors = [
     { name = "Kormos Attila", email = "kormosa@gmail.com" },
-    { name = "Claude AI (Anthropic, Claude Opus 5)" },
 ]
 maintainers = [
     { name = "Kormos Attila", email = "kormosa@gmail.com" },

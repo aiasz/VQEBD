@@ -44,8 +44,8 @@ jelöljük.
 
 A commitok `Co-Authored-By` sorai alapján (43 commit a `v1.0.0`-ig, 2026-09-22 … 2026-11-02): **Claude Sonnet 5.5** (23),
 **Claude Opus 5** (3), **Claude Opus 5.5** (2). **15 korai commit nem tartalmaz ilyen sort**, ezért ott a modell nincs a
-történetben rögzítve; a dokumentumok „Készítők" sora egységesen a „Claude AI (Anthropic, Claude Opus 5)" megnevezést
-használja, ami **nem pontos** minden commitra. A pontos modell-hozzárendelés így nem rekonstruálható teljesen.
+történetben rögzítve; a dokumentumok szerzői sora egységesen „Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)" (a konkrét
+modellt nem nevezi meg, mert az nem minden commitra rekonstruálható). A pontos modell-hozzárendelés így nem rekonstruálható teljesen.
 
 ### Mi NEM történt meg (és mi nem ellenőrzött)
 
@@ -78,11 +78,11 @@ Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat
 
 ### Hol van ez jelölve
 
-- [`README.md`](README.md): „Készítők" sor és az „MI-felhasználás" szakasz (HU/EN)
+- [`README.md`](README.md): a szerzői sor és az „MI-felhasználás" szakasz (HU/EN)
 - [`CITATION.cff`](CITATION.cff): az `abstract` és a `message` mondata
 - GitHub Release `v1.0.0` jegyzete és a Zenodo-rekord leírása
 - [`docs/09_publishing.md`](docs/09_publishing.md): kötelező ellenőrzőpont a kiadásoknál
-- a LICENSE szerzői sora az MI-t is nevesíti (jogi jelentősége nincs eldöntve)
+- a `LICENSE` szerzői sora (copyright) csak Kormos Attila nevét tartalmazza; a README lábléce és a dokumentumok szerzői sora jelöli a megvalósítást végző MI-eszközt
 
 > **A Zenodo-rekord** (`10.5281/zenodo.23886003`) leírásának elején ugyanez a jelölés szerepel (a szerző vezette be a Zenodo
 > felületén, 2026-11-02). A rekord szerzőlistája a szerző döntése szerint csak Kormos Attila.
@@ -132,8 +132,8 @@ with the model.
 
 From the commit `Co-Authored-By` trailers (43 commits up to `v1.0.0`, 2026-09-22 … 2026-11-02): **Claude Sonnet 5.5** (23),
 **Claude Opus 5** (3), **Claude Opus 5.5** (2). **15 early commits carry no such trailer**, so the model is not recorded
-there; the documents' "Authors" lines uniformly say "Claude AI (Anthropic, Claude Opus 5)", which is **not accurate for
-every commit**. The exact model attribution cannot be fully reconstructed.
+there; the documents' author lines uniformly say "Author: Kormos Attila · Implemented with an AI tool: Claude (Anthropic)" (without
+naming a specific model, because that cannot be reconstructed for every commit). The exact model attribution cannot be fully reconstructed.
 
 ### What was NOT done (and is not verified)
 
@@ -164,11 +164,11 @@ AI-generated text may contain further errors not uncovered here.
 
 ### Where this is marked
 
-- [`README.md`](README.md): the "Authors" line and the "AI use" section (HU/EN)
+- [`README.md`](README.md): the author line and the "AI use" section (HU/EN)
 - [`CITATION.cff`](CITATION.cff): a sentence in `abstract` and `message`
 - the GitHub Release `v1.0.0` notes and the Zenodo record description
 - [`docs/09_publishing.md`](docs/09_publishing.md): a mandatory checkpoint for releases
-- the LICENSE copyright line names the AI as well (its legal significance has not been decided)
+- the `LICENSE` copyright line names only Attila Kormos; the README footer and the documents' author lines mark the AI tool that did the implementation
 
 > **The Zenodo record** (`10.5281/zenodo.23886003`) carries the same marking at the start of its description (added by the
 > author in the Zenodo interface, 2026-11-02). Per the author's decision the record's author list contains only Attila Kormos.

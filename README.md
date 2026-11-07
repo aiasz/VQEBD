@@ -1034,4 +1034,4 @@ Commit messages follow the [Conventional Commits](https://www.conventionalcommit
 
 ---
 
-*© 2026 Kormos Attila (Attila Kormos), Claude AI (Anthropic) — MIT license*
+*© 2026 Kormos Attila (Attila Kormos) · Megvalósítás MI-eszközzel / Implemented with an AI tool: Claude (Anthropic) — MIT license*
