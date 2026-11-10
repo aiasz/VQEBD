@@ -1,0 +1,181 @@
+{
+  "block": "C4",
+  "kind": "confirmatory",
+  "vqebd_version": "1.0.0",
+  "protocol_fingerprint": "6352160344462f26a5547a0874c2bc88412c970f886e5433ca755431147e93c9",
+  "timestamp": "2026-11-10T09:01:51Z",
+  "backend": "ibm_kingston",
+  "shots": 8192,
+  "physical_qubits": [
+    1,
+    2
+  ],
+  "quota_before": {
+    "usage_consumed_seconds": 231,
+    "usage_limit_seconds": 600,
+    "usage_remaining_seconds": 369,
+    "usage_limit_reached": false,
+    "usage_period": {
+      "start_time": "2026-10-13T08:57:56.418Z",
+      "end_time": "2026-11-10T08:57:56.418Z"
+    },
+    "time_available_at": null
+  },
+  "quota_after": {
+    "usage_consumed_seconds": 270,
+    "usage_limit_seconds": 600,
+    "usage_remaining_seconds": 330,
+    "usage_limit_reached": false,
+    "usage_period": {
+      "start_time": "2026-10-13T09:01:52.127Z",
+      "end_time": "2026-11-10T09:01:52.127Z"
+    },
+    "time_available_at": null
+  },
+  "calibration_before": {
+    "backend": "ibm_kingston",
+    "last_update_date": "2026-11-10T08:43:26+00:00",
+    "captured_utc": "2026-11-10T08:58:00Z",
+    "physical_qubits": [
+      1,
+      2
+    ],
+    "qubits": {
+      "1": {
+        "t1_s": 0.00034204922809216763,
+        "t2_s": 0.0005969605810020824,
+        "readout_error": 0.00390625,
+        "sx_error": 0.000229552946720393,
+        "x_error": 0.000229552946720393
+      },
+      "2": {
+        "t1_s": 0.0003178335596884262,
+        "t2_s": 0.0001281715488313782,
+        "readout_error": 0.01318359375,
+        "sx_error": 0.0002709788347432111,
+        "x_error": 0.0002709788347432111
+      }
+    },
+    "cz_errors": {
+      "1-2": 0.0007882442931249622,
+      "2-1": 0.0007882442931249622
+    }
+  },
+  "calibration_after": {
+    "backend": "ibm_kingston",
+    "last_update_date": "2026-11-10T08:43:26+00:00",
+    "captured_utc": "2026-11-10T09:01:51Z",
+    "physical_qubits": [
+      1,
+      2
+    ],
+    "qubits": {
+      "1": {
+        "t1_s": 0.00034204922809216763,
+        "t2_s": 0.0005969605810020824,
+        "readout_error": 0.00390625,
+        "sx_error": 0.000229552946720393,
+        "x_error": 0.000229552946720393
+      },
+      "2": {
+        "t1_s": 0.0003178335596884262,
+        "t2_s": 0.0001281715488313782,
+        "readout_error": 0.01318359375,
+        "sx_error": 0.0002709788347432111,
+        "x_error": 0.0002709788347432111
+      }
+    },
+    "cz_errors": {
+      "1-2": 0.0007882442931249622,
+      "2-1": 0.0007882442931249622
+    }
+  },
+  "hardware_mha": {
+    "raw": {
+      "0.735": 25.022995602799636,
+      "1.5": 14.123249460711751,
+      "2.0": 9.672158937791053
+    },
+    "trex": {
+      "0.735": 12.58138851151891,
+      "1.5": 2.0193715671776857,
+      "2.0": 1.0445311364633003
+    }
+  },
+  "model_mha": {
+    "readout": {
+      "0.735": 22.3628297428728,
+      "1.5": 11.489821389103682,
+      "2.0": 11.753253839473853
+    },
+    "no_readout": {
+      "0.735": 7.691941538774617,
+      "1.5": 3.3373423553660246,
+      "2.0": 2.927080792680714
+    }
+  },
+  "runs": [
+    {
+      "resilience_level": 0,
+      "job_id": "dbpdqb0qtr0c738e8uh0",
+      "wall_time_s": 44.86030858702725,
+      "quantum_seconds": 15,
+      "timestamps": {
+        "created": "2026-11-10T09:00:29.705133Z",
+        "finished": "2026-11-10T09:01:07.552211Z",
+        "running": "2026-11-10T09:00:31.738883Z"
+      },
+      "points": [
+        {
+          "bond_length": 0.735,
+          "energy_ha": -1.1122830401506008,
+          "stds_ha": 0.0028346593317644547,
+          "ensemble_standard_error_ha": 0.0028346593317644547
+        },
+        {
+          "bond_length": 1.5,
+          "energy_ha": -0.9840261040106983,
+          "stds_ha": 0.0024091244655805757,
+          "ensemble_standard_error_ha": 0.0024091244655805757
+        },
+        {
+          "bond_length": 2.0,
+          "energy_ha": -0.9389689532383942,
+          "stds_ha": 0.0016258407161258048,
+          "ensemble_standard_error_ha": 0.0016258407161258048
+        }
+      ]
+    },
+    {
+      "resilience_level": 1,
+      "job_id": "dbpdqmc4148s739uf7h0",
+      "wall_time_s": 39.33219703298528,
+      "quantum_seconds": 24,
+      "timestamps": {
+        "created": "2026-11-10T09:01:13.67677Z",
+        "finished": "2026-11-10T09:01:50.378019Z",
+        "running": "2026-11-10T09:01:15.709254Z"
+      },
+      "points": [
+        {
+          "bond_length": 0.735,
+          "energy_ha": -1.1247246472418815,
+          "stds_ha": 0.0029279088627520464,
+          "ensemble_standard_error_ha": 0.003046656765045817
+        },
+        {
+          "bond_length": 1.5,
+          "energy_ha": -0.9961299819042324,
+          "stds_ha": 0.0026392074052341346,
+          "ensemble_standard_error_ha": 0.0024953673865431023
+        },
+        {
+          "bond_length": 2.0,
+          "energy_ha": -0.947596581039722,
+          "stds_ha": 0.0021095269850239357,
+          "ensemble_standard_error_ha": 0.0017707195097154862
+        }
+      ]
+    }
+  ]
+}

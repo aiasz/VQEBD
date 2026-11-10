@@ -5,7 +5,7 @@
 | **Fázis** | 11 *(a mesterterv 10. „közösségi visszacsatolás" fázisától független, kísérleti ág; a számozás nem jelent időrendet)* |
 | **Dokumentum-verzió** | 1.2.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). A B0 pilot lefutott (2026-11-02, 57 QPU-s), a C1 is (2026-11-04, 39 QPU-s; kvóta 153/600 s), a C2 is (2026-11-06/07, 39 QPU-s; kvóta 192/600 s), és a C3 is (2026-11-08, 39 QPU-s; kvóta 231/600 s), a C4…C8 még nem; a blokkokat a szerző blokkonként külön hagyja jóvá. Eredmény: [`TR-F11`](../testing/TR-F11_heron_modell.md) (előzetes).** |
+| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). A B0 pilot lefutott (2026-11-02, 57 QPU-s), a C1 is (2026-11-04, 39 QPU-s; kvóta 153/600 s), a C2 is (2026-11-06/07, 39 QPU-s; kvóta 192/600 s), a C3 is (2026-11-08, 39 QPU-s; kvóta 231/600 s), és a C4 is (2026-11-10, 39 QPU-s; kvóta 270/600 s; köztes leíró összesítés a TR-F11 9.6-ban), a C5…C8 még nem; a blokkokat a szerző blokkonként külön hagyja jóvá. Eredmény: [`TR-F11`](../testing/TR-F11_heron_modell.md) (előzetes).** |
 | **Célverzió** | `v1.1.0` (ha a fázis lezárul) |
 | **Tesztterv** | [`TP-F11`](../testing/TP-F11_heron_modell.md) |
 | **Előzmény** | [`phase_09.md`](phase_09.md), [`TR-F05` 7.](../testing/TR-F05_batch.md), [`10_literature_positioning.md`](../10_literature_positioning.md), v1.0.0 |
@@ -115,7 +115,7 @@ szabad keretet a futtatás előtt mindig az élő `usage()` adja):
 | C1 | 2 | 34,2 s | 148 / 600 = 25% | **Lefutott 2026-11-04-én: tényleges 39 s (153 / 600 = 25,5%)**; a TREX 8,0 s/PUB (B0: 6,6) — a becslés +14%, lásd TR-F11 6.1 |
 | C2 | 4 | 34,2 s | 182 / 600 = 30% | **Lefutott 2026-11-06/07-én: tényleges 39 s (192 / 600 = 32%)**; a nyers job 15 órát várt sorban; lásd TR-F11 7. szakasz |
 | C3 | 6 | 34,2 s | 217 / 600 = 36% | **Lefutott 2026-11-08-án: tényleges 39 s (231 / 600 = 38,5%)**; ~12 perc alatt, a TREX szint volt az első; lásd TR-F11 8. szakasz |
-| C4 | 8 | 34,2 s | 251 / 600 = 42% | **Köztes elemzés** (csak leíró; a végpont nem változik) |
+| C4 | 8 | 34,2 s | 251 / 600 = 42% | **Lefutott 2026-11-10-én: tényleges 39 s (270 / 600 = 45%)**; ~1,5 perc alatt, nyers szint először. **Köztes elemzés** (csak leíró; a végpont nem változik): lásd TR-F11 9.6 |
 | C5 | 10 | 34,2 s | 285 / 600 = 48% | |
 | C6 | 12 | 34,2 s | 319 / 600 = 53% | |
 | C7 | 14 | 34,2 s | 353 / 600 = 59% | |
