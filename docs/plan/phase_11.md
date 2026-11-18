@@ -122,6 +122,7 @@ szabad keretet a futtatás előtt mindig az élő `usage()` adja):
 | C8 | 16 | 34,2 s | 388 / 600 = 65% | **A megerősítő szakasz vége; a H1–H4 kiértékelése** |
 | ~~D θ-scan~~ | — | — | — | **elhagyva** (döntés 4.) |
 
+- **Kalibrációs-frissességi szabály a C7-re és a C8-ra (rögzítve 2026-11-18-án, a C7 mérése és bármely további eredmény ismerete előtt; a szerző jóváhagyásával).** A terv alapfeltevése, hogy a kalibráció naponta frissül, és a blokkok ezért független körülményeket látnak (R1, H4). A C6 mérése idején az `ibm_kingston` közölt kalibrációja (2026-11-13 14:57 UTC) már ~66 órás volt, a C7 tervezett napján (2026-11-18) ~5 napos, miközben az `ibm_marrakesh` aznap frissült. A szabály: a C7-et csak az `ibm_kingston` **újabb** kalibrációja után indítjuk (naponta csak olvasó ellenőrzés; friss `--dry-run`, külön jóváhagyás); ha 2026-11-22-ig nem frissül, a szerzővel újra egyeztetünk, és a döntést (régi kalibrációval futás a dokumentációban jelezve, vagy más lépés) külön rögzítjük. A küszöbök, a hipotézisek és az elemzés nem változnak.
 - Az 1. ablak összes használata: 57 s (meglévő) + 57 s (B0) + 8 × 34,2 s = **~388 s ≤ 480 s** (a 80% küszöb). **A tartalék ≥ 212 s.**
 - Ha a pilot a **per-PUB költséget > 20%-kal eltérőnek** mutatja a becsléstől (kisebb jobok költsége nem biztos, hogy lineáris), a
   táblázatot **a C1 előtt** újraszámoljuk; a kapu amúgy is az élő használatot nézi.
