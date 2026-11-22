@@ -8,7 +8,7 @@
 | **Fázis** | 11 — Kalibrációból épített Heron-zajmodell validálása valódi hardveren |
 | **Terv** | [`phase_11.md`](../plan/phase_11.md) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a terv szövegét az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A C1 (11.C) lefutott (2026-11-04), a C2 is (2026-11-06/07), a C3 is (2026-11-08), a C4 is (2026-11-10; köztes leíró összesítéssel); a C5 is (2026-11-12), a C6 is (2026-11-16; az első kísérlet megszakadt, újraindítva); C7, C8 és a végleges TR-F11 még nem készültek.** |
+| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A C1 (11.C) lefutott (2026-11-04), a C2 is (2026-11-06/07), a C3 is (2026-11-08), a C4 is (2026-11-10; köztes leíró összesítéssel); a C5 is (2026-11-12), a C6 is (2026-11-16; az első kísérlet megszakadt, újraindítva); a C7 is (2026-11-22, a kalibrációs várakozás után); a C8, a kiegészítő C9 és a végleges TR-F11 még nem készültek.** |
 
 ---
 
@@ -36,6 +36,7 @@
 | **TC-1110** | AC-11.5 | a protokoll-ujjlenyomat módosításra változik; az eltérő `FROZEN` megtagadja a beküldést | ugyanott |
 | **TC-1111** | AC-11.4 | a protokoll a jóváhagyott értékeket tartalmazza (δ = 3,0 mHa; {0,735; 1,5; 2,0} Å; 8 blokk; 80%; qubitpár [1, 2]) | ugyanott |
 | **TC-1112** | AC-11.4 | `--dry-run` B0: 0 QPU-s, beküldés nélkül lefut, modell-előrejelzést ad | kézi végrehajtás, `phase_11.md` M9–M11; megismételve a B0 előtt (2026-11-02), ✅ |
+| **TC-1121** | AC-11.4 | a C7 valódi futtatása a kalibrációs-frissességi szabály teljesülése után: a kapuk átengedik, a tényleges QPU-idő 39 s, a kvóta 348 → 387 s, a kimenet teljes, a kalibráció-életkor (~37 h) a rögzített definíció szerint számolva | `c7.json`, `c7.log`, TR-F11 12. szakasz — ✅ |
 | **TC-1120** | AC-11.4 | a C6 valódi futtatása: a megszakadt első kísérlet (Docker leállt) után a feladat lemondva, a blokk a protokoll szerint újraindítva; a kapuk átengedik, a tényleges QPU-idő 39 s, a kvóta 309 → 348 s, a kimenet teljes | `c6.json`, `c6.log`, `c6_megszakadt_1.log`, TR-F11 11. szakasz — ✅ |
 | **TC-1119** | AC-11.4 | a C5 valódi futtatása: a kapuk átengedik, a tényleges QPU-idő 39 s (a becslés 34,2 s, a kapu 42,7 s-mal számolt), a kvóta 270 → 309 s, a kimenet teljes | `c5.json`, `c5.log`, TR-F11 10. szakasz — ✅ |
 | **TC-1118** | AC-11.4 | a C4 valódi futtatása: a kapuk átengedik, a tényleges QPU-idő 39 s (a becslés 34,2 s, a kapu 42,7 s-mal számolt), a kvóta 231 → 270 s, a kimenet teljes; köztes leíró összesítés, döntés nélkül | `c4.json`, `c4.log`, TR-F11 9. szakasz — ✅ |
