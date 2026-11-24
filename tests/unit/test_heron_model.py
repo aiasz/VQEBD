@@ -250,6 +250,90 @@ def test_runner_refuses_real_submission_without_a_frozen_protocol(
         runner.main(["--block", "B0", "--data-dir", str(tmp_path)])
 
 
-def test_runner_rejects_an_unknown_block_name(runner: ModuleType) -> None:
+@pytest.mark.parametrize("name", ["C10", "C0", "B1", "X1", "c9"])
+def test_runner_rejects_an_unknown_block_name(runner: ModuleType, name: str) -> None:
     with pytest.raises(SystemExit):
-        runner.main(["--block", "C9", "--dry-run"])
+        runner.main(["--block", name, "--dry-run"])
+
+
+# --- a kiegészítő C9 blokk (phase_11.md, 2026-11-18) ----------------------------------------------
+
+
+def test_c9_is_a_supplementary_block_with_trex_first(runner: ModuleType) -> None:
+    assert runner.BLOCK_RE.match("C9")
+    assert runner.block_kind("C9") == "supplementary"
+    assert runner.block_kind("C8") == "confirmatory" and runner.block_kind("B0") == "pilot"
+    assert runner.block_bonds("C9") == runner.block_bonds("C8")
+    assert runner.level_order("C9") == [1, 0]  # páratlan: TREX először
+    assert runner.level_order("C8") == [0, 1]
+    assert PROTOCOL["confirmatory_blocks"] == 8  # a PROTOCOL nem változott
+
+
+def test_c9_needs_the_complete_confirmatory_series(runner: ModuleType, tmp_path: Path) -> None:
+    for i in range(1, 8):
+        (tmp_path / f"c{i}.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="C8"):
+        runner.check_confirmatory_complete(tmp_path)
+    (tmp_path / "c8.json").write_text("{}", encoding="utf-8")
+    runner.check_confirmatory_complete(tmp_path)  # teljes: nem dob
+
+
+def test_runner_refuses_c9_before_the_confirmatory_series_is_complete(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _stub_runner(runner, monkeypatch, consumed=426.0)
+    with pytest.raises(RuntimeError, match="nem teljes"):
+        runner.main(["--block", "C9", "--dry-run", "--data-dir", str(tmp_path)])
+
+
+def test_c9_fits_the_eighty_percent_rule_after_the_measured_c1_to_c8(runner: ModuleType) -> None:
+    """A tényleges 426 s után (C8 vége) a C9 kapuja 426 + 42,75 = 468,75 s ≤ 480 s."""
+    bonds = runner.block_bonds("C9")
+    gate = runner.estimated_qpu_seconds(len(bonds), safety=PROTOCOL["gate_safety_factor"])
+    assert_block_within_budget(_usage(426.0), gate)
+    assert 600.0 - (426.0 + 39.0) >= 0.2 * 600.0
+
+
+class _MetricsService:
+    """Hamis szolgáltatás: a ``metrics()`` hívások egymás után a megadott állapotokat adják."""
+
+    def __init__(self, sequence: list[dict[str, Any]]) -> None:
+        self._sequence = list(sequence)
+        self.calls = 0
+
+    def job(self, job_id: str) -> SimpleNamespace:
+        def metrics() -> dict[str, Any]:
+            index = min(self.calls, len(self._sequence) - 1)
+            self.calls += 1
+            return self._sequence[index]
+
+        return SimpleNamespace(metrics=metrics)
+
+
+def test_final_metrics_waits_for_the_completed_usage(runner: ModuleType) -> None:
+    """A C8 TREX jobjánál a befejezéskor még 0 QPU-s állt; a futtató várja meg a véglegeset."""
+    service = _MetricsService(
+        [
+            {"usage": {"quantum_seconds": 0, "seconds": 0}},
+            {"usage": {"quantum_seconds": 0, "seconds": 0, "status": "pending"}},
+            {"usage": {"quantum_seconds": 24, "seconds": 24, "status": "complete"}},
+        ]
+    )
+    waits: list[float] = []
+    metrics, final = runner.final_metrics(service, "job", wait_s=0.5, sleep=waits.append)
+    assert final is True and metrics["usage"]["quantum_seconds"] == 24
+    assert service.calls == 3 and waits == [0.5, 0.5]
+
+
+def test_final_metrics_accepts_a_positive_usage_without_status(runner: ModuleType) -> None:
+    service = _MetricsService([{"usage": {"quantum_seconds": 15}}])
+    metrics, final = runner.final_metrics(service, "job", sleep=lambda _: None)
+    assert final is True and metrics["usage"]["quantum_seconds"] == 15 and service.calls == 1
+
+
+def test_final_metrics_gives_up_and_flags_a_non_final_usage(runner: ModuleType) -> None:
+    service = _MetricsService([{"usage": {"quantum_seconds": 0}}])
+    waits: list[float] = []
+    metrics, final = runner.final_metrics(service, "job", attempts=4, sleep=waits.append)
+    assert final is False and metrics["usage"]["quantum_seconds"] == 0
+    assert service.calls == 4 and len(waits) == 3

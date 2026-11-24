@@ -11,6 +11,8 @@ Védőkorlátok (a ``vqebd.hardware`` meglévő K7-védelme fölött):
 - a befagyasztott protokoll ujjlenyomata egyezzen a ``docs/figures/data/f11/FROZEN`` fájllal;
 - **az élő ``usage()`` alapján a blokk után sem lehet a használat a keret 80%-a fölött**;
 - megerősítő blokk csak a pilot (B0) fix qubitpárjával fut;
+- a kiegészítő C9 (``supplementary``, rögzítve 2026-11-18-án) csak a teljes megerősítő sorozat
+  (C1…C8) után indítható; az elsődleges elemzésbe nem számít bele;
 - ``--dry-run``: a klasszikus számítás, a modell-előrejelzés és a kapu lefut, **beküldés nincs**.
 
 A modul sehol nem ütemez automatikusan (ADR-0008): minden blokkot a szerző indít.
@@ -19,6 +21,7 @@ Használat::
 
     python scripts/run_heron_blocks.py --block B0 --dry-run
     VQEBD_ALLOW_HARDWARE=true python scripts/run_heron_blocks.py --block C1
+    python scripts/run_heron_blocks.py --block C9 --dry-run      # kiegészítő blokk
 
 Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc
 """
@@ -57,11 +60,53 @@ from vqebd.heron_model import (
 )
 
 DATA_DIR = Path("docs/figures/data/f11")
-BLOCK_RE = re.compile(r"^(B0|C[1-8])$")
+BLOCK_RE = re.compile(r"^(B0|C[1-9])$")
+SUPPLEMENTARY_BLOCKS = ("C9",)
+"""Kiegészítő blokkok (``phase_11.md``, 2026-11-18); a ``PROTOCOL``/ujjlenyomat nem változik."""
 
 
 def block_kind(block: str) -> str:
-    return "pilot" if block == "B0" else "confirmatory"
+    if block == "B0":
+        return "pilot"
+    return "supplementary" if block in SUPPLEMENTARY_BLOCKS else "confirmatory"
+
+
+def check_confirmatory_complete(data_dir: Path) -> None:
+    """Kiegészítő blokk csak a teljes megerősítő sorozat (C1…C8) mentett kimenete után indulhat."""
+    expected = int(PROTOCOL["confirmatory_blocks"])
+    missing = [f"C{i}" for i in range(1, expected + 1) if not (data_dir / f"c{i}.json").is_file()]
+    if missing:
+        raise RuntimeError(
+            f"a megerősítő sorozat nem teljes (hiányzik: {', '.join(missing)}) — "
+            "kiegészítő blokk nem indítható"
+        )
+
+
+def final_metrics(
+    service: Any,
+    job_id: str,
+    *,
+    attempts: int = 20,
+    wait_s: float = 3.0,
+    sleep: Any = time.sleep,
+) -> tuple[dict[str, Any], bool]:
+    """A job metrikái a **végleges** használati adattal.
+
+    A befejezés után az IBM a ``usage`` mezőt néha csak késve véglegesíti (a C8 TREX jobjánál a
+    mentéskor 0 QPU-s állt, a valós érték 24 s volt). Végleges, ha ``usage.status == "complete"``,
+    illetve ``status`` hiányában, ha a ``quantum_seconds`` pozitív. Visszaadja a metrikákat és azt,
+    hogy véglegesek-e (a kísérletek elfogyása után az utolsó állapotot, ``False``-szal).
+    """
+    metrics: dict[str, Any] = {}
+    for attempt in range(max(1, attempts)):
+        metrics = service.job(job_id).metrics()
+        usage = metrics.get("usage") or {}
+        status = usage.get("status")
+        if status == "complete" or (status is None and (usage.get("quantum_seconds") or 0) > 0):
+            return metrics, True
+        if attempt < attempts - 1:
+            sleep(wait_s)
+    return metrics, False
 
 
 def block_bonds(block: str) -> tuple[float, ...]:
@@ -127,7 +172,9 @@ def model_predictions(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Fázis 11 — egy hardveres blokk")
-    parser.add_argument("--block", required=True, help="B0 (pilot) vagy C1…C8")
+    parser.add_argument(
+        "--block", required=True, help="B0 (pilot), C1…C8 (megerősítő) vagy C9 (kiegészítő)"
+    )
     parser.add_argument("--backend", default=PROTOCOL["backend"])
     parser.add_argument("--shots", type=int, default=PROTOCOL["shots"])
     parser.add_argument("--seed", type=int, default=PROTOCOL["seed"])
@@ -137,9 +184,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if not BLOCK_RE.match(args.block):
-        parser.error("a blokk B0 vagy C1…C8 lehet")
+        parser.error("a blokk B0, C1…C8 vagy a kiegészítő C9 lehet")
     bonds = block_bonds(args.block)
     kind = block_kind(args.block)
+    if kind == "supplementary":
+        check_confirmatory_complete(args.data_dir)
     required = estimated_qpu_seconds(len(bonds))
     gate_required = estimated_qpu_seconds(len(bonds), safety=PROTOCOL["gate_safety_factor"])
     print(f"Blokk {args.block} ({kind}): {len(bonds)} geometria × (nyers + TREX), R = {bonds} Å")
@@ -204,7 +253,7 @@ def main(argv: list[str] | None = None) -> int:
             [p["theta_star"] for p in prepared["points"]],
         )
         job_id = evaluator.last_job_id
-        metrics = service.job(job_id).metrics()
+        metrics, usage_final = final_metrics(service, job_id)
         label = "raw" if level == 0 else "trex"
         for p, r in zip(prepared["points"], results, strict=True):
             error = (r["evs"] + p["energy_offset_ha"] - p["full_ci_ha"]) * 1e3
@@ -215,6 +264,7 @@ def main(argv: list[str] | None = None) -> int:
                 "job_id": job_id,
                 "wall_time_s": time.perf_counter() - started,
                 "quantum_seconds": metrics.get("usage", {}).get("quantum_seconds"),
+                "usage_final": usage_final,
                 "timestamps": metrics.get("timestamps", {}),
                 "points": [
                     {
@@ -227,7 +277,8 @@ def main(argv: list[str] | None = None) -> int:
                 ],
             }
         )
-        print(f"  szint {level}: job {job_id}, {runs[-1]['quantum_seconds']} QPU-s")
+        note = "" if usage_final else " (a használati adat még nem végleges)"
+        print(f"  szint {level}: job {job_id}, {runs[-1]['quantum_seconds']} QPU-s{note}")
 
     snapshot_after = calibration_snapshot(first.backend, qubits)
     payload = {

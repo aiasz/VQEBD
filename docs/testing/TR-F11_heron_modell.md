@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Azonosító** | TR-F11 |
-| **Dokumentum-verzió** | 0.9.0 (előzetes: B0 pilot + C1–C8; a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
+| **Dokumentum-verzió** | 0.10.0 (előzetes: B0 pilot + C1–C8; a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
 | **Dátum** | 2026-11-02 (B0), 2026-11-04 (C1), 2026-11-06/07 (C2), 2026-11-08 (C3), 2026-11-10 (C4), 2026-11-12 (C5), 2026-11-14/16 (C6), 2026-11-22 (C7), 2026-11-24 (C8) |
 | **Terv / tesztterv** | [`phase_11.md`](../plan/phase_11.md), [`TP-F11_heron_modell.md`](TP-F11_heron_modell.md) |
 | **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0-t 2026-11-02-án, a C1-et 2026-11-04-én, a C2-t 2026-11-06-án, a C3-at 2026-11-08-án, a C4-et 2026-11-10-én, a C5-öt 2026-11-12-én, a C6-ot 2026-11-14-én és újraindítását 2026-11-15-én, a C7-et 2026-11-22-én, a C8-at 2026-11-24-én külön jóváhagyta) |
@@ -954,5 +954,42 @@ Előzetes ellenőrzés (2026-11-24 09:28 UTC, csak olvasás): `ibm_kingston` akt
 
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás). A korrelációs és az összesítő számítás nem része az előre rögzített elemzésnek.
 - Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+
+## 14. A C9 előtti, hardver nélküli bővítés és a C1–C8 kalibráció-életkora (2026-11-24)
+
+**Az elsődleges elemzés futtatása előtt rögzítve.** QPU-idő nem fogyott (kvóta 426 / 600 s); a `PROTOCOL`, az ujjlenyomat (`63521603…e93c9`) és a `FROZEN`
+változatlan (ellenőrizve 2026-11-24). Az elsődleges elemzés kódja (`vqebd.heron_analysis.analyze`, a mérések előtt megírva) **nem változott**.
+
+### 14.1 Mi változott (TP-F11 TC-1123–TC-1126)
+
+| Elem | Változás | Teszt |
+|---|---|---|
+| `scripts/run_heron_blocks.py` | a C9 elfogadott blokknév, `kind = "supplementary"`; csak a teljes C1–C8 mentett kimenete után indítható; a szintek sorrendje a meglévő szabály szerint (C9: TREX először) | TC-1123 |
+| `scripts/run_heron_blocks.py` | `final_metrics`: a job metrikáit a **végleges** használati adatig várja (`usage.status == "complete"`); ha nem véglegesül, `usage_final = false`-szal rögzít (a 13.2 ¹ hibája ellen) | TC-1124 |
+| `vqebd.heron_analysis` | új, csak leíró függvények: `describe_differences`, `sensitivity_analyses` (a 2026-11-18-án rögzített (a) C1–C9 és (b) ≤ 48 órás vizsgálat, döntési mező nélkül) | TC-1125 |
+| `scripts/analyze_heron.py` | a kimenet három részre bomlik: `primary` (változatlanul az `analyze`, csak megerősítő blokkok), `confirmatory_complete` (8 megerősítő blokk megvan-e), `sensitivity` | TC-1125 |
+| `vqebd.heron_calibration_age`, `scripts/heron_calibration_age.py` | a 2026-11-19-i életkor-definíció kódja és a történeti rekonstrukció (`backend.properties(datetime=…)`, csak olvasás) → [`calibration_age.json`](../figures/data/f11/calibration_age.json) | TC-1126 |
+
+Egy teszt azt is rögzíti, hogy egy kiegészítő blokk — szélsőséges értékkel is — az elsődleges eredményt **bitre azonosan** hagyja.
+
+### 14.2 Kalibráció-életkor, C1–C8 (rekonstrukció a 2026-11-19-i definíció szerint)
+
+| Blokk | Az első job indulása (UTC) | Legrégebbi paraméter | Mérési időpontja (UTC) | Életkor | ≤ 48 h (b) | Egyezik a pillanatképpel |
+|---|---|---|---|---|---|---|
+| C1 | 2026-11-04 08:26:45 | q1 T1 | 2026-11-03 23:15:27 | **9,2 h** | igen | igen |
+| C2 | 2026-11-06 23:34:13 | q1 T2 | 2026-11-04 23:47:08 | **47,8 h** | igen | igen |
+| C3 | 2026-11-08 08:46:08 | cz-hiba | 2026-11-07 02:22:55 | **30,4 h** | igen | igen |
+| C4 | 2026-11-10 09:00:31 | q1 T1 | 2026-11-09 21:53:06 | **11,1 h** | igen | igen |
+| C5 | 2026-11-12 08:21:19 | q1 T1 | 2026-11-11 17:25:24 | **14,9 h** | igen | igen |
+| C6 | 2026-11-16 09:23:49 | q1 T1 | 2026-11-12 19:33:48 | **85,8 h** | **nem** | igen |
+| C7 | 2026-11-22 14:22:15 | q1 T1 | 2026-11-21 01:03:46 | **37,3 h** | igen | igen |
+| C8 | 2026-11-24 09:36:01 | q1 T1 | 2026-11-23 22:52:01 | **10,7 h** | igen | igen |
+
+- A lekérdezett történeti értékek **mind a nyolc blokknál** megegyeznek a blokk elején mentett pillanatképpel (a modell bemenetével), tehát a rekonstrukció
+  ugyanazt a kalibrációt látja, amelyből a modell-előrejelzés készült. A C6–C8 életkora egyezik a mérés napján élőben megfigyelt értékkel (85,8 / 37,3 / 10,7 h).
+- A (b) érzékenységi vizsgálatból a C8 után **csak a C6 esik ki**. A **C2 (47,8 h) a határ közelében** van; a 48 órás határ előre rögzített (2026-11-18), nem
+  módosítható, és a határ a vizsgálatba beletartozik.
+- A C2 nyers jobját 2026-11-06 08:33-kor küldtük be, de 15 órát állt sorban, és csak 23:34-kor indult (7. szakasz); ezért volt a kalibráció a
+  mérés idején ilyen idős.
 
 *Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

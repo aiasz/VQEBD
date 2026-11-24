@@ -29,7 +29,9 @@ __all__ = [
     "TostResult",
     "analyze",
     "decide_h1",
+    "describe_differences",
     "paired_improvement",
+    "sensitivity_analyses",
     "tost_equivalence",
 ]
 
@@ -211,3 +213,101 @@ def analyze(
             err_fixed = [_mean_sq(hw_raw[i], fixed, geoms) for i in range(len(confirmatory))]
             result["H4"] = paired_improvement(err_fixed, err_ro)
     return result
+
+
+# --- előre rögzített, csak leíró érzékenységi vizsgálatok (phase_11.md, 2026-11-18) -------------
+#
+# Az elsődleges elemzést (``analyze``) nem érintik: döntési szabályuk nincs, a kimenetük külön
+# táblázatba kerül. (a) az összes megerősítő + kiegészítő blokk (C1–C9); (b) csak azok, amelyeknél
+# a kalibráció az első job indulásakor legfeljebb ``max_age_h`` órás volt.
+
+_ANALYSED_KINDS = ("confirmatory", "supplementary")
+
+
+def _summary(values: Sequence[float], blocks: Sequence[str], confidence: float) -> dict[str, Any]:
+    v = np.asarray(values, dtype=float)
+    n = int(v.size)
+    out: dict[str, Any] = {
+        "n": n,
+        "blocks": list(blocks),
+        "mean": float(v.mean()) if n else None,
+        "sd": None,
+        "ci_low": None,
+        "ci_high": None,
+    }
+    if n >= 2:
+        sd = float(v.std(ddof=1))
+        crit = float(stats.t.ppf(0.5 + confidence / 2.0, n - 1))
+        half = crit * sd / math.sqrt(n)
+        out.update(sd=sd, ci_low=out["mean"] - half, ci_high=out["mean"] + half)
+    return out
+
+
+def describe_differences(
+    blocks: Sequence[Mapping[str, Any]], *, confidence: float = 0.90
+) -> dict[str, Any]:
+    """Leíró összesítés geometriánként (nincs döntés): a H1 és a H3 páros eltérései.
+
+    ``raw_vs_readout_model``: nyers hardver − kiolvasásos modell; ``trex_vs_no_readout_model``:
+    TREX hardver − kiolvasás nélküli modell. Geometriánként ``n``, a blokkok, átlag, szórás és
+    ``confidence`` szintű t-intervallum (csak leíró; 2 blokk alatt ``None``).
+    """
+    names = [str(b.get("block")) for b in blocks]
+    if not blocks:
+        return {"blocks": [], "raw_vs_readout_model": {}, "trex_vs_no_readout_model": {}}
+    geoms = sorted(_by_geometry(blocks[0], "hardware_mha", "raw"), key=float)
+    for b in blocks:
+        if sorted(_by_geometry(b, "hardware_mha", "raw"), key=float) != geoms:
+            raise AnalysisError(f"a(z) {b.get('block')} blokk geometriái eltérnek")
+    pairs = {
+        "raw_vs_readout_model": (("hardware_mha", "raw"), ("model_mha", "readout")),
+        "trex_vs_no_readout_model": (("hardware_mha", "trex"), ("model_mha", "no_readout")),
+    }
+    out: dict[str, Any] = {"blocks": names}
+    for label, (hw_key, model_key) in pairs.items():
+        hw = [_by_geometry(b, *hw_key) for b in blocks]
+        model = [_by_geometry(b, *model_key) for b in blocks]
+        out[label] = {
+            g: _summary([hw[i][g] - model[i][g] for i in range(len(blocks))], names, confidence)
+            for g in geoms
+        }
+    return out
+
+
+def sensitivity_analyses(
+    blocks: Sequence[Mapping[str, Any]],
+    ages_h: Mapping[str, float],
+    *,
+    max_age_h: float = 48.0,
+    confidence: float = 0.90,
+) -> dict[str, Any]:
+    """Az előre rögzített két leíró érzékenységi vizsgálat (döntési szabály nélkül).
+
+    Args:
+        blocks: Blokk-rekordok; a ``pilot`` kimarad, a ``confirmatory`` és a ``supplementary``
+            számít.
+        ages_h: Blokkonkénti kalibráció-életkor órában (``vqebd.heron_calibration_age``).
+        max_age_h: A (b) vizsgálat határa (a határ még beletartozik).
+    """
+    analysed = [b for b in blocks if b.get("kind") in _ANALYSED_KINDS]
+    fresh = [
+        b
+        for b in analysed
+        if str(b.get("block")) in ages_h and float(ages_h[str(b.get("block"))]) <= max_age_h
+    ]
+    return {
+        "decision_rule": None,
+        "all_blocks": describe_differences(analysed, confidence=confidence),
+        "calibration_age_at_most": {
+            "max_age_h": max_age_h,
+            "excluded_older": [
+                str(b.get("block"))
+                for b in analysed
+                if str(b.get("block")) in ages_h and float(ages_h[str(b.get("block"))]) > max_age_h
+            ],
+            "excluded_unknown_age": [
+                str(b.get("block")) for b in analysed if str(b.get("block")) not in ages_h
+            ],
+            **describe_differences(fresh, confidence=confidence),
+        },
+    }

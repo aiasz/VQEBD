@@ -8,7 +8,7 @@
 | **Fázis** | 11 — Kalibrációból épített Heron-zajmodell validálása valódi hardveren |
 | **Terv** | [`phase_11.md`](../plan/phase_11.md) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a terv szövegét az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A C1 (11.C) lefutott (2026-11-04), a C2 is (2026-11-06/07), a C3 is (2026-11-08), a C4 is (2026-11-10; köztes leíró összesítéssel); a C5 is (2026-11-12), a C6 is (2026-11-16; az első kísérlet megszakadt, újraindítva); a C7 is (2026-11-22, a kalibrációs várakozás után); a C8 is (2026-11-24; a megerősítő mérés teljes); a kiegészítő C9, az elsődleges elemzés és a végleges TR-F11 még nem készültek.** |
+| **Státusz** | **A 11.A (kód, kvóta nélkül) tesztjei kész; a B0 pilot (11.B) lefutott, eredménye az előzetes TR-F11-ben. A C1 (11.C) lefutott (2026-11-04), a C2 is (2026-11-06/07), a C3 is (2026-11-08), a C4 is (2026-11-10; köztes leíró összesítéssel); a C5 is (2026-11-12), a C6 is (2026-11-16; az első kísérlet megszakadt, újraindítva); a C7 is (2026-11-22, a kalibrációs várakozás után); a C8 is (2026-11-24; a megerősítő mérés teljes); a C9 előtti, hardver nélküli bővítés (TC-1123–TC-1126) és a kalibráció-életkor rekonstrukciója kész (2026-11-24); a kiegészítő C9, az elsődleges elemzés és a végleges TR-F11 még nem készültek.** |
 
 ---
 
@@ -36,6 +36,10 @@
 | **TC-1110** | AC-11.5 | a protokoll-ujjlenyomat módosításra változik; az eltérő `FROZEN` megtagadja a beküldést | ugyanott |
 | **TC-1111** | AC-11.4 | a protokoll a jóváhagyott értékeket tartalmazza (δ = 3,0 mHa; {0,735; 1,5; 2,0} Å; 8 blokk; 80%; qubitpár [1, 2]) | ugyanott |
 | **TC-1112** | AC-11.4 | `--dry-run` B0: 0 QPU-s, beküldés nélkül lefut, modell-előrejelzést ad | kézi végrehajtás, `phase_11.md` M9–M11; megismételve a B0 előtt (2026-11-02), ✅ |
+| **TC-1123** | AC-11.4 | a kiegészítő C9: a `BLOCK_RE` elfogadja, `block_kind = supplementary`, TREX először, csak a teljes C1–C8 mentett kimenete után indítható (szárazfutásban is); a C10 / C0 / B1 / X1 / c9 elutasítva; a C9 kapuja a tényleges 426 s után is ≤ 480 s, ≥ 20% tartalékkal | `tests/unit/test_heron_model.py` (2026-11-24) |
+| **TC-1124** | AC-11.4 | `final_metrics`: a futtató megvárja a végleges használati adatot (`status: complete`), `status` nélkül a pozitív értéket elfogadja, a kísérletek elfogyása után `usage_final = false`-szal rögzít | ugyanott |
+| **TC-1125** | AC-11.3 | a kiegészítő blokk az elsődleges elemzést nem változtatja (szélsőséges értékkel sem); a leíró érzékenységi vizsgálatok: (a) C1–C9, a pilot nélkül; (b) ≤ 48 h, a határ beletartozik, az idősebb és az ismeretlen életkorú blokkok külön listázva; döntési mező nincs; a szkript jelzi, ha a megerősítő sorozat nem teljes | `tests/unit/test_heron_analysis.py` (2026-11-24) |
+| **TC-1126** | AC-11.2 | a kalibráció-életkor definíciója: csak a pár T1 / T2 / kiolvasás / cz-hibája számít (az sx és a `last_update_date` nem); C6-példa ~85,8 h; a pillanatképpel való egyezés ellenőrzése; hiányzó paraméter vagy a job utáni mérés hibát ad | `tests/unit/test_heron_calibration_age.py`; élő rekonstrukció 2026-11-24 (`calibration_age.json`, mind a 8 blokk egyezik a pillanatképpel) — ✅ |
 | **TC-1122** | AC-11.4 | a C8 (az utolsó megerősítő blokk) valódi futtatása a kalibrációs-frissességi szabály teljesülése után: a kapuk átengedik, a tényleges QPU-idő 39 s, a kvóta 387 → 426 s, a kimenet teljes, a kalibráció-életkor ~10,7 h; eltérés: a TREX job `quantum_seconds` mezője a mentéskor 0 (utólagos lekérdezés: 24 s) | `c8.json`, `c8.log`, TR-F11 13. szakasz — ✅ (megjegyzéssel) |
 | **TC-1121** | AC-11.4 | a C7 valódi futtatása a kalibrációs-frissességi szabály teljesülése után: a kapuk átengedik, a tényleges QPU-idő 39 s, a kvóta 348 → 387 s, a kimenet teljes, a kalibráció-életkor (~37 h) a rögzített definíció szerint számolva | `c7.json`, `c7.log`, TR-F11 12. szakasz — ✅ |
 | **TC-1120** | AC-11.4 | a C6 valódi futtatása: a megszakadt első kísérlet (Docker leállt) után a feladat lemondva, a blokk a protokoll szerint újraindítva; a kapuk átengedik, a tényleges QPU-idő 39 s, a kvóta 309 → 348 s, a kimenet teljes | `c6.json`, `c6.log`, `c6_megszakadt_1.log`, TR-F11 11. szakasz — ✅ |
@@ -49,7 +53,7 @@
 
 ## 3. A mérések kapui (nem teszt, hanem eljárás)
 
-Minden hardveres blokk (B0, C1…C8) előtt, sorrendben: (1) `--dry-run`; (2) a szerző külön igenje; (3) a futtató élő
+Minden hardveres blokk (B0, C1…C8 és a kiegészítő C9) előtt, sorrendben: (1) `--dry-run`; (2) a szerző külön igenje; (3) a futtató élő
 `usage()` ellenőrzése. A blokk után: a kimeneti fájl és a kvóta-állás ellenőrzése, a következő blokk csak ezek után.
 
 *Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

@@ -8,6 +8,10 @@ Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — 
 
 from __future__ import annotations
 
+import importlib.util
+import json
+from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 import numpy as np
@@ -18,9 +22,12 @@ from vqebd.heron_analysis import (
     TostResult,
     analyze,
     decide_h1,
+    describe_differences,
     paired_improvement,
+    sensitivity_analyses,
     tost_equivalence,
 )
+from vqebd.heron_model import PROTOCOL, protocol_fingerprint
 
 pytestmark = pytest.mark.unit
 
@@ -149,3 +156,133 @@ def test_paired_improvement_sign_and_shape() -> None:
     assert result["supported"] is True and result["mean_difference"] > 0
     with pytest.raises(AnalysisError):
         paired_improvement([1.0, 2.0], [1.0])
+
+
+# --- a kiegészítő C9 és az előre rögzített leíró érzékenységi vizsgálatok (2026-11-18) ----------
+
+
+def _supplementary(offset: float) -> dict[str, Any]:
+    """Egy kiegészítő blokk, amelynek nyers eltérése ``offset`` mHa minden geometrián."""
+    return {
+        "block": "C9",
+        "kind": "supplementary",
+        "hardware_mha": {"raw": {g: HW_TRUE[g] + offset for g in GEOMS}, "trex": HW_TRUE},
+        "model_mha": {"readout": HW_TRUE, "no_readout": HW_TRUE},
+    }
+
+
+def test_a_supplementary_block_never_changes_the_primary_analysis() -> None:
+    """A C9 az elsődleges elemzésbe nem számít bele — szélsőséges értékkel sem."""
+    blocks = _blocks(shift=0.0)
+    alone = analyze(blocks, delta=3.0)
+    with_c9 = analyze([*blocks, _supplementary(500.0)], delta=3.0)
+    assert with_c9 == alone
+    assert with_c9["n_confirmatory_blocks"] == 8
+
+
+def test_describe_differences_matches_the_paired_differences() -> None:
+    blocks = _blocks(shift=2.0, n=4)
+    out = describe_differences(blocks)
+    raw = out["raw_vs_readout_model"]["0.735"]
+    expected = [
+        b["hardware_mha"]["raw"]["0.735"] - b["model_mha"]["readout"]["0.735"] for b in blocks
+    ]
+    assert raw["n"] == 4 and raw["blocks"] == ["C1", "C2", "C3", "C4"]
+    assert raw["mean"] == pytest.approx(float(np.mean(expected)))
+    assert raw["sd"] == pytest.approx(float(np.std(expected, ddof=1)))
+    tost = tost_equivalence(expected, delta=3.0)  # ugyanaz a 90%-os intervallum, döntés nélkül
+    assert raw["ci_low"] == pytest.approx(tost.ci_low) and raw["ci_high"] == pytest.approx(
+        tost.ci_high
+    )
+    assert "equivalent" not in raw and "decision" not in raw
+    assert set(out["trex_vs_no_readout_model"]) == set(GEOMS)
+
+
+def test_describe_differences_handles_one_or_no_block() -> None:
+    one = describe_differences(_blocks(shift=1.0, n=1))
+    cell = one["raw_vs_readout_model"]["1.5"]
+    assert cell["n"] == 1 and cell["mean"] is not None and cell["sd"] is None
+    assert cell["ci_low"] is None and cell["ci_high"] is None
+    empty = describe_differences([])
+    assert empty == {"blocks": [], "raw_vs_readout_model": {}, "trex_vs_no_readout_model": {}}
+
+
+def test_sensitivity_a_uses_c1_to_c9_and_b_filters_by_calibration_age() -> None:
+    blocks = _blocks(shift=0.0)
+    pilot = {**blocks[0], "block": "B0", "kind": "pilot"}
+    every = [pilot, *blocks, _supplementary(1.0)]
+    ages = {"C1": 9.2, "C2": 48.0, "C3": 48.01, "C6": 85.8, "C7": 37.3, "C8": 10.7, "C9": 20.0}
+    out = sensitivity_analyses(every, ages, max_age_h=48.0)
+    assert out["decision_rule"] is None
+    assert out["all_blocks"]["blocks"] == [f"C{i}" for i in range(1, 10)]  # a pilot kimarad
+    fresh = out["calibration_age_at_most"]
+    assert fresh["max_age_h"] == 48.0
+    assert fresh["blocks"] == ["C1", "C2", "C7", "C8", "C9"]  # a 48,0 h még beletartozik
+    assert fresh["excluded_older"] == ["C3", "C6"]
+    assert fresh["excluded_unknown_age"] == ["C4", "C5"]
+    assert fresh["raw_vs_readout_model"]["2.0"]["n"] == 5
+
+
+def test_sensitivity_without_any_known_age_keeps_b_empty() -> None:
+    out = sensitivity_analyses(_blocks(shift=0.0, n=3), {})
+    fresh = out["calibration_age_at_most"]
+    assert fresh["blocks"] == [] and fresh["excluded_unknown_age"] == ["C1", "C2", "C3"]
+    assert out["all_blocks"]["raw_vs_readout_model"]["0.735"]["n"] == 3
+
+
+# --- az elemző szkript (repó-checkoutból) -------------------------------------------------------
+
+
+@pytest.fixture
+def analyze_script(repo_root: Path) -> ModuleType:
+    path = repo_root / "scripts" / "analyze_heron.py"
+    if not path.is_file():
+        pytest.skip("scripts/ nincs a szállított image-ben")
+    spec = importlib.util.spec_from_file_location("analyze_heron_under_test", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _write_blocks(directory: Path, blocks: list[dict[str, Any]]) -> None:
+    for b in blocks:
+        record = {**b, "protocol_fingerprint": protocol_fingerprint()}
+        name = f"{str(b['block']).lower()}.json"
+        (directory / name).write_text(json.dumps(record), encoding="utf-8")
+
+
+def test_analyze_script_keeps_the_primary_result_separate_from_the_sensitivity(
+    analyze_script: ModuleType, tmp_path: Path
+) -> None:
+    blocks = _blocks(shift=0.0)
+    _write_blocks(tmp_path, [*blocks, _supplementary(40.0)])
+    ages = {"blocks": [{"block": "C1", "age_h": 9.2}, {"block": "C9", "age_h": 20.0}]}
+    (tmp_path / "calibration_age.json").write_text(json.dumps(ages), encoding="utf-8")
+    out_file = tmp_path / "analysis.json"
+    assert analyze_script.main(["--data-dir", str(tmp_path), "--out", str(out_file)]) == 0
+    out = json.loads(out_file.read_text(encoding="utf-8"))
+    expected = analyze(
+        blocks,
+        delta=PROTOCOL["delta_mha"],
+        equivalence_confidence=PROTOCOL["equivalence_confidence"],
+    )
+    assert out["primary"] == json.loads(json.dumps(expected))  # a C9 nem számít bele
+    assert out["confirmatory_complete"] is True and out["confirmatory_blocks_expected"] == 8
+    assert out["protocol_fingerprint"] == protocol_fingerprint()
+    sens = out["sensitivity"]
+    assert sens["all_blocks"]["blocks"] == [f"C{i}" for i in range(1, 10)]
+    assert sens["calibration_age_at_most"]["max_age_h"] == 48.0
+    assert sens["calibration_age_at_most"]["blocks"] == ["C1", "C9"]
+
+
+def test_analyze_script_flags_an_incomplete_confirmatory_series(
+    analyze_script: ModuleType, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    _write_blocks(tmp_path, _blocks(shift=0.0, n=7))
+    assert analyze_script.main(["--data-dir", str(tmp_path)]) == 0
+    captured = capsys.readouterr()
+    assert json.loads(captured.out)["confirmatory_complete"] is False
+    assert "nem a végleges" in captured.err
+    sens = json.loads(captured.out)["sensitivity"]["calibration_age_at_most"]
+    assert sens["excluded_unknown_age"] == [f"C{i}" for i in range(1, 8)]  # nincs életkor-fájl
