@@ -1,0 +1,11 @@
+Blokk C8 (confirmatory): 3 geometria × (nyers + TREX), R = (0.735, 1.5, 2.0) Å
+Becsült QPU-igény: 34.2 s (a kapu 42.7 s-mal számol)
+Kvóta: {"usage_consumed_seconds": 387, "usage_limit_seconds": 600, "usage_remaining_seconds": 213, "usage_limit_reached": false, "usage_period": {"start_time": "2026-10-27T09:33:12.669Z", "end_time": "2026-11-24T09:33:12.669Z"}, "time_available_at": null}
+Fizikai qubitek: [1, 2] (a protokollban előre rögzítve)
+Kalibráció: 2026-11-24T09:11:14+00:00
+Modell-előrejelzés (kvóta nélkül)…
+  modell (readout): 0.735: +24.38, 1.5: +12.85, 2.0: +13.12
+  modell (no_readout): 0.735: +7.45, 1.5: +3.26, 2.0: +2.78
+  szint 0: job dc2lkvuq4uuc73a5hbbg, 15 QPU-s
+  szint 1: job dc2ll6inj2vs73dgu8h0, 0 QPU-s
+Mentve: docs/figures/data/f11/c8.json
