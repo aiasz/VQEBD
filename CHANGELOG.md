@@ -15,6 +15,9 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 - **Zenodo verzió-DOI a `v1.1.0` kiadáshoz** (2026-11-26): [`10.5281/zenodo.24560414`](https://doi.org/10.5281/zenodo.24560414) a koncepció-DOI [`10.5281/zenodo.23886002`](https://doi.org/10.5281/zenodo.23886002) alatt; beírva a README-be (HU/EN) és a `CITATION.cff`-be. A rekord szerzője csak Kormos Attila, a licenc MIT, a leírás a `CITATION.cff` összefoglalója (az `AI_DISCLOSURE.md`-re hivatkozik).
 - **README: kapcsolati sor** (a szerző kérésére, HU/EN): a fejlécben és a hivatkozási szakaszokban a szerző e-mail-címe.
 
+### Javítva
+- **`AI_DISCLOSURE.md` 1.2.1** (a szerző kifogása nyomán): a kiegészítő C9 mérési napot az 1.2.0 tévesen az MI javaslataként írta le — a szerző javasolta. A „Ki mit végzett” táblázat két új sora konkrétan megnevezi a szerző Fázis 11-es munkáját (a menet közbeni problémák megoldása és döntések; a blokkonkénti jóváhagyás, a kiadás előtti átnézés elrendelése és a nyolc átnézési kérdés); a README MI-szakasza (HU/EN) ehhez igazítva. A már archivált `v1.1.0` Zenodo-csomag nem változik.
+
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés.

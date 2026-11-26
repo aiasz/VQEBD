@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
-| **Nyilatkozat verziója** | 1.2.0 (2026-11-26) |
+| **Nyilatkozat verziója** | 1.2.1 (2026-11-26) |
 | **Vonatkozik** | a `v1.0.0` és a `v1.1.0` kiadásra (Zenodo koncepció-DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002)) és minden későbbi verzióra, amíg ez a fájl módosítatlan |
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
@@ -19,7 +19,7 @@ irányt és minden érdemi döntést a szerző adta, a kérdéseket ő választo
 áttekintés vetett fel); az IBM-hozzáférést, a kvótát és az MI-használat
 költségét ő biztosította és viselte. A kódot, valamint a tervek és a dokumentáció szövegét az Anthropic **Claude** nyelvi
 modelljei írták meg (a Claude Code ügynökön keresztül) — a szerző kérésére, az ő utasításai szerint és jóváhagyásával. Az MI
-javaslatokat tett (például a Fázis 11 kérdése, a kiegészítő C9 és a kalibrációs-frissességi szabály), de a szerző jóváhagyása nélkül semmit nem
+javaslatokat tett (például a Fázis 11 kérdése és a kalibrációs-frissességi szabály megfogalmazása), de a szerző jóváhagyása nélkül semmit nem
 hajtott végre, és a szerző külön engedélye nélkül egyetlen hardveres futtatás sem indult. A végeredményért
 a szerző felel. Az eredmények **nem estek át független szakmai lektoráláson, és független replikáció sem történt.** A projekt
 eszköz- és adatműtermék, nem lektorált tudományos eredmény.
@@ -35,6 +35,8 @@ eszköz- és adatműtermék, nem lektorált tudományos eredmény.
 | Kísérlettervezés (fázisterv, tesztterv, hipotézisek, elfogadási kritériumok) | megadta a feladatot, **jóváhagyta, módosította** | megfogalmazta |
 | Kísérletek lefuttatása szimulátoron és az IBM-hardveren | **blokkonként engedélyezte**, és előírta a kvóta betartását | lefuttatta az engedély és a kódba épített védelmek keretein belül |
 | Elemzés, statisztika, ábrák, dokumentáció, jegyzőkönyvek, szakirodalmi áttekintés | jóváhagyta, ellenőrizte, javíttatta | **megírta** |
+| Fázis 11: a menet közbeni problémák és döntések | **a szerző oldotta meg és döntötte el**: a megszakadt C6 lemondása és teljes újraindítása (a kísérlet egysége az ütemterv előtt); a 10 napos kalibrációs szünet miatti várakozás; a kiegészítő C9 javaslata; az IBM-támogatás értesítése | lehetőségeket, kockázatokat és számításokat adott, a döntéseket végrehajtotta, az IBM-levelet megfogalmazta |
+| Fázis 11: ellenőrzés és átnézés | **a szerző végezte és rendelte el**: minden blokk egyenkénti jóváhagyása próbafuttatás után; a kiadás előtti alapos átnézés és adatvédelmi ellenőrzés; a végleges jegyzőkönyv átnézése nyolc kérdéssel (ezekből derült ki a szimmetrikus kiolvasás korlátja) | az ellenőrzéseket lefuttatta (független MI-ügynökökkel is), a talált hibákat javította, a kérdéseket megválaszolta |
 | Kiadás (GitHub Release, Zenodo-fiók és -integráció), a szerzői lista | **elvégezte / eldöntötte** (a Zenodo-rekord szerzője csak Kormos Attila) | előkészítette |
 | Felelősség az eredményekért és a kiadásért | **a szerző** | — (eszközként nem vállalhat felelősséget) |
 
@@ -85,7 +87,8 @@ Az MI hibázott, és a hibák egy részét a saját ellenőrzései tárták fel.
   adatvesztéshez vezethető hibákat talált, a C9 előtt javítva (14.3); a kiadás előtti átnézés kiderítette, hogy a blokk utáni kalibrációs pillanatkép a
   gyorsítótárból származott (22.1), és hogy egy fizikai értelmezés („koherencia”, 21.2/6) és a TOST-eredmény egyes megfogalmazásai tévesek voltak (22.3); a C6 kalibráció-életkora először tévesen (66 h helyett 85,8 h) szerepelt (11.3);
   egy konfidencia-határ dupla kerekítéssel +7,5 lett +7,4 helyett (javítva); **a modell a kiolvasási hibát szimmetrikusnak vette** — ezt az MI a
-  protokoll befagyasztása előtt nem vette észre, a szerző átnézési kérdése nyomán derült ki (TR-F11 18.11, 21.).
+  protokoll befagyasztása előtt nem vette észre, a szerző átnézési kérdése nyomán derült ki (TR-F11 18.11, 21.); és ez a nyilatkozat (1.2.0) a
+  kiegészítő C9-et tévesen az MI javaslataként írta le — a szerző javasolta (1.2.1-ben javítva).
 
 Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat.
 
@@ -120,7 +123,7 @@ Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat
 decision came from the author, who also chose the questions (some, such as the Phase 11 question, were raised by the AI-written literature review); the IBM access, the quota and the cost of the AI use were provided and
 borne by the author. The code, and the text of the plans and documentation, were written by Anthropic's **Claude** language
 models (through the Claude Code agent) — at the author's request, following the author's instructions and with the author's
-approval. The AI made proposals (for example the Phase 11 question, the supplementary block C9 and the calibration-freshness rule), but carried out nothing
+approval. The AI made proposals (for example the Phase 11 question and the wording of the calibration-freshness rule), but carried out nothing
 without the author's approval, and no hardware run started without the author's separate permission. The author
 is responsible for the final result. The results have **not been independently peer-reviewed or independently replicated.**
 The project is a tool and data artifact, not a peer-reviewed scientific result.
@@ -136,6 +139,8 @@ The project is a tool and data artifact, not a peer-reviewed scientific result.
 | Experimental design (phase plans, test plans, hypotheses, acceptance criteria) | gave the task, **approved and amended** | drafted it |
 | Running experiments on simulators and IBM hardware | **permitted each block**, and required staying within the quota | ran them within the permission and the guards built into the code |
 | Analysis, statistics, figures, documentation, test reports, literature review | approved, checked, had errors fixed | **wrote it** |
+| Phase 11: problems and decisions along the way | **solved and decided by the author**: cancelling and fully restarting the interrupted C6 (the integrity of the experiment before the schedule); waiting out the 10-day calibration gap; proposing the supplementary block C9; notifying IBM support | offered options, risks and calculations, carried out the decisions, drafted the IBM message |
+| Phase 11: checking and review | **done and ordered by the author**: approving every block one by one after a dry run; ordering the thorough pre-release review and privacy check; reviewing the final report with eight questions (which revealed the symmetric-readout limitation) | ran the checks (also with independent AI agents), fixed the errors found, answered the questions |
 | Release (GitHub Release, Zenodo account and integration), author list | **performed / decided** (the Zenodo record lists only Attila Kormos) | prepared |
 | Responsibility for the results and the release | **the author** | — (as a tool it cannot take responsibility) |
 
@@ -186,7 +191,8 @@ The AI made mistakes, some of which its own checks uncovered. They are public:
   bugs in the runner that could have lost data, fixed before C9 (14.3); the pre-release review found that the post-block calibration snapshot came
   from a cache (22.1), and that one physical interpretation ("coherence", 21.2/6) and some wording of the TOST result were wrong (22.3); the calibration age of C6 was first stated wrongly (66 h instead of
   85.8 h; 11.3); one confidence bound was double-rounded to +7.5 instead of +7.4 (fixed); **the model treated the readout error as
-  symmetric** — the AI did not notice this before the protocol was frozen; it emerged from the author's review questions (TR-F11 18.11, 21.).
+  symmetric** — the AI did not notice this before the protocol was frozen; it emerged from the author's review questions (TR-F11 18.11, 21.); and this
+  disclosure (1.2.0) wrongly attributed the supplementary block C9 to the AI — the author proposed it (fixed in 1.2.1).
 
 AI-generated text may contain further errors not uncovered here.
 
