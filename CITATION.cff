@@ -9,7 +9,7 @@ type: software
 version: 1.1.0
 date-released: "2026-11-26"
 license: MIT
-doi: "10.5281/zenodo.23886002"   # Zenodo koncepció-DOI: a projekt minden verziójára (a v1.0.0 verzió-DOI-ja: 10.5281/zenodo.23886003)
+doi: "10.5281/zenodo.23886002"   # Zenodo koncepció-DOI: a projekt minden verziójára (verzió-DOI-k: v1.0.0 — 10.5281/zenodo.23886003, v1.1.0 — 10.5281/zenodo.24560414)
 identifiers:
   - type: doi
     value: "10.5281/zenodo.23886002"
@@ -17,6 +17,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.23886003"
     description: "Zenodo, a v1.0.0 kiadás pillanatképe (verzió-DOI)"
+  - type: doi
+    value: "10.5281/zenodo.24560414"
+    description: "Zenodo, a v1.1.0 kiadás pillanatképe (verzió-DOI)"
 repository-code: "https://github.com/aiasz/VQEBD"
 url: "https://github.com/aiasz/VQEBD"
 

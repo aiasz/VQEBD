@@ -11,6 +11,9 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Hozzáadva
+- **Zenodo verzió-DOI a `v1.1.0` kiadáshoz** (2026-11-26): [`10.5281/zenodo.24560414`](https://doi.org/10.5281/zenodo.24560414) a koncepció-DOI [`10.5281/zenodo.23886002`](https://doi.org/10.5281/zenodo.23886002) alatt; beírva a README-be (HU/EN) és a `CITATION.cff`-be. A rekord szerzője csak Kormos Attila, a licenc MIT, a leírás a `CITATION.cff` összefoglalója (az `AI_DISCLOSURE.md`-re hivatkozik).
+
 ### Tervezett
 - **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
 - **D3** — szimulátoros GitHub Actions ütemezés.

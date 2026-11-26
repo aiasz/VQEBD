@@ -204,7 +204,7 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 | AC-11.6 | ✅ a H1–H4 az előre rögzített szabály szerint kiértékelve (TR-F11 15.): H1 elutasítva, H2 igaz; a negatív eredmény a TR-F11-ben közölve; a feltáró, a megerősítő és a kiegészítő adat külön jelölve |
 | AC-11.7 | ✅ a korlátok a TR-F11 18. szakaszában; a szerző átnézte (2026-11-26); a kiadás előtti helyesbítések: TR-F11 22. |
 | 11.E | elmarad (az előre kimondott következmény: H1 nem egyenértékű) |
-| 11.F | a TR-F11 végleges (1.0.1); README / CHANGELOG frissítve; `v1.1.0` és Zenodo a szerző külön jóváhagyásával |
+| 11.F | ✅ a TR-F11 végleges (1.0.1); README / CHANGELOG frissítve; **kiadva 2026-11-26**: `v1.1.0` (GitHub Release), Zenodo verzió-DOI [10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414) |
 
 ## 7. Kockázatok és korlátok
 

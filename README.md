@@ -130,7 +130,7 @@ pontosságot (`TR-F05`), a hardveres görbén csak egy pont egyeztethető vele (
 | **8** | **Konténeres rendszer, a dashboard egyparancsos indítása** | ✅ **Lezárva** (`v0.11.0`) |
 | **9** | **Dokumentáció, validálás, publikálás (Zenodo DOI)** | ✅ **Lezárva** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Közösségi visszacsatolás | ⬜ Tervezett |
-| **11** | **A kalibrációból épített Heron-zajmodell validálása valódi hardveren** | ✅ **Lezárva** (`v1.1.0`) — negatív eredmény (H1 elutasítva) |
+| **11** | **A kalibrációból épített Heron-zajmodell validálása valódi hardveren** | ✅ **Lezárva** (`v1.1.0`) — negatív eredmény (H1 elutasítva) — DOI: [10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414) |
 
 ### Mit old meg ez a projekt?
 
@@ -513,7 +513,8 @@ külön biztonsági kapcsoló védi: `VQEBD_ALLOW_HARDWARE=false` az alapértelm
 
 Ha a projektet használod, hivatkozz rá a [`CITATION.cff`](CITATION.cff) szerint (GitHub: *Cite this repository*).
 **Zenodo DOI:** [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) (a projekt minden verziójára;
-a `v1.0.0` pontos pillanatképe: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)).
+a `v1.0.0` pontos pillanatképe: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003), a `v1.1.0`-é:
+[10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414)).
 A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
 
 ```bibtex
@@ -661,7 +662,7 @@ limitations are stated openly in the test reports, e.g.: no noisy-simulation con
 | **8** | **Container system, one-command dashboard launch** | ✅ **Completed** (`v0.11.0`) |
 | **9** | **Documentation, validation, publication (Zenodo DOI)** | ✅ **Completed** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Community feedback | ⬜ Planned |
-| **11** | **Validating the calibration-built Heron noise model on real hardware** | ✅ **Completed** (`v1.1.0`) — negative result (H1 rejected) |
+| **11** | **Validating the calibration-built Heron noise model on real hardware** | ✅ **Completed** (`v1.1.0`) — negative result (H1 rejected) — DOI: [10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414) |
 
 ### What Does This Project Solve?
 
@@ -1050,7 +1051,8 @@ by default. Reporting a vulnerability: [`SECURITY.md`](SECURITY.md).
 
 If you use this project, please cite it according to [`CITATION.cff`](CITATION.cff) (GitHub: *Cite this repository*).
 **Zenodo DOI:** [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) (all versions; the exact `v1.0.0`
-snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). The release procedure:
+snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003), the `v1.1.0` snapshot:
+[10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414)). The release procedure:
 [`docs/09_publishing.md`](docs/09_publishing.md) (in Hungarian).
 
 ```bibtex
