@@ -245,11 +245,23 @@ def analyze_script(repo_root: Path) -> ModuleType:
     return module
 
 
+def _running(block: str) -> str:
+    return f"2026-11-{int(block[1:]) + 3:02d}T08:00:01.250000+00:00"
+
+
 def _write_blocks(directory: Path, blocks: list[dict[str, Any]]) -> None:
     for b in blocks:
-        record = {**b, "protocol_fingerprint": protocol_fingerprint()}
+        record = {
+            **b,
+            "protocol_fingerprint": protocol_fingerprint(),
+            "runs": [{"timestamps": {"running": _running(str(b["block"]))}}],
+        }
         name = f"{str(b['block']).lower()}.json"
         (directory / name).write_text(json.dumps(record), encoding="utf-8")
+
+
+def _age(block: str, age_h: Any) -> dict[str, Any]:
+    return {"block": block, "age_h": age_h, "first_job_running_utc": _running(block)}
 
 
 def test_analyze_script_keeps_the_primary_result_separate_from_the_sensitivity(
@@ -257,7 +269,7 @@ def test_analyze_script_keeps_the_primary_result_separate_from_the_sensitivity(
 ) -> None:
     blocks = _blocks(shift=0.0)
     _write_blocks(tmp_path, [*blocks, _supplementary(40.0)])
-    ages = {"blocks": [{"block": "C1", "age_h": 9.2}, {"block": "C9", "age_h": 20.0}]}
+    ages = {"blocks": [_age("C1", 9.2), _age("C9", 20.0)]}
     (tmp_path / "calibration_age.json").write_text(json.dumps(ages), encoding="utf-8")
     out_file = tmp_path / "analysis.json"
     assert analyze_script.main(["--data-dir", str(tmp_path), "--out", str(out_file)]) == 0
@@ -286,3 +298,43 @@ def test_analyze_script_flags_an_incomplete_confirmatory_series(
     assert "nem a végleges" in captured.err
     sens = json.loads(captured.out)["sensitivity"]["calibration_age_at_most"]
     assert sens["excluded_unknown_age"] == [f"C{i}" for i in range(1, 8)]  # nincs életkor-fájl
+
+
+def test_analyze_script_ignores_stale_or_missing_age_records(
+    analyze_script: ModuleType, tmp_path: Path
+) -> None:
+    _write_blocks(tmp_path, _blocks(shift=0.0, n=8))
+    stale = {**_age("C2", 10.0), "first_job_running_utc": "2026-10-01T00:00:00+00:00"}
+    ages = {
+        "blocks": [
+            _age("C1", 9.2),
+            stale,
+            _age("C3", None),
+            _age("C4", 48.0001),
+            _age("C5", True),
+            _age("C6", float("nan")),
+        ]
+    }
+    (tmp_path / "calibration_age.json").write_text(json.dumps(ages), encoding="utf-8")
+    out_file = tmp_path / "analysis.json"
+    assert analyze_script.main(["--data-dir", str(tmp_path), "--out", str(out_file)]) == 0
+    fresh = json.loads(out_file.read_text(encoding="utf-8"))["sensitivity"][
+        "calibration_age_at_most"
+    ]
+    assert fresh["blocks"] == ["C1"]
+    assert fresh["excluded_older"] == ["C4"]  # 48,0001 h > 48 h (kerekítés nélkül)
+    assert {"C2", "C3", "C5", "C6"} <= set(fresh["excluded_unknown_age"])
+
+
+def test_a_broken_supplementary_block_cannot_block_the_primary_result(
+    analyze_script: ModuleType, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    blocks = _blocks(shift=0.0)
+    broken = _supplementary(1.0)
+    del broken["hardware_mha"]["raw"]["2.0"]  # eltérő geometriák a C9-ben
+    _write_blocks(tmp_path, [*blocks, broken])
+    assert analyze_script.main(["--data-dir", str(tmp_path)]) == 0
+    captured = capsys.readouterr()
+    out = json.loads(captured.out)
+    assert out["primary"]["H1"]["decision"] == "equivalent" and out["confirmatory_complete"]
+    assert "error" in out["sensitivity"] and "érzékenységi" in captured.err

@@ -17,6 +17,7 @@ Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — 
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import sys
 import time
@@ -37,6 +38,30 @@ def load_blocks(data_dir: Path) -> list[dict[str, Any]]:
     return [b for b in blocks if b.get("kind") in ("confirmatory", "supplementary")]
 
 
+def load_previous(path: Path) -> dict[str, dict[str, Any]]:
+    """A korábbi életkor-fájl rekordjai blokknév szerint (hiányában vagy hibásan üres)."""
+    if not path.is_file():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {str(r.get("block")): r for r in payload.get("blocks", []) if isinstance(r, dict)}
+
+
+def still_valid(record: dict[str, Any], block: dict[str, Any]) -> bool:
+    """Érvényes-e még a korábbi rekord: van életkora, és ugyanahhoz a blokkfuttatáshoz tartozik."""
+    age, recorded = record.get("age_h"), record.get("first_job_running_utc")
+    if isinstance(age, bool) or not isinstance(age, int | float) or not recorded:
+        return False
+    try:
+        start = first_job_running(block)
+        then = dt.datetime.fromisoformat(str(recorded).replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return abs((start - then).total_seconds()) < 1.0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Fázis 11 — kalibráció-életkor (csak olvasás)")
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
@@ -46,16 +71,40 @@ def main(argv: list[str] | None = None) -> int:
     if not blocks:
         print("Nincs megerősítő vagy kiegészítő blokk.", file=sys.stderr)
         return 1
+    out = args.data_dir / OUT_NAME
+    previous = load_previous(out)
     service = connect_service()
     backends: dict[str, Any] = {}
     records = []
+    failed = []
     for block in blocks:
-        name = block["backend"]
-        if name not in backends:
-            backends[name] = service.backend(name)
-        backend = backends[name]
-        properties = backend.properties(datetime=first_job_running(block))
-        record = block_calibration_age(block, properties)
+        try:
+            name = block["backend"]
+            if name not in backends:
+                backends[name] = service.backend(name)
+            properties = backends[name].properties(datetime=first_job_running(block))
+            if properties is None:
+                raise ValueError("a történeti kalibráció nem érhető el")
+            record = block_calibration_age(block, properties)
+        except Exception as exc:  # egy blokk hibája ne vesszen el a többi eredménye
+            failed.append(block.get("block"))
+            old = previous.get(str(block.get("block")))
+            if old is not None and still_valid(old, block):
+                records.append({**old, "reused_after_error": repr(exc)})
+                print(
+                    f"{block.get('block')}: HIBA — a korábbi rekord marad: {exc!r}", file=sys.stderr
+                )
+                continue
+            records.append(
+                {
+                    "block": block.get("block"),
+                    "kind": block.get("kind"),
+                    "age_h": None,
+                    "error": repr(exc),
+                }
+            )
+            print(f"{block.get('block')}: HIBA — {exc!r}", file=sys.stderr)
+            continue
         records.append(record)
         print(
             f"{record['block']}: {record['age_h']:.1f} h "
@@ -72,11 +121,13 @@ def main(argv: list[str] | None = None) -> int:
         "generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "blocks": records,
     }
-    out = args.data_dir / OUT_NAME
     out.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
     )
     print(f"Mentve: {out}")
+    if failed:
+        print(f"Ismeretlen életkorú blokkok (hiba): {failed}", file=sys.stderr)
+        return 1
     return 0
 
 

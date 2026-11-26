@@ -68,7 +68,7 @@ def pair_parameters(properties: Any, qubits: Sequence[int]) -> list[dict[str, An
         if missing:
             raise ValueError(f"a q{q} kalibrációjából hiányzik: {sorted(missing)}")
     cz = [
-        par
+        (par, [int(q) for q in gate.qubits])
         for gate in properties.gates
         if gate.gate == "cz" and sorted(int(q) for q in gate.qubits) == sorted(pair)
         for par in gate.parameters
@@ -76,28 +76,31 @@ def pair_parameters(properties: Any, qubits: Sequence[int]) -> list[dict[str, An
     ]
     if not cz:
         raise ValueError(f"a {pair} pár cz-hibája hiányzik a kalibrációból")
-    oldest_cz = min(cz, key=lambda par: _utc(par.date))
+    oldest_cz, oldest_qubits = min(cz, key=lambda item: _utc(item[0].date))
     found.append(
         {
             "name": "cz gate_error",
             "value": float(oldest_cz.value),
             "unit": str(getattr(oldest_cz, "unit", "") or ""),
             "date": _utc(oldest_cz.date),
+            "qubits": oldest_qubits,
         }
     )
     return found
 
 
 def first_job_running(block: Mapping[str, Any]) -> dt.datetime:
-    """A blokk első jobjának indulása (a ``runs[*].timestamps.running`` legkorábbi értéke)."""
-    times = [
-        _utc(run["timestamps"]["running"])
-        for run in block.get("runs", [])
-        if run.get("timestamps", {}).get("running")
-    ]
-    if not times:
-        raise ValueError(f"a(z) {block.get('block')} blokkban nincs ``running`` időbélyeg")
-    return min(times)
+    """A blokk első jobjának indulása (a ``runs[*].timestamps.running`` legkorábbi értéke).
+
+    Raises:
+        ValueError: Ha nincs futás, vagy **bármelyik** futásnál hiányzik a ``running`` időbélyeg
+            (különben a legkorábbi indulás csendben a későbbi jobra csúszhatna).
+    """
+    runs = block.get("runs") or []
+    running = [(run.get("timestamps") or {}).get("running") for run in runs]
+    if not runs or not all(running):
+        raise ValueError(f"a(z) {block.get('block')} blokkban hiányzik a ``running`` időbélyeg")
+    return min(_utc(str(t)) for t in running)
 
 
 def calibration_age_hours(
@@ -129,8 +132,10 @@ def _matches_snapshot(
         return None
     for p in parameters:
         if p["name"] == "cz gate_error":
-            saved = list(snapshot.get("cz_errors", {}).values())
-            if not saved or not math.isclose(p["value"], float(saved[0]), rel_tol=rel_tol):
+            cz_errors = snapshot.get("cz_errors", {})
+            key = "-".join(str(q) for q in p.get("qubits", []))
+            saved = [cz_errors[key]] if key in cz_errors else list(cz_errors.values())
+            if not any(math.isclose(p["value"], float(v), rel_tol=rel_tol) for v in saved):
                 return False
             continue
         qubit, name = p["name"].split(" ", 1)
@@ -161,10 +166,10 @@ def block_calibration_age(
     return {
         "block": block["block"],
         "kind": block.get("kind"),
-        "first_job_running_utc": start.isoformat(timespec="seconds"),
+        "first_job_running_utc": start.isoformat(),
         "oldest_parameter": oldest["name"],
         "oldest_parameter_date_utc": oldest["date"].isoformat(timespec="seconds"),
-        "age_h": round(age, 2),
+        "age_h": age,  # kerekítés nélkül: a 48 órás határt a pontos érték dönti el
         "properties_last_update_utc": None
         if last_update is None
         else _utc(last_update).isoformat(timespec="seconds"),
@@ -175,6 +180,7 @@ def block_calibration_age(
                 "value": p["value"],
                 "unit": p["unit"],
                 "date_utc": p["date"].isoformat(timespec="seconds"),
+                **({"qubits": p["qubits"]} if "qubits" in p else {}),
             }
             for p in parameters
         ],

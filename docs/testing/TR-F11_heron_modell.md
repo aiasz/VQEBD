@@ -992,6 +992,26 @@ Egy teszt azt is rögzíti, hogy egy kiegészítő blokk — szélsőséges ért
 - A C2 nyers jobját 2026-11-06 08:33-kor küldtük be, de 15 órát állt sorban, és csak 23:34-kor indult (7. szakasz); ezért volt a kalibráció a
   mérés idején ilyen idős.
 
+### 14.3 Független kódellenőrzés és javítások a C9 előtt (2026-11-26)
+
+A C9 napján, a hardveres futtatás **előtt** egy független MI-ellenőrző (külön ügynök, a saját következtetéseim átadása nélkül) átnézte a 14.1 változásait;
+két kört futott. Az elsődleges elemzés kódja (`analyze`) bájtra azonos a mérések előttivel (`57a421b`); a javított kód a feltöltött `analysis.json`-t
+**bitre azonosan** adja vissza. A `PROTOCOL` / ujjlenyomat / `FROZEN` változatlan.
+
+| # | Talált hiba (a 14.1 változataiban) | Javítás | Teszt |
+|---|---|---|---|
+| 1 | a `final_metrics` a `status: complete` + 0 s állapotot végesnek fogadta volna el (a C8 hibája megismétlődhetett volna, „végleges” jelöléssel) | végleges csak a pozitív `quantum_seconds` | TC-1127 |
+| 2 | a két job között futó, ismételt metrika-lekérdezés hibája a mentés előtt leállíthatta volna a futtatót (a mért adat elveszett volna, és a kvóta az újrafuttatásra már nem elég: 450 + 42,75 > 480 s) | a két job között ismét **egyetlen, hibatűrő** olvasás (mint a C1–C8-nál); a blokkfájl azonnal mentődik; a végleges használat lekérdezése **utána**, kivétel nélkül; a blokk utáni kalibráció/kvóta hibája esetén `null` | TC-1127 |
+| 3 | a várakozás a két job közé esett volna (a második job ~1 perccel később indult volna, mint a C1–C8-nál) | lásd 2. — a két job közti ütem a C1–C8-cal azonos | TC-1127 |
+| 4 | egy meglévő blokkfájl (pl. elírt `--block C8`) felülírható volt | valódi futtatás megtagadva, ha a kimenet létezik | TC-1127 |
+| 5 | a 48 órás határ kerekített életkoron dőlt el | az életkor kerekítés nélkül tárolva | TC-1128 |
+| 6 | egy hibás kiegészítő blokk vagy életkor-rekord az elsődleges eredmény kiírását is megakaszthatta | az elsődleges rész előbb, az érzékenységi rész hibatűrően; elavult / hiányos életkor-rekord kizárva | TC-1128 |
+| 7 | a cz-hiba pillanatkép-egyezése irány szerint téves eltérést jelezhetett | ugyanazon irány összevetése | TC-1128 |
+| 8 | az életkor-szkript egy átmeneti hiba miatt jó rekordokat írhatott felül, ill. egy hiányzó `running` időbélyeg csendben későbbi indulást adott | a korábbi érvényes rekord megmarad; hiányzó `running` → ismeretlen életkor | TC-1128 |
+| 9 | az első job eredménye a második végéig csak a memóriában volt; a fájl újraírása nem volt atomi | részleges mentés (`c9.partial.json`, az elemzés nem olvassa; siker után törlődik); atomi írás | TC-1127 |
+
+A C1–C8 adatait egyik hiba sem érintette (a C8 `quantum_seconds` rögzítési hibáját a 13.2 írja le). Az ellenőrzést MI végezte; emberi kódellenőrzés nem történt.
+
 ## 15. Az elsődleges elemzés (2026-11-24): **H1 elutasítva**, H2 igaz
 
 **Megerősítő eredmény.** Az előre rögzített elemzés (`scripts/analyze_heron.py` → `vqebd.heron_analysis.analyze`; a mérések előtt megírva, szintetikus adaton

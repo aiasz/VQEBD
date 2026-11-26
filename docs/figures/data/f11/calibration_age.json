@@ -1,15 +1,15 @@
 {
   "definition": "az első job indulása − a qubitpár T1, T2, kiolvasási hiba és cz-hiba legrégebbi mérési időpontja (órában); az sx/x hiba kimarad (phase_11.md, 2026-11-19)",
   "source": "backend.properties(datetime=<az első job indulása>), csak olvasás",
-  "generated_utc": "2026-11-24T09:52:24Z",
+  "generated_utc": "2026-11-26T07:53:49Z",
   "blocks": [
     {
       "block": "C1",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-04T08:26:45+00:00",
+      "first_job_running_utc": "2026-11-04T08:26:45.490518+00:00",
       "oldest_parameter": "q1 T1",
       "oldest_parameter_date_utc": "2026-11-03T23:15:27+00:00",
-      "age_h": 9.19,
+      "age_h": 9.188469588333334,
       "properties_last_update_utc": "2026-11-04T07:49:27+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -53,17 +53,21 @@
           "name": "cz gate_error",
           "value": 0.0009893798899124617,
           "unit": "",
-          "date_utc": "2026-11-04T01:52:47+00:00"
+          "date_utc": "2026-11-04T01:52:47+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C2",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-06T23:34:13+00:00",
+      "first_job_running_utc": "2026-11-06T23:34:13.117257+00:00",
       "oldest_parameter": "q1 T2",
       "oldest_parameter_date_utc": "2026-11-04T23:47:08+00:00",
-      "age_h": 47.78,
+      "age_h": 47.784754793611114,
       "properties_last_update_utc": "2026-11-06T22:34:00+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -107,17 +111,21 @@
           "name": "cz gate_error",
           "value": 0.000991353796444605,
           "unit": "",
-          "date_utc": "2026-11-05T19:23:08+00:00"
+          "date_utc": "2026-11-05T19:23:08+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C3",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-08T08:46:08+00:00",
+      "first_job_running_utc": "2026-11-08T08:46:08.955244+00:00",
       "oldest_parameter": "cz gate_error",
       "oldest_parameter_date_utc": "2026-11-07T02:22:55+00:00",
-      "age_h": 30.39,
+      "age_h": 30.38720979,
       "properties_last_update_utc": "2026-11-08T08:12:30+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -161,17 +169,21 @@
           "name": "cz gate_error",
           "value": 0.0009811026706087467,
           "unit": "",
-          "date_utc": "2026-11-07T02:22:55+00:00"
+          "date_utc": "2026-11-07T02:22:55+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C4",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-10T09:00:31+00:00",
+      "first_job_running_utc": "2026-11-10T09:00:31.738883+00:00",
       "oldest_parameter": "q1 T1",
       "oldest_parameter_date_utc": "2026-11-09T21:53:06+00:00",
-      "age_h": 11.12,
+      "age_h": 11.123816356388888,
       "properties_last_update_utc": "2026-11-10T08:43:26+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -215,17 +227,21 @@
           "name": "cz gate_error",
           "value": 0.0007882442931249622,
           "unit": "",
-          "date_utc": "2026-11-10T00:06:13+00:00"
+          "date_utc": "2026-11-10T00:06:13+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C5",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-12T08:21:19+00:00",
+      "first_job_running_utc": "2026-11-12T08:21:19.776481+00:00",
       "oldest_parameter": "q1 T1",
       "oldest_parameter_date_utc": "2026-11-11T17:25:24+00:00",
-      "age_h": 14.93,
+      "age_h": 14.932160133611111,
       "properties_last_update_utc": "2026-11-12T07:58:36+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -269,17 +285,21 @@
           "name": "cz gate_error",
           "value": 0.0010305941208901548,
           "unit": "",
-          "date_utc": "2026-11-11T18:32:57+00:00"
+          "date_utc": "2026-11-11T18:32:57+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C6",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-16T09:23:49+00:00",
+      "first_job_running_utc": "2026-11-16T09:23:49.146036+00:00",
       "oldest_parameter": "q1 T1",
       "oldest_parameter_date_utc": "2026-11-12T19:33:48+00:00",
-      "age_h": 85.83,
+      "age_h": 85.83365167666666,
       "properties_last_update_utc": "2026-11-13T14:57:10+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -323,17 +343,21 @@
           "name": "cz gate_error",
           "value": 0.0009736307440351144,
           "unit": "",
-          "date_utc": "2026-11-12T20:29:12+00:00"
+          "date_utc": "2026-11-12T20:29:12+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C7",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-22T14:22:15+00:00",
+      "first_job_running_utc": "2026-11-22T14:22:15.368903+00:00",
       "oldest_parameter": "q1 T1",
       "oldest_parameter_date_utc": "2026-11-21T01:03:46+00:00",
-      "age_h": 37.31,
+      "age_h": 37.30815802861111,
       "properties_last_update_utc": "2026-11-22T14:12:44+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -377,17 +401,21 @@
           "name": "cz gate_error",
           "value": 0.0008200679548716061,
           "unit": "",
-          "date_utc": "2026-11-21T23:38:08+00:00"
+          "date_utc": "2026-11-21T23:38:08+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     },
     {
       "block": "C8",
       "kind": "confirmatory",
-      "first_job_running_utc": "2026-11-24T09:36:01+00:00",
+      "first_job_running_utc": "2026-11-24T09:36:01.226913+00:00",
       "oldest_parameter": "q1 T1",
       "oldest_parameter_date_utc": "2026-11-23T22:52:01+00:00",
-      "age_h": 10.73,
+      "age_h": 10.733396364722221,
       "properties_last_update_utc": "2026-11-24T09:11:14+00:00",
       "matches_snapshot": true,
       "parameters": [
@@ -431,7 +459,11 @@
           "name": "cz gate_error",
           "value": 0.0010102839279503562,
           "unit": "",
-          "date_utc": "2026-11-23T23:47:35+00:00"
+          "date_utc": "2026-11-23T23:47:35+00:00",
+          "qubits": [
+            1,
+            2
+          ]
         }
       ]
     }

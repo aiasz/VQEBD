@@ -337,3 +337,253 @@ def test_final_metrics_gives_up_and_flags_a_non_final_usage(runner: ModuleType) 
     metrics, final = runner.final_metrics(service, "job", attempts=4, sleep=waits.append)
     assert final is False and metrics["usage"]["quantum_seconds"] == 0
     assert service.calls == 4 and len(waits) == 3
+
+
+def test_final_metrics_does_not_accept_a_complete_but_zero_usage(runner: ModuleType) -> None:
+    """A ``status: complete`` 0 másodperccel nem végleges (a C8 TREX jobjának hibája)."""
+    service = _MetricsService(
+        [
+            {"usage": {"quantum_seconds": 0, "seconds": 0, "status": "complete"}},
+            {"usage": {"quantum_seconds": 24, "seconds": 24, "status": "complete"}},
+        ]
+    )
+    metrics, final = runner.final_metrics(service, "job", sleep=lambda _: None)
+    assert final is True and metrics["usage"]["quantum_seconds"] == 24 and service.calls == 2
+
+
+class _BrokenService:
+    def job(self, job_id: str) -> Any:
+        raise RuntimeError("az API nem elérhető")
+
+
+def test_metrics_errors_and_null_usage_are_not_fatal(runner: ModuleType) -> None:
+    assert runner.read_metrics(_BrokenService(), "job") == {}
+    metrics, final = runner.final_metrics(_BrokenService(), "job", attempts=3, sleep=lambda _: None)
+    assert metrics == {} and final is False
+    null_usage: dict[str, Any] = {"usage": None, "timestamps": None}
+    assert runner.usage_seconds(null_usage) is None
+    assert runner.usage_is_final(null_usage) is False
+
+
+def test_a_measured_block_is_never_overwritten(runner: ModuleType, tmp_path: Path) -> None:
+    (tmp_path / "c8.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="már létezik"):
+        runner.check_not_measured(tmp_path / "c8.json")
+    runner.check_not_measured(tmp_path / "c9.json")  # még nem létezik: nem dob
+
+
+# --- a beküldési út hamis szolgáltatással (hálózat és QPU nélkül) ---------------------------------
+
+
+class _FakeJobService:
+    """Hamis IBM-szolgáltatás: kvóta és jobonkénti metrika-sorozat (kivétel is lehet benne)."""
+
+    def __init__(self, metrics_by_job: dict[str, list[Any]], *, consumed: float = 426.0) -> None:
+        self.metrics_by_job = metrics_by_job
+        self.calls = dict.fromkeys(metrics_by_job, 0)
+        self.consumed = consumed
+        self.usage_calls = 0
+        self.fail_usage_after: int | None = None
+
+    def usage(self) -> dict[str, Any]:
+        self.usage_calls += 1
+        if self.fail_usage_after is not None and self.usage_calls > self.fail_usage_after:
+            raise RuntimeError("a kvóta nem olvasható")
+        return _usage(self.consumed)
+
+    def job(self, job_id: str) -> SimpleNamespace:
+        sequence = self.metrics_by_job[job_id]
+
+        def metrics() -> dict[str, Any]:
+            item = sequence[min(self.calls[job_id], len(sequence) - 1)]
+            self.calls[job_id] += 1
+            if isinstance(item, Exception):
+                raise item
+            return dict(item)
+
+        return SimpleNamespace(metrics=metrics)
+
+
+def _prepared(bonds: tuple[float, ...], seed: int) -> dict[str, Any]:
+    points = [
+        {
+            "bond_length": b,
+            "observable": object(),
+            "theta_star": [0.1],
+            "energy_offset_ha": 0.5,
+            "full_ci_ha": -1.0,
+        }
+        for b in bonds
+    ]
+    return {"points": points, "circuit": None, "seeds": None}
+
+
+def _stub_submission(
+    runner: ModuleType,
+    monkeypatch: pytest.MonkeyPatch,
+    data_dir: Path,
+    service: _FakeJobService,
+    log: list[tuple[int, dict[str, int]]],
+    *,
+    snapshot_fails_after: int | None = None,
+    fail_level: int | None = None,
+) -> None:
+    snapshots = {"n": 0}
+
+    def snapshot(backend: Any, qubits: Any) -> dict[str, Any]:
+        snapshots["n"] += 1
+        if snapshot_fails_after is not None and snapshots["n"] > snapshot_fails_after:
+            raise RuntimeError("a kalibráció nem olvasható")
+        return {"last_update_date": "2026-11-26T07:25:12+00:00", "qubits": {}, "cz_errors": {}}
+
+    class FakeEvaluator:
+        def __init__(self, *args: Any, resilience_level: int, initial_layout: Any, **kw: Any):
+            self.level = resilience_level
+            self.physical_qubits = sorted(int(q) for q in initial_layout)
+            self.backend = SimpleNamespace(name=kw["backend_name"])
+            self.last_job_id: str | None = None
+
+        def evaluate_observables(self, observables: Any, thetas: Any) -> list[dict[str, float]]:
+            log.append((self.level, dict(service.calls)))
+            if self.level == fail_level:
+                raise RuntimeError("a job megszakadt")
+            self.last_job_id = f"job-{self.level}"
+            return [
+                {"evs": -1.47, "stds": 0.003, "ensemble_standard_error": 0.003} for _ in observables
+            ]
+
+    monkeypatch.setattr(runner, "connect_service", lambda: service)
+    monkeypatch.setattr(runner.prep, "prepare", _prepared)
+    monkeypatch.setattr(runner, "calibration_snapshot", snapshot)
+    monkeypatch.setattr(
+        runner,
+        "model_predictions",
+        lambda *a, **k: {"readout": {"0.735": 24.0}, "no_readout": {"0.735": 7.0}},
+    )
+    monkeypatch.setattr(runner, "IBMQpuEnergyEvaluator", FakeEvaluator)
+    monkeypatch.setattr(runner.time, "sleep", lambda _s: None)
+    monkeypatch.setenv("VQEBD_ALLOW_HARDWARE", "true")
+    (data_dir / "FROZEN").write_text(protocol_fingerprint() + "\n", encoding="utf-8")
+    (data_dir / "b0.json").write_text(json.dumps({"physical_qubits": [1, 2]}), encoding="utf-8")
+    for i in range(1, 9):
+        (data_dir / f"c{i}.json").write_text("{}", encoding="utf-8")
+
+
+_RUN = {"running": "2026-11-26T08:00:01Z", "created": "2026-11-26T08:00:00Z"}
+
+
+def test_c9_submission_keeps_the_c1_c8_rhythm_and_records_the_final_usage(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    service = _FakeJobService(
+        {
+            "job-1": [  # TREX: a befejezéskor még 0 s (mint a C8-nál), később 24 s
+                {"usage": {"quantum_seconds": 0, "status": "complete"}, "timestamps": _RUN},
+                {"usage": {"quantum_seconds": 24, "status": "complete"}, "timestamps": _RUN},
+            ],
+            "job-0": [{"usage": {"quantum_seconds": 15, "status": "complete"}, "timestamps": _RUN}],
+        }
+    )
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log)
+    assert runner.main(["--block", "C9", "--data-dir", str(tmp_path)]) == 0
+
+    assert [level for level, _ in log] == [1, 0]  # TREX először
+    assert log[1][1]["job-1"] == 1  # a két job között pontosan egy metrika-olvasás
+    saved = json.loads((tmp_path / "c9.json").read_text(encoding="utf-8"))
+    assert saved["block"] == "C9" and saved["kind"] == "supplementary"
+    assert saved["protocol_fingerprint"] == protocol_fingerprint()
+    trex, raw = saved["runs"]
+    assert trex["resilience_level"] == 1 and raw["resilience_level"] == 0
+    assert trex["quantum_seconds"] == 24 and trex["quantum_seconds_initial"] == 0
+    assert trex["usage_final"] is True and raw["usage_final"] is True
+    assert raw["quantum_seconds"] == 15 and "quantum_seconds_initial" not in raw
+    assert set(saved["hardware_mha"]) == {"raw", "trex"}
+
+    assert not (tmp_path / "c9.partial.json").exists()  # a részleges mentés törölve
+    assert not (tmp_path / ".c9.json.tmp").exists()  # az atomi írás nem hagy szemetet
+
+    # második indítás (pl. elírt blokknév): felülírás megtagadva, új job nem indul
+    with pytest.raises(RuntimeError, match="már létezik"):
+        runner.main(["--block", "C9", "--data-dir", str(tmp_path)])
+    assert len(log) == 2
+
+
+def test_the_measured_data_are_saved_even_if_every_follow_up_query_fails(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    broken = RuntimeError("az API nem elérhető")
+    service = _FakeJobService({"job-1": [broken], "job-0": [broken]})
+    service.fail_usage_after = 1  # a blokk előtti kvóta még olvasható, utána nem
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log, snapshot_fails_after=1)
+    assert runner.main(["--block", "C9", "--data-dir", str(tmp_path)]) == 0
+    saved = json.loads((tmp_path / "c9.json").read_text(encoding="utf-8"))
+    assert [r["job_id"] for r in saved["runs"]] == ["job-1", "job-0"]
+    assert all(r["usage_final"] is False and r["quantum_seconds"] is None for r in saved["runs"])
+    assert saved["quota_after"] is None and saved["calibration_after"] is None
+    assert saved["hardware_mha"]["trex"] and saved["hardware_mha"]["raw"]
+
+
+def test_c9_dry_run_passes_the_gates_without_submitting(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    service = _FakeJobService({})
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log)
+    monkeypatch.delenv("VQEBD_ALLOW_HARDWARE", raising=False)
+    assert runner.main(["--block", "C9", "--dry-run", "--data-dir", str(tmp_path)]) == 0
+    assert log == [] and not (tmp_path / "c9.json").exists()
+
+
+def test_the_first_job_survives_on_disk_if_the_second_job_fails(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    service = _FakeJobService(
+        {"job-1": [{"usage": {"quantum_seconds": 24, "status": "complete"}, "timestamps": _RUN}]}
+    )
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log, fail_level=0)
+    with pytest.raises(RuntimeError, match="megszakadt"):
+        runner.main(["--block", "C9", "--data-dir", str(tmp_path)])
+    assert not (tmp_path / "c9.json").exists()
+    partial = json.loads((tmp_path / "c9.partial.json").read_text(encoding="utf-8"))
+    assert partial["partial"] is True and partial["kind"] == "supplementary"
+    assert [r["job_id"] for r in partial["runs"]] == ["job-1"]
+    assert partial["runs"][0]["points"]  # a TREX job energiái megvannak
+
+
+def test_a_crash_while_finalizing_keeps_the_saved_block(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    service = _FakeJobService(
+        {
+            "job-1": [{"usage": {"quantum_seconds": 0}, "timestamps": _RUN}],
+            "job-0": [{"usage": {"quantum_seconds": 15}, "timestamps": _RUN}],
+        }
+    )
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log)
+
+    def explode(*args: Any, **kwargs: Any) -> bool:
+        raise RuntimeError("váratlan hiba")
+
+    monkeypatch.setattr(runner, "finalize_usage", explode)
+    assert runner.main(["--block", "C9", "--data-dir", str(tmp_path)]) == 0
+    saved = json.loads((tmp_path / "c9.json").read_text(encoding="utf-8"))
+    assert saved["runs"][0]["usage_final"] is False and saved["runs"][1]["usage_final"] is True
+    assert not (tmp_path / "c9.partial.json").exists()
+
+
+def test_finalize_fills_a_missing_timestamp_even_if_the_usage_stays_non_final(
+    runner: ModuleType,
+) -> None:
+    runs: list[dict[str, Any]] = [
+        {"job_id": "j", "usage_final": False, "quantum_seconds": None, "timestamps": {}}
+    ]
+    service = _MetricsService(
+        [{"usage": {"quantum_seconds": 0}, "timestamps": {"running": "2026-11-26T08:00:02Z"}}]
+    )
+    assert runner.finalize_usage(service, runs, attempts=2, sleep=lambda _: None) is True
+    assert runs[0]["timestamps"]["running"] == "2026-11-26T08:00:02Z"
+    assert runs[0]["usage_final"] is False and runs[0]["quantum_seconds"] is None

@@ -9,8 +9,10 @@ Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — 
 from __future__ import annotations
 
 import datetime as dt
+import importlib.util
 import json
-from types import SimpleNamespace
+from pathlib import Path
+from types import ModuleType, SimpleNamespace
 from typing import Any
 
 import pytest
@@ -147,3 +149,96 @@ def test_missing_parameters_or_a_measurement_after_the_job_are_refused() -> None
         calibration_age_hours(_t("2026-11-12 21:00:00"), later)
     with pytest.raises(ValueError, match="nincs"):
         calibration_age_hours(_t("2026-11-16 09:00:00"), [])
+
+
+def test_the_age_is_stored_without_rounding_for_the_48_hour_boundary() -> None:
+    block = _block()
+    block["runs"] = [{"timestamps": {"running": "2026-11-14T19:33:48Z"}}]  # +48 h 0 s
+    assert block_calibration_age(block, _props())["age_h"] == 48.0
+    block["runs"] = [{"timestamps": {"running": "2026-11-14T19:34:03Z"}}]  # +48 h 15 s
+    age = block_calibration_age(block, _props())["age_h"]
+    assert age > 48.0 and age == pytest.approx(48.0 + 15 / 3600)
+
+
+def test_the_cz_value_is_compared_with_the_same_direction_of_the_snapshot() -> None:
+    block = _block()
+    block["calibration_before"]["cz_errors"] = {"1-2": 0.00111, "2-1": 0.00097}
+    record = block_calibration_age(block, _props())  # a kalibráció [2, 1] iránya: 0,00097
+    assert record["matches_snapshot"] is True
+    assert record["parameters"][-1]["qubits"] == [2, 1]
+    block["calibration_before"]["cz_errors"] = {"1-2": 0.00097, "2-1": 0.00111}
+    assert block_calibration_age(block, _props())["matches_snapshot"] is False
+
+
+# --- a rekonstrukciós szkript hamis szolgáltatással -----------------------------------------------
+
+
+@pytest.fixture
+def age_script(repo_root: Path) -> ModuleType:
+    path = repo_root / "scripts" / "heron_calibration_age.py"
+    if not path.is_file():
+        pytest.skip("scripts/ nincs a szállított image-ben")
+    spec = importlib.util.spec_from_file_location("heron_calibration_age_under_test", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_the_script_queries_the_calibration_at_the_first_job_and_survives_a_bad_block(
+    age_script: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    asked: list[dt.datetime] = []
+
+    class Backend:
+        def properties(self, datetime: dt.datetime) -> Any:
+            asked.append(datetime)
+            if datetime.day == 20:
+                raise RuntimeError("nincs történeti adat")
+            return _props()
+
+    service = SimpleNamespace(backend=lambda name: Backend())
+    monkeypatch.setattr(age_script, "connect_service", lambda: service)
+    good = {**_block(), "backend": "ibm_test"}
+    bad = {**_block(), "block": "C7", "backend": "ibm_test"}
+    bad["runs"] = [{"timestamps": {"running": "2026-11-20T10:00:00Z"}}]
+    pilot = {**_block(), "block": "B0", "kind": "pilot", "backend": "ibm_test"}
+    for name, block in (("c6", good), ("c7", bad), ("b0", pilot)):
+        (tmp_path / f"{name}.json").write_text(json.dumps(block), encoding="utf-8")
+
+    assert age_script.main(["--data-dir", str(tmp_path)]) == 1  # egy blokk hibás
+    payload = json.loads((tmp_path / "calibration_age.json").read_text(encoding="utf-8"))
+    records = {r["block"]: r for r in payload["blocks"]}
+    assert set(records) == {"C6", "C7"}  # a pilot kimarad
+    assert records["C6"]["age_h"] == pytest.approx(85.83, abs=0.01)
+    assert records["C7"]["age_h"] is None and "nincs történeti adat" in records["C7"]["error"]
+    assert asked[0] == _t("2026-11-16 09:23:49.146036")  # az első job indulásakor
+
+
+def test_a_run_without_a_running_timestamp_makes_the_age_unknown() -> None:
+    block = _block()
+    block["runs"][0]["timestamps"] = {}  # az egyik futás időbélyege hiányzik
+    with pytest.raises(ValueError, match="running"):
+        first_job_running(block)
+
+
+def test_a_failed_query_keeps_the_previous_valid_record(
+    age_script: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    class Backend:
+        ok = True
+
+        def properties(self, datetime: dt.datetime) -> Any:
+            if not Backend.ok:
+                raise RuntimeError("átmeneti hiba")
+            return _props()
+
+    service = SimpleNamespace(backend=lambda name: Backend())
+    monkeypatch.setattr(age_script, "connect_service", lambda: service)
+    (tmp_path / "c6.json").write_text(json.dumps({**_block(), "backend": "ibm_test"}), "utf-8")
+    assert age_script.main(["--data-dir", str(tmp_path)]) == 0
+    Backend.ok = False
+    assert age_script.main(["--data-dir", str(tmp_path)]) == 1
+    record = json.loads((tmp_path / "calibration_age.json").read_text("utf-8"))["blocks"][0]
+    assert record["age_h"] == pytest.approx(85.83, abs=0.01)  # a jó érték megmaradt
+    assert "átmeneti hiba" in record["reused_after_error"]

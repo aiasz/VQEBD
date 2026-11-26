@@ -26,25 +26,57 @@ Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — 
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
 
 from vqebd.heron_analysis import AnalysisError, analyze, sensitivity_analyses
+from vqebd.heron_calibration_age import first_job_running
 from vqebd.heron_model import PROTOCOL, protocol_fingerprint
 
 SENSITIVITY_MAX_AGE_H = 48.0
 """A (b) érzékenységi vizsgálat határa órában (``phase_11.md``, 2026-11-18; nem ``PROTOCOL``)."""
 
 
-def load_ages(data_dir: Path) -> dict[str, float]:
-    """Blokkonkénti kalibráció-életkor (óra) a ``calibration_age.json``-ból; hiányában üres."""
+def load_ages(data_dir: Path, blocks: list[dict[str, Any]]) -> dict[str, float]:
+    """Blokkonkénti kalibráció-életkor (óra) a ``calibration_age.json``-ból.
+
+    Csak az érvényes rekord számít: van ``age_h`` értéke, és az első job indulása egyezik a
+    blokkfájlban rögzítettel (elavult rekord nem keveredhet be). A többi blokk ismeretlen életkorú.
+    """
     path = data_dir / "calibration_age.json"
     if not path.is_file():
         return {}
     payload: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-    return {str(r["block"]): float(r["age_h"]) for r in payload.get("blocks", [])}
+    by_name = {str(b.get("block")): b for b in blocks}
+    ages: dict[str, float] = {}
+    for record in payload.get("blocks", []):
+        name = str(record.get("block"))
+        age, recorded = record.get("age_h"), record.get("first_job_running_utc")
+        block = by_name.get(name)
+        valid_age = isinstance(age, int | float) and not isinstance(age, bool)
+        if block is None or not valid_age or not math.isfinite(age) or not recorded:
+            continue
+        try:
+            start = first_job_running(block)
+            same = abs((start - _parse_utc(str(recorded))).total_seconds()) < 1.0
+        except ValueError:
+            same = False
+        if not same:
+            print(
+                f"FIGYELEM: a(z) {name} életkor-rekordja nem a mentett blokkhoz tartozik",
+                file=sys.stderr,
+            )
+            continue
+        ages[name] = float(age)
+    return ages
+
+
+def _parse_utc(text: str) -> dt.datetime:
+    return dt.datetime.fromisoformat(text.replace("Z", "+00:00"))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -68,15 +100,20 @@ def main(argv: list[str] | None = None) -> int:
             delta=PROTOCOL["delta_mha"],
             equivalence_confidence=PROTOCOL["equivalence_confidence"],
         )
-        sensitivity = sensitivity_analyses(
-            blocks,
-            load_ages(args.data_dir),
-            max_age_h=SENSITIVITY_MAX_AGE_H,
-            confidence=PROTOCOL["equivalence_confidence"],
-        )
     except AnalysisError as exc:
         print(f"Az elemzés nem végezhető el: {exc}", file=sys.stderr)
         return 1
+    # a leíró érzékenységi rész hibája az elsődleges eredményt nem akaszthatja meg
+    try:
+        sensitivity: dict[str, Any] = sensitivity_analyses(
+            blocks,
+            load_ages(args.data_dir, blocks),
+            max_age_h=SENSITIVITY_MAX_AGE_H,
+            confidence=PROTOCOL["equivalence_confidence"],
+        )
+    except (AnalysisError, KeyError, TypeError, ValueError) as exc:
+        print(f"FIGYELEM: az érzékenységi vizsgálat nem készült el: {exc!r}", file=sys.stderr)
+        sensitivity = {"error": repr(exc)}
     expected = int(PROTOCOL["confirmatory_blocks"])
     complete = primary["n_confirmatory_blocks"] == expected
     if not complete:
