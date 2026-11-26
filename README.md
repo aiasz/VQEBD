@@ -130,6 +130,7 @@ pontosságot (`TR-F05`), a hardveres görbén csak egy pont egyeztethető vele (
 | **8** | **Konténeres rendszer, a dashboard egyparancsos indítása** | ✅ **Lezárva** (`v0.11.0`) |
 | **9** | **Dokumentáció, validálás, publikálás (Zenodo DOI)** | ✅ **Lezárva** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Közösségi visszacsatolás | ⬜ Tervezett |
+| **11** | **A kalibrációból épített Heron-zajmodell validálása valódi hardveren** | ✅ **Mérések lezárva** (2026-11-26) — negatív eredmény (H1 elutasítva); a kiadás a szerző jóváhagyására vár |
 
 ### Mit old meg ez a projekt?
 
@@ -372,6 +373,29 @@ Utána: **<http://localhost:8501>**. Leállítás: `docker compose -f docker/doc
 
 Részletek: [`docs/08_deployment.md`](docs/08_deployment.md), [`TR-F08`](docs/testing/TR-F08_konteneres_rendszer.md).
 
+### Fázis 11 — a Heron-zajmodell validálása valódi hardveren (negatív eredmény)
+
+Megjósolja-e az IBM által **közölt** kalibrációs adatokból épített zajmodell a valódi `ibm_kingston` gép hibáját a H₂ kétqubites VQE-jén? A
+szabályokat a mérések **előtt** rögzítettük (`protocol-f11-frozen`): a modell akkor „jó”, ha a gép nyers hibája és a modell közti átlagos eltérés
+minden vizsgált kötéshossznál bizonyíthatóan ±3,0 mHa-en belül van (90%-os TOST). 1 pilot + 8 megerősítő + 1 kiegészítő blokk, 2026. nov. 2–26.,
+fix qubitpár [1, 2], összesen 408 QPU-másodperc.
+
+| R (Å) | Átlagos eltérés (gép − modell, C1–C8) | 90% CI | ±3,0 mHa-en belül? |
+|---|---|---|---|
+| 0.735 | +7.5 mHa | [−0.1; +15.1] | nem |
+| 1.5 | +2.8 mHa | [−1.9; +7.4] | nem |
+| 2.0 | −0.2 mHa | [−2.6; +2.2] | igen |
+
+- **H1 (elsődleges): elutasítva** — az előre kimondott következmény szerint negatív eredmény, közölve; a modellre épülő nagyobb szimulációk (11.E)
+  elmaradnak.
+- **H2: igaz** — a kiolvasási hiba modellezése nélkül a modell sokkal rosszabb (mind a 8 blokkban).
+- Az előre rögzített érzékenységi vizsgálatok (mind a 9 blokk; csak a ≤ 48 órás kalibrációjú blokkok) a képet nem változtatják.
+- **Korlát:** egy eszköz, egy qubitpár, H₂, 8 (+1) blokk; MI-vel készített terv és elemzés, nem lektorált. A gép nyers hibája (8–55 mHa) a kémiai
+  pontosság fölött van — a kísérlet a zajmodellt teszteli, nem a gép pontosságát.
+
+Részletek: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (végleges tervezet, a szerző
+ellenőrzésére vár).
+
 ### Gyors indítás
 
 ```bash
@@ -415,7 +439,8 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | A Fázis 7 részletes terve |
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | A Fázis 8 részletes terve |
 | [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | A Fázis 9 részletes terve |
-| [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **A Fázis 11 terve (jóváhagyásra vár):** a Heron-zajmodell validálása, a hardveres mérések az ingyenes keretbe darabolva |
+| [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **A Fázis 11 terve (jóváhagyva 2026-11-02; a mérések lezárva):** a Heron-zajmodell validálása, a hardveres mérések az ingyenes keretbe darabolva |
+| [`docs/testing/TR-F11_heron_modell.md`](docs/testing/TR-F11_heron_modell.md) | **A Fázis 11 jegyzőkönyve (végleges tervezet):** H1 elutasítva, H2 igaz; érzékenységi vizsgálatok, korlátok |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
@@ -636,6 +661,7 @@ limitations are stated openly in the test reports, e.g.: no noisy-simulation con
 | **8** | **Container system, one-command dashboard launch** | ✅ **Completed** (`v0.11.0`) |
 | **9** | **Documentation, validation, publication (Zenodo DOI)** | ✅ **Completed** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Community feedback | ⬜ Planned |
+| **11** | **Validating the calibration-built Heron noise model on real hardware** | ✅ **Measurements completed** (2026-11-26) — negative result (H1 rejected); the release awaits the author's approval |
 
 ### What Does This Project Solve?
 
@@ -884,6 +910,29 @@ Then open **<http://localhost:8501>**. Stop it with `docker compose -f docker/do
 Details: [`docs/08_deployment.md`](docs/08_deployment.md), [`TR-F08`](docs/testing/TR-F08_konteneres_rendszer.md)
 (both in Hungarian).
 
+### Phase 11 — Validating the Heron Noise Model on Real Hardware (Negative Result)
+
+Does a noise model built from IBM's **published** calibration data predict the error of the real `ibm_kingston` device on the two-qubit H₂ VQE? The
+rules were fixed **before** measuring (`protocol-f11-frozen`): the model counts as "good" if the mean difference between the raw hardware error and
+the model is demonstrably within ±3.0 mHa at every bond length tested (90% TOST). 1 pilot + 8 confirmatory + 1 supplementary block, 2–26 Nov 2026,
+fixed qubit pair [1, 2], 408 QPU seconds in total.
+
+| R (Å) | Mean difference (hardware − model, C1–C8) | 90% CI | Within ±3.0 mHa? |
+|---|---|---|---|
+| 0.735 | +7.5 mHa | [−0.1; +15.1] | no |
+| 1.5 | +2.8 mHa | [−1.9; +7.4] | no |
+| 2.0 | −0.2 mHa | [−2.6; +2.2] | yes |
+
+- **H1 (primary): rejected** — as stated in advance, a negative result that is reported; the larger simulations built on the model (11.E) are
+  dropped.
+- **H2: supported** — without modelling the readout error the model is much worse (in all 8 blocks).
+- The pre-specified sensitivity analyses (all 9 blocks; only blocks with calibration ≤ 48 h old) do not change the picture.
+- **Limitations:** one device, one qubit pair, H₂, 8 (+1) blocks; plan and analysis made with AI, not peer-reviewed. The raw hardware error
+  (8–55 mHa) is far above chemical accuracy — the experiment tests the noise model, not the accuracy of the device.
+
+Details: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (final draft awaiting the author's
+review; both in Hungarian).
+
 ### Quick Start
 
 ```bash
@@ -927,7 +976,8 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 | [`docs/plan/phase_07.md`](docs/plan/phase_07.md) | Detailed Phase 7 plan |
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | Detailed Phase 8 plan |
 | [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | Detailed Phase 9 plan |
-| [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **Phase 11 plan (awaiting approval; in Hungarian):** validating the Heron noise model, hardware runs split to fit the free quota |
+| [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **Phase 11 plan (approved 2026-11-02; measurements completed; in Hungarian):** validating the Heron noise model, hardware runs split to fit the free quota |
+| [`docs/testing/TR-F11_heron_modell.md`](docs/testing/TR-F11_heron_modell.md) | **Phase 11 report (final draft; in Hungarian):** H1 rejected, H2 supported; sensitivity analyses, limitations |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |

@@ -1,14 +1,50 @@
-# TR-F11 — Fázis 11 jegyzőkönyv (a Heron-zajmodell validálása) — ELŐZETES: B0 pilot, C1–C9, elsődleges elemzés és érzékenységi vizsgálatok (a mérések lezárva)
+# TR-F11 — Fázis 11 jegyzőkönyv (a Heron-zajmodell validálása) — VÉGLEGES TERVEZET (a szerző ellenőrzésére vár)
 
 | | |
 |---|---|
 | **Azonosító** | TR-F11 |
-| **Dokumentum-verzió** | 0.12.0 (előzetes: B0 pilot + C1–C9 + az elsődleges elemzés; a 16. szakasz a kiegészítő C9-et és a végleges érzékenységi vizsgálatokat, a 15. szakasz az elsődleges elemzést (H1–H4), a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
+| **Dokumentum-verzió** | 0.13.0 (végleges tervezet: a 0. szakasz az összefoglaló, a 17. a leíró reziduum-áttekintés, a 18. a korlátok, a 19. az elfogadási kritériumok, a 20. a következő lépések; a 16. szakasz a kiegészítő C9-et és a végleges érzékenységi vizsgálatokat, a 15. szakasz az elsődleges elemzést (H1–H4), a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
 | **Dátum** | 2026-11-02 (B0), 2026-11-04 (C1), 2026-11-06/07 (C2), 2026-11-08 (C3), 2026-11-10 (C4), 2026-11-12 (C5), 2026-11-14/16 (C6), 2026-11-22 (C7), 2026-11-24 (C8), 2026-11-26 (C9) |
 | **Terv / tesztterv** | [`phase_11.md`](../plan/phase_11.md), [`TP-F11_heron_modell.md`](TP-F11_heron_modell.md) |
 | **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0-t 2026-11-02-án, a C1-et 2026-11-04-én, a C2-t 2026-11-06-án, a C3-at 2026-11-08-án, a C4-et 2026-11-10-én, a C5-öt 2026-11-12-én, a C6-ot 2026-11-14-én és újraindítását 2026-11-15-én, a C7-et 2026-11-22-én, a C8-at 2026-11-24-én, a C9-et 2026-11-26-án külön jóváhagyta) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a kódot és a szöveget az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **Előzetes — a megerősítő eredmény kész.** A pilot (B0) és mind a nyolc megerősítő blokk (C1–C8) lefutott, és az előre rögzített elsődleges elemzés is (2026-11-24, 15. szakasz): **H1 elutasítva** (a 2,0 Å-nél egyenértékű, a 0,735 és az 1,5 Å-nél nem), **H2 igaz**; a H3 felderítő, a H4 leíró. **A B0 nem megerősítő adat.** A kiegészítő C9 és a végleges érzékenységi vizsgálatok is elkészültek (2026-11-26, 16. szakasz): az elsődleges eredmény változatlan, a képet nem módosítják — **a hardveres mérések lezárva**. Hátravan: a szerző által ellenőrzött végleges jegyzőkönyv (AC-11.7). |
+| **Státusz** | **Végleges tervezet (2026-11-26) — a szerző ellenőrzésére vár.** A hardveres mérések lezárultak (B0 pilot, C1–C8 megerősítő, C9 kiegészítő blokk); az előre rögzített elsődleges elemzés: **H1 elutasítva** (csak a 2,0 Å-nél egyenértékű), **H2 igaz**, a H3 felderítő, a H4 leíró; az előre rögzített érzékenységi vizsgálatok a képet nem változtatják. **A B0 feltáró, a C9 kiegészítő adat.** Összefoglaló: 0. szakasz; korlátok: 18. szakasz. A szerző ellenőrzése után a verzió 1.0.0 lesz. |
+
+## 0. Összefoglaló — a Fázis 11 eredménye
+
+**A kérdés.** Megjósolja-e az IBM által *közölt* kalibrációs adatokból (T1, T2, kiolvasási hiba, kapuhibák) épített Heron-zajmodell, mekkora hibát ad a
+valódi `ibm_kingston` kvantumgép a H₂-molekula kétqubites VQE-számításában? A jóslat akkor jó, ha a gép nyers hibája és a modell közti átlagos eltérés
+minden vizsgált kötéshossznál bizonyíthatóan ±3,0 mHa-en belül van (90%-os egyenértékűségi teszt, TOST). A szabályokat a mérések **előtt** rögzítettük
+(`protocol-f11-frozen`, 2026-11-02).
+
+**A mérés.** Egy pilot (B0), nyolc megerősítő (C1–C8) és egy kiegészítő blokk (C9), 2026. november 2. és 26. között, mindig ugyanazon a gépen és
+qubitpáron ([1, 2]), blokkonként friss kalibrációs pillanatképpel és modell-előrejelzéssel, blokkonként a szerző külön jóváhagyásával; összesen
+**408 QPU-másodperc** az ingyenes keretből (a keret végig ≤ 80%).
+
+**Az eredmény az előre rögzített szabályok szerint** (15–16. szakasz):
+
+| Hipotézis | Eredmény | Számok (mHa; 90% CI, ill. 95% CI) |
+|---|---|---|
+| **H1** *(elsődleges)*: a modell ±3,0 mHa-en belül jósolja a nyers hibát | **elutasítva** (1/3 geometria) | 0,735 Å: +7,5 [−0,1; +15,1] — nem; 1,5 Å: +2,8 [−1,9; +7,4] — nem; 2,0 Å: −0,2 [−2,6; +2,2] — igen |
+| **H2**: a kiolvasási hiba modellezése lényeges | **igaz** | +252 mHa² [+131; +373]; mind a 8 blokkban a kiolvasásos modell a jobb |
+| **H3** *(felderítő)*: TREX-hardver ≈ kiolvasás nélküli modell | csak a 2,0 Å-nél egyenértékű | megerősítő állítást nem hoz |
+| **H4** *(leíró)*: pontosabb-e a friss kalibráció egy rögzítettnél | nem bizonyult pontosabbnak | 8-ból 6 blokkban a rögzített (B0) kalibráció egyezett jobban |
+
+- **Érzékenységi vizsgálatok** (előre rögzítve, leíró): mind a kilenc blokkal (C1–C9) és csak a legfeljebb 48 órás kalibrációjú blokkokkal (a C6 nélkül) is
+  ugyanez a kép — csak a 2,0 Å fér a sávba; a 0,735 Å-nél az intervallum mindkét esetben teljesen pozitív: a modell az egyensúlyi geometrián rendszeresen
+  **alulbecsüli** a gép nyers hibáját.
+- **Az előre kimondott következmény:** negatív eredmény, **közlendő**; a 11.E (nagyobb rendszerek szimulálása a modellel) **elmarad**; a következő lépés az
+  eltérések okainak elemzése (első, leíró áttekintés: 17. szakasz).
+- **Ami állítható:** ezen az eszközön, ezen a qubitpáron, a H₂ kétqubites VQE-jén, 2026 novemberében a közölt kalibrációból épített modell az előre rögzített
+  pontossággal **nem** jósolta meg a gép nyers hibáját (csak a leghosszabb, 2,0 Å-es kötésnél); a kiolvasási hiba modellezése nélküle sokkal rosszabb.
+- **Ami nem állítható:** hogy a modell más gépen, qubitpáron vagy molekulán sem működne; hogy a kvantumgép „pontos” lenne (nyers hibája 8–55 mHa, a kémiai
+  pontosság 1,6 mHa — a kísérlet a *zajmodellt* teszteli, nem a gépet); az eltérés oka.
+- **Korlátok:** 18. szakasz; **az elfogadási kritériumok:** 19. szakasz. Az 1–14. szakasz a mérés időrendi naplója (blokkonként), a 15–16. a végleges elemzés.
+
+**Közérthetően.** A gép hivatalos „műszerlapjából” (kalibrációs adataiból) épített számítógépes másolat azt próbálta előre megmondani, mennyit fog tévedni a
+valódi kvantumgép. Átlagosan nem járt messze, de a gép napról napra többet ingadozott, és a másolat olyan adatokra reagált, amelyekre a gép nem; ezért a
+rövid kötésű molekulánál a jóslat nem volt elég pontos, a hosszú kötésnél igen. A „nem sikerült” itt is érvényes, előre vállalt eredmény: azt mutatja, hogy
+erre a feladatra a közölt kalibrációból épített modellre önmagában nem lehet hagyatkozni.
 
 ## 1. Mi futott le
 
@@ -1176,5 +1212,86 @@ Előzetes ellenőrzés (2026-11-26 07:39 és 08:01 UTC, csak olvasás): `ibm_kin
 - A terv szerinti további hardveres mérés **nincs**. Hátravan: a végleges, a szerző által ellenőrzött TR-F11 (AC-11.7, minden korlát kimondva), a reziduum-elemzés
   (az előre kimondott következő lépés), README / CHANGELOG, `v1.1.0` és új Zenodo-verzió — a szerző jóváhagyásával.
 - Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+
+## 17. Leíró reziduum-áttekintés (felderítő, utólagos — nem része az előre rögzített elemzésnek)
+
+Az előre kimondott következő lépés a reziduumok elemzése (`phase_11.md` 3. fejezet). Ez a szakasz csak az **első, leíró áttekintés** a meglévő adatokon;
+okot nem állít. Reziduum = nyers hardver − kiolvasásos modell (mHa), C1–C9 (n = 9); Pearson-féle r a blokk elején mentett kalibrációs paraméterekkel.
+**Óvatosság:** 8 paraméter × 3 geometria = 24 korreláció kilenc ponton — több közepes |r| a véletlenből is adódhat (egyetlen tesztnél n = 9 mellett
+|r| ≳ 0,67 felelne meg p < 0,05-nek); szignifikanciát nem állítunk.
+
+### 17.1 A kalibrációs paraméterek blokkonként (a modell bemenete)
+
+| Blokk | T1 q1 / q2 (µs) | T2 q1 / q2 (µs) | Kiolvasás q1 / q2 | cz-hiba | Életkor |
+|---|---|---|---|---|---|
+| C1 | 178 / 306 | 284 / 131 | 0,68% / 1,07% | 0,10% | 9,2 h |
+| C2 | 256 / 277 | 462 / 117 | 0,88% / 0,98% | 0,10% | 47,8 h |
+| C3 | 315 / 254 | 419 / 127 | 0,73% / 1,51% | 0,10% | 30,4 h |
+| C4 | 342 / 318 | 597 / 128 | 0,39% / 1,32% | 0,08% | 11,1 h |
+| C5 | 259 / 258 | 431 / 106 | **1,66%** / 1,27% | 0,10% | 14,9 h |
+| C6 | 341 / 308 | 598 / 122 | 0,44% / 1,32% | 0,10% | 85,8 h |
+| C7 | 199 / 288 | **22** / 127 | 1,04% / 1,06% | 0,08% | 37,3 h |
+| C8 | 233 / 299 | 301 / 122 | 0,72% / 1,29% | 0,10% | 10,7 h |
+| C9 | 361 / 322 | 641 / 115 | 0,70% / 1,45% | 0,10% | 7,2 h |
+
+### 17.2 Megfigyelések (0,735 / 1,5 / 2,0 Å)
+
+1. **A modell ingadozását főleg a q1 közölt kiolvasási hibája hajtja, a gépét nem.** r(modell, q1 kiolvasás) = +0,87 / +0,90 / +0,90 (ez mechanikus: a
+   modell ezt az értéket használja), r(gép, q1 kiolvasás) = −0,16 / −0,58 / +0,01. Ezért a reziduum a q1 kiolvasási hibájával negatívan korrelál
+   (−0,47 / −0,73 / −0,59; a C1 nélkül −0,71 / −0,91 / −0,71). Példa: a C5-nél (q1 kiolvasás 1,66%) a modell 33,8 mHa-t jósolt, a gép 25,6 mHa-t adott.
+2. **A kiolvasás hozzájárulása (nyers − TREX) a gépen átlagosan nagyobb, mint a modellben** (24,6 vs. 17,4 / 12,3 vs. 9,8 / 11,6 vs. 10,6 mHa), és
+   blokkonként sem követi a modellt (r = −0,15 / −0,56 / −0,35).
+3. **A modell és a gép blokkonkénti értéke nem követi egymást** (r = −0,26 / −0,65 / −0,10). A gép nyers hibájának blokkok közti szórása a 0,735 Å-nél
+   8,7 mHa (a C1 nélkül 4,2), a modellé 4,2 mHa.
+4. **A kalibráció életkora** a reziduummal nem mutat egyértelmű kapcsolatot (r = −0,13 / +0,13 / +0,18).
+5. **A C1** (az első megerősítő blokk, +31,8 mHa a 0,735 Å-nél) erősen befolyásolja a korrelációkat; nélküle több előjel megfordul.
+
+**Lehetséges, nem igazolt értelmezés:** a közölt kiolvasási hiba (különösen a q1-é) nem azt a kiolvasási hibát írja le, amely a futás idején a mi
+áramkörünkre hatott (eltérő mérési feltételek, egyidejű kiolvasás, időbeli ingadozás) — összhangban az IBM-oktatóanyag megjegyzésével a közölt és a
+saját mérésű értékek eltéréséről (13.6). Ez a következő fázis lehetséges kérdése, nem következtetés.
+
+## 18. Korlátok (AC-11.7)
+
+1. **Egy eszköz, egy qubitpár:** `ibm_kingston` (Heron r2), fizikai qubitek [1, 2]; 2 qubit, 4 CZ-kapu. Az eredmény nem általánosítható más eszközre,
+   qubitpárra vagy nagyobb áramkörre (R2, R7).
+2. **Egy molekula, három geometria:** H₂, R = 0,735 / 1,5 / 2,0 Å, egy ansatz, a θ\*-pontban (a θ-scan és a H5 elhagyva, döntés 4.).
+3. **Kis minta:** 8 megerősítő (+ 1 kiegészítő) blokk 24 nap alatt. A kapott blokk-közi szórás mellett a 0,735 és az 1,5 Å-nél még tökéletes átlagos
+   egyezés esetén sem lett volna elég 8 blokk (≈ 4,5 mHa alatti szórás kellett volna); a minta nagyságát a QPU-keret korlátozta.
+4. **A modell a közölt kalibrációból épül.** A közölt értékek mérési módszere és időpontja eltérhet a futásétól (13.6); a Kingston 10 napig nem kapott új
+   kalibrációt (12.1), a C6 85,8 órás kalibrációval futott — az érzékenységi vizsgálat szerint ez a képet nem változtatja (16.3).
+5. **A TREX-et a modell nem szimulálja:** a H3 csak közelítés (R3).
+6. **MI-vel készült munka, nem lektorált:** a terv, a kód, az elemzés és a szöveg MI-vel (Claude, Anthropic) készült a szerző irányításával; a kód ~80%-át a
+   szerző saját bevallása szerint soronként átnézte (`AI_DISCLOSURE.md`); független emberi statisztikus nem vett részt (R6 javaslata nem teljesült); a 14.3
+   kódellenőrzése is MI-vel történt.
+7. **Nincs külső előzetes regisztráció** (OSF, döntés 5.): a rögzítés a `protocol-f11-frozen` git-címke és a `FROZEN` ujjlenyomat. A mérések közben
+   rögzített kiegészítések (kalibrációs-frissességi szabály, életkor-definíció, a C9) mindig az érintett adatok **előtt** készültek, és az elsődleges
+   elemzést nem érintik.
+8. **A futtató módosult a mérési szakaszban** (14.1, 14.3): a mérés logikája, a protokoll és az elsődleges elemzés nem; a C8 TREX jobjának QPU-ideje hibásan
+   rögzült (13.2, az eredményt nem érinti).
+9. **A gép nyers hibája (8–55 mHa) messze a kémiai pontosság (1,6 mHa) fölött van:** a kísérlet a zajmodellt teszteli, nem a gép pontosságát; a pontos
+   referenciát a klasszikus Full CI adja.
+10. **A 17. szakasz utólagos, felderítő:** okot nem állít; a megfigyelések új, előre rögzített vizsgálatot igényelnek.
+
+## 19. Az elfogadási kritériumok állapota (`phase_11.md` 6. fejezet)
+
+| AC | Állapot |
+|---|---|
+| AC-11.1 | ✅ a modell bitre azonos a felderítő útvonallal, a kiolvasás kapcsolható (`phase_11.md` 6.1) |
+| AC-11.2 | ✅ minden blokkhoz pillanatkép a blokk előtt és után, a modell ebből épült; a történeti rekonstrukció mind a 9 blokknál egyezik (14.2, 16.1) |
+| AC-11.3 | ✅ az elemzés szintetikus adaton tesztelve a mérések előtt; a kiegészítő blokk az elsődleges eredményt nem változtatja (TC-1125) |
+| AC-11.4 | ✅ egyetlen blokk sem lépte át a 80%-ot (csúcs 465 / 600 s = 77,5%); a kapu tesztelt (TC-1107–TC-1109, TC-1123, TC-1127) |
+| AC-11.5 | ✅ a `protocol-f11-frozen` címke megelőzte az első hardveres blokkot (`phase_11.md` 6.1) |
+| AC-11.6 | ✅ a H1–H4 az előre rögzített szabály szerint kiértékelve (15.); a negatív eredmény ebben a jegyzőkönyvben közölve; a feltáró (B0), a megerősítő (C1–C8) és a kiegészítő (C9) adat külön jelölve; a nyilvános kiadás (`v1.1.0`, Zenodo) a szerző jóváhagyásával |
+| AC-11.7 | ✅ a korlátok a 18. szakaszban — a szerző ellenőrzésével véglegesítendő |
+
+## 20. Következtetés és lehetséges következő lépések (a döntés a szerzőé)
+
+- **A Fázis 11 mérési része lezárult.** A 11.E elmarad (H1 nem egyenértékű). A 11.F (a végleges TR-F11, README / CHANGELOG, `v1.1.0` és új Zenodo-verzió) a
+  szerző ellenőrzésével és jóváhagyásával zárul.
+- **Lehetséges irányok egy következő fázishoz** (javaslat, nem döntés; mindegyikhez új, külön, előre rögzített protokoll kell):
+  1. saját, futás előtti karakterizálás (különösen a kiolvasásé) és az ebből épített modell összevetése a közölt kalibrációs modellel — az IBM-oktatóanyag
+     módszere (13.6), Qiskit ≥ 2.0, tehát új környezet;
+  2. a 0,735 Å-es eltérés forrásának célzott vizsgálata szimulációban (mely zajkomponens hiányzik a modellből: koherens hiba, áthallás, szivárgás);
+  3. más qubitpár vagy eszköz — a QPU-keret korlátai mellett (a gördülő keretből a B0 57 s-a 2026-11-30-án, a C1 39 s-a 12-02-án kerül ki).
 
 *Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

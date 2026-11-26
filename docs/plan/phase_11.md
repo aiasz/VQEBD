@@ -5,7 +5,7 @@
 | **Fázis** | 11 *(a mesterterv 10. „közösségi visszacsatolás" fázisától független, kísérleti ág; a számozás nem jelent időrendet)* |
 | **Dokumentum-verzió** | 1.2.0 |
 | **Dátum** | 2026-11-02 |
-| **Státusz** | **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). A B0 pilot lefutott (2026-11-02, 57 QPU-s), a C1 is (2026-11-04, 39 QPU-s; kvóta 153/600 s), a C2 is (2026-11-06/07, 39 QPU-s; kvóta 192/600 s), a C3 is (2026-11-08, 39 QPU-s; kvóta 231/600 s), és a C4 is (2026-11-10, 39 QPU-s; kvóta 270/600 s; köztes leíró összesítés a TR-F11 9.6-ban), a C5 is (2026-11-12, 39 QPU-s; kvóta 309/600 s; az eltérés előjele megfordult, lásd TR-F11 10. szakasz), a C6 is (2026-11-16, 39 QPU-s; kvóta 348/600 s; az első kísérlet 2026-11-14-én technikai okból megszakadt, nincs adat, lásd TR-F11 11. szakasz), a C7 is (2026-11-22, 39 QPU-s; kvóta 387/600 s; a Kingston 10 napos kalibrációs szünete után, lásd TR-F11 12. szakasz), a C8 is (2026-11-24, 39 QPU-s; kvóta 426/600 s; **a megerősítő mérés teljes**, lásd TR-F11 13. szakasz), az előre rögzített elsődleges elemzés is lefutott (2026-11-24: **H1 elutasítva** — csak a 2,0 Å-nél egyenértékű; **H2 igaz**; az előre kimondott következmény szerint negatív eredmény, közlendő, a 11.E elmarad; lásd TR-F11 15. szakasz), a kiegészítő C9 is (2026-11-26, 39 QPU-s; kvóta 465/600 s; a végleges érzékenységi vizsgálatok az elsődleges eredmény képét nem változtatják, lásd TR-F11 16. szakasz) — **a hardveres mérések lezárva**; a blokkokat a szerző blokkonként külön hagyja jóvá. Eredmény: [`TR-F11`](../testing/TR-F11_heron_modell.md) (előzetes).** |
+| **Státusz** | **A MÉRÉSEK LEZÁRVA (2026-11-26): H1 elutasítva, H2 igaz; a 11.E elmarad; a végleges TR-F11 tervezete kész, a szerző ellenőrzésére vár (11.F).** **JÓVÁHAGYVA (2026-11-02, 8. fejezet). A 11.A (kód, kvóta nélkül) elkészült, a protokoll befagyasztva (`FROZEN`, címke, 2026-11-02). A B0 pilot lefutott (2026-11-02, 57 QPU-s), a C1 is (2026-11-04, 39 QPU-s; kvóta 153/600 s), a C2 is (2026-11-06/07, 39 QPU-s; kvóta 192/600 s), a C3 is (2026-11-08, 39 QPU-s; kvóta 231/600 s), és a C4 is (2026-11-10, 39 QPU-s; kvóta 270/600 s; köztes leíró összesítés a TR-F11 9.6-ban), a C5 is (2026-11-12, 39 QPU-s; kvóta 309/600 s; az eltérés előjele megfordult, lásd TR-F11 10. szakasz), a C6 is (2026-11-16, 39 QPU-s; kvóta 348/600 s; az első kísérlet 2026-11-14-én technikai okból megszakadt, nincs adat, lásd TR-F11 11. szakasz), a C7 is (2026-11-22, 39 QPU-s; kvóta 387/600 s; a Kingston 10 napos kalibrációs szünete után, lásd TR-F11 12. szakasz), a C8 is (2026-11-24, 39 QPU-s; kvóta 426/600 s; **a megerősítő mérés teljes**, lásd TR-F11 13. szakasz), az előre rögzített elsődleges elemzés is lefutott (2026-11-24: **H1 elutasítva** — csak a 2,0 Å-nél egyenértékű; **H2 igaz**; az előre kimondott következmény szerint negatív eredmény, közlendő, a 11.E elmarad; lásd TR-F11 15. szakasz), a kiegészítő C9 is (2026-11-26, 39 QPU-s; kvóta 465/600 s; a végleges érzékenységi vizsgálatok az elsődleges eredmény képét nem változtatják, lásd TR-F11 16. szakasz) — **a hardveres mérések lezárva**; a blokkokat a szerző blokkonként külön hagyja jóvá. Eredmény: [`TR-F11`](../testing/TR-F11_heron_modell.md) (előzetes).** |
 | **Célverzió** | `v1.1.0` (ha a fázis lezárul) |
 | **Tesztterv** | [`TP-F11`](../testing/TP-F11_heron_modell.md) |
 | **Előzmény** | [`phase_09.md`](phase_09.md), [`TR-F05` 7.](../testing/TR-F05_batch.md), [`10_literature_positioning.md`](../10_literature_positioning.md), v1.0.0 |
@@ -193,6 +193,16 @@ hardver) pontosítja, nem javítja a hardver eredményét.
 | AC-11.4 | ✅ `tests/unit/test_heron_model.py` (80% kapu, ütemterv-összeg, hiányzó engedély, hiányzó `FROZEN`); a szárazfutás **0 QPU-s** |
 | AC-11.5 | ✅ befagyasztva 2026-11-02: `docs/figures/data/f11/FROZEN` (ujjlenyomat `63521603…e93c9`, kód: `57a421b`) + annotált címke `protocol-f11-frozen`; a címke (commit: 16:48 UTC) megelőzi a B0 beküldését (job létrehozva: 17:05 UTC), a commit-időbélyegek igazolják |
 | AC-11.6–7 | ⬜ a mérések után |
+
+### 6.2 Az elfogadási kritériumok a mérések után (2026-11-26)
+
+| AC | Állapot |
+|---|---|
+| AC-11.4 | ✅ egyetlen blokk sem lépte át a 80%-ot (csúcs 465 / 600 s = 77,5%) |
+| AC-11.6 | ✅ a H1–H4 az előre rögzített szabály szerint kiértékelve (TR-F11 15.): H1 elutasítva, H2 igaz; a negatív eredmény a TR-F11-ben közölve; a feltáró, a megerősítő és a kiegészítő adat külön jelölve |
+| AC-11.7 | ✅ a korlátok a TR-F11 18. szakaszában — a szerző ellenőrzésével véglegesítendő |
+| 11.E | elmarad (az előre kimondott következmény: H1 nem egyenértékű) |
+| 11.F | folyamatban: a végleges TR-F11 tervezete kész; README / CHANGELOG frissítve; `v1.1.0` és Zenodo a szerző jóváhagyásával |
 
 ## 7. Kockázatok és korlátok
 
