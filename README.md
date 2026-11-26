@@ -393,8 +393,7 @@ fix qubitpár [1, 2], összesen 408 QPU-másodperc.
 - **Korlát:** egy eszköz, egy qubitpár, H₂, 8 (+1) blokk; MI-vel készített terv és elemzés, nem lektorált. A gép nyers hibája (8–55 mHa) a kémiai
   pontosság fölött van — a kísérlet a zajmodellt teszteli, nem a gép pontosságát.
 
-Részletek: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (végleges tervezet, a szerző
-ellenőrzésére vár).
+Részletek: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (végleges).
 
 ### Gyors indítás
 
@@ -440,7 +439,7 @@ Részletes útmutató: **[`docs/00_setup.md`](docs/00_setup.md)** (Fázis 0), a 
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | A Fázis 8 részletes terve |
 | [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | A Fázis 9 részletes terve |
 | [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **A Fázis 11 terve (jóváhagyva 2026-11-02; a mérések lezárva):** a Heron-zajmodell validálása, a hardveres mérések az ingyenes keretbe darabolva |
-| [`docs/testing/TR-F11_heron_modell.md`](docs/testing/TR-F11_heron_modell.md) | **A Fázis 11 jegyzőkönyve (végleges tervezet):** H1 elutasítva, H2 igaz; érzékenységi vizsgálatok, korlátok |
+| [`docs/testing/TR-F11_heron_modell.md`](docs/testing/TR-F11_heron_modell.md) | **A Fázis 11 jegyzőkönyve:** H1 elutasítva, H2 igaz; érzékenységi vizsgálatok, korlátok |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Többplatformos validáció: mit ad, és mit nem** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Zajos és véges lövésszámú szimuláció (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Valódi hardveres futtatás IBM Heron QPU-n (L5)** |
@@ -930,8 +929,7 @@ fixed qubit pair [1, 2], 408 QPU seconds in total.
 - **Limitations:** one device, one qubit pair, H₂, 8 (+1) blocks; plan and analysis made with AI, not peer-reviewed. The raw hardware error
   (8–55 mHa) is far above chemical accuracy — the experiment tests the noise model, not the accuracy of the device.
 
-Details: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (final draft awaiting the author's
-review; both in Hungarian).
+Details: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (final; both in Hungarian).
 
 ### Quick Start
 
@@ -977,7 +975,7 @@ Detailed guide: **[`docs/00_setup.md`](docs/00_setup.md)** (Phase 0); for the co
 | [`docs/plan/phase_08.md`](docs/plan/phase_08.md) | Detailed Phase 8 plan |
 | [`docs/plan/phase_09.md`](docs/plan/phase_09.md) | Detailed Phase 9 plan |
 | [`docs/plan/phase_11.md`](docs/plan/phase_11.md) | **Phase 11 plan (approved 2026-11-02; measurements completed; in Hungarian):** validating the Heron noise model, hardware runs split to fit the free quota |
-| [`docs/testing/TR-F11_heron_modell.md`](docs/testing/TR-F11_heron_modell.md) | **Phase 11 report (final draft; in Hungarian):** H1 rejected, H2 supported; sensitivity analyses, limitations |
+| [`docs/testing/TR-F11_heron_modell.md`](docs/testing/TR-F11_heron_modell.md) | **Phase 11 report (in Hungarian):** H1 rejected, H2 supported; sensitivity analyses, limitations |
 | [`docs/01m_multiplatform.md`](docs/01m_multiplatform.md) | **Multi-platform validation: what it buys, what it doesn't** |
 | [`docs/01b_noisy_simulation.md`](docs/01b_noisy_simulation.md) | **Noisy and finite-shot simulation (L3a / L3b)** |
 | [`docs/02_hardware_run.md`](docs/02_hardware_run.md) | **Real physical hardware execution on IBM Heron QPU (L5)** |
