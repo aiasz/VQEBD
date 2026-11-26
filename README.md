@@ -536,7 +536,7 @@ A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
 
 A projekt **MI-vel készített kísérlet**, amelyet Kormos Attila kezdeményezett és irányított: ő adta az ötletet, a célokat, a
 döntéseket (egyes kérdéseket, például a Fázis 11-ét, az MI szakirodalmi áttekintése vetett fel), az IBM-hozzáférést és az MI-használat költségét, jóváhagyta a lépéseket (a hardveres futtatásokat blokkonként
-külön), a Fázis 11-ben megoldotta a menet közbeni problémákat (a megszakadt blokk újraindítása, a kalibrációs szünet, a kiegészítő mérés javaslata), elrendelte és kérdéseivel irányította a kiadás előtti átnézést, és hozta a kiadási döntéseket. A kódot, a terveket és a szöveget a Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code)
+külön), a Fázis 11-ben megoldotta a menet közbeni problémákat (a megszakadt blokk újraindítása, a kalibrációs szünet, a kiegészítő mérés javaslata), maga nézte át a végleges jegyzőkönyvet (az átnézéséből született kérdései vezettek a kiolvasási hiba korlátjának felismeréséhez), elrendelte a kiadás előtti alapos átnézést, és hozta a kiadási döntéseket. A kódot, a terveket és a szöveget a Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code)
 írta meg az ő kérésére és utasításai szerint; a futtatásokat és az elemzést is a Claude végezte el, a szerző engedélyével. Ami **nem** történt meg: független szakértői lektorálás, külső replikáció, a hivatkozott művek teljes szövegének
 emberi átolvasása; a Fázis 2 és az 5.H hardveres eredményei pontonként egyetlen futásúak, a Fázis 11 geometriánként 8 (+1) blokkot mért egy eszközön. A tudományos újdonságot nem állítjuk
 ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)). A teljes, pontos nyilatkozat, a dokumentált MI-hibákkal
@@ -1075,7 +1075,7 @@ snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003), th
 
 The project is an **AI-assisted experiment**, initiated and directed by Attila Kormos: the author provided the idea, goals,
 decisions (some questions, such as Phase 11's, were raised by the AI's literature review), IBM access and the cost of the AI use, approved the steps (hardware runs block by block, separately), in Phase 11 solved the problems along the way (restarting the
-interrupted block, the calibration gap, proposing the supplementary run), ordered and steered the pre-release review with their questions, and made the
+interrupted block, the calibration gap, proposing the supplementary run), personally reviewed the final report (questions from that review led to identifying the readout-error limitation), ordered the thorough pre-release review, and made the
 release decisions. The code, plans and text were written by Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code) at the author's
 request and following the author's instructions; the runs and the analysis were carried out by Claude with the author's
 permission. What has **not** happened: independent expert review, external replication, human reading of the cited works in

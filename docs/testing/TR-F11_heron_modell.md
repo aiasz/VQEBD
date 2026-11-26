@@ -1315,7 +1315,8 @@ saját mérésű értékek eltéréséről (13.6). Ez a következő fázis lehet
 
 ## 21. A szerzői átnézés kérdései (2026-11-26) — felderítő válaszok
 
-A szerző a végleges tervezet átnézésekor nyolc kérdést vetett fel. A válaszok **utólagos, felderítő** vizsgálatból származnak
+A szerző a végleges tervezetet maga nézte át, és az átnézés során nyolc kérdést vetett fel; a kiolvasási hiba irányfüggésére vonatkozó kérdése (4.)
+vezetett a szimmetrikus kiolvasás korlátjának (18.11) felismeréséhez. A válaszok **utólagos, felderítő** vizsgálatból származnak
 ([`scripts/explore_heron_review.py`](../../scripts/explore_heron_review.py) → [`explore_review.json`](../figures/data/f11/explore_review.json)): jobot nem
 küldtünk be, QPU-idő nem fogyott, az IBM-től csak a történeti kalibrációt kérdeztük le. **Az elsődleges eredményt és a döntést nem érintik** (a küszöb és
 a szabály változatlan). Kilenc blokk, sok párhuzamos összevetés — szignifikanciát nem állítunk.
