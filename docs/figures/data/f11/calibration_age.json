@@ -1,7 +1,7 @@
 {
   "definition": "az első job indulása − a qubitpár T1, T2, kiolvasási hiba és cz-hiba legrégebbi mérési időpontja (órában); az sx/x hiba kimarad (phase_11.md, 2026-11-19)",
   "source": "backend.properties(datetime=<az első job indulása>), csak olvasás",
-  "generated_utc": "2026-11-26T07:53:49Z",
+  "generated_utc": "2026-11-26T08:11:36Z",
   "blocks": [
     {
       "block": "C1",
@@ -460,6 +460,64 @@
           "value": 0.0010102839279503562,
           "unit": "",
           "date_utc": "2026-11-23T23:47:35+00:00",
+          "qubits": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "block": "C9",
+      "kind": "supplementary",
+      "first_job_running_utc": "2026-11-26T08:09:59.061178+00:00",
+      "oldest_parameter": "q1 T1",
+      "oldest_parameter_date_utc": "2026-11-26T01:00:32+00:00",
+      "age_h": 7.157516993888889,
+      "properties_last_update_utc": "2026-11-26T07:53:21+00:00",
+      "matches_snapshot": true,
+      "parameters": [
+        {
+          "name": "q1 T1",
+          "value": 361.4158686941795,
+          "unit": "us",
+          "date_utc": "2026-11-26T01:00:32+00:00"
+        },
+        {
+          "name": "q1 T2",
+          "value": 640.6229581083934,
+          "unit": "us",
+          "date_utc": "2026-11-26T01:00:38+00:00"
+        },
+        {
+          "name": "q1 readout_error",
+          "value": 0.0069580078125,
+          "unit": "",
+          "date_utc": "2026-11-26T07:47:07+00:00"
+        },
+        {
+          "name": "q2 T1",
+          "value": 322.3031072789151,
+          "unit": "us",
+          "date_utc": "2026-11-26T01:00:32+00:00"
+        },
+        {
+          "name": "q2 T2",
+          "value": 114.79953685816052,
+          "unit": "us",
+          "date_utc": "2026-11-26T01:00:40+00:00"
+        },
+        {
+          "name": "q2 readout_error",
+          "value": 0.0145263671875,
+          "unit": "",
+          "date_utc": "2026-11-26T07:47:07+00:00"
+        },
+        {
+          "name": "cz gate_error",
+          "value": 0.0010448978726535219,
+          "unit": "",
+          "date_utc": "2026-11-26T02:01:47+00:00",
           "qubits": [
             1,
             2

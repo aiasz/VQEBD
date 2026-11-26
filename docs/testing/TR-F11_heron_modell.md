@@ -1,14 +1,14 @@
-# TR-F11 — Fázis 11 jegyzőkönyv (a Heron-zajmodell validálása) — ELŐZETES: B0 pilot, C1–C8 és az elsődleges elemzés
+# TR-F11 — Fázis 11 jegyzőkönyv (a Heron-zajmodell validálása) — ELŐZETES: B0 pilot, C1–C9, elsődleges elemzés és érzékenységi vizsgálatok (a mérések lezárva)
 
 | | |
 |---|---|
 | **Azonosító** | TR-F11 |
-| **Dokumentum-verzió** | 0.11.0 (előzetes: B0 pilot + C1–C8 + az elsődleges elemzés; a 15. szakasz az elsődleges elemzést (H1–H4), a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
-| **Dátum** | 2026-11-02 (B0), 2026-11-04 (C1), 2026-11-06/07 (C2), 2026-11-08 (C3), 2026-11-10 (C4), 2026-11-12 (C5), 2026-11-14/16 (C6), 2026-11-22 (C7), 2026-11-24 (C8) |
+| **Dokumentum-verzió** | 0.12.0 (előzetes: B0 pilot + C1–C9 + az elsődleges elemzés; a 16. szakasz a kiegészítő C9-et és a végleges érzékenységi vizsgálatokat, a 15. szakasz az elsődleges elemzést (H1–H4), a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
+| **Dátum** | 2026-11-02 (B0), 2026-11-04 (C1), 2026-11-06/07 (C2), 2026-11-08 (C3), 2026-11-10 (C4), 2026-11-12 (C5), 2026-11-14/16 (C6), 2026-11-22 (C7), 2026-11-24 (C8), 2026-11-26 (C9) |
 | **Terv / tesztterv** | [`phase_11.md`](../plan/phase_11.md), [`TP-F11_heron_modell.md`](TP-F11_heron_modell.md) |
-| **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0-t 2026-11-02-án, a C1-et 2026-11-04-én, a C2-t 2026-11-06-án, a C3-at 2026-11-08-án, a C4-et 2026-11-10-én, a C5-öt 2026-11-12-én, a C6-ot 2026-11-14-én és újraindítását 2026-11-15-én, a C7-et 2026-11-22-én, a C8-at 2026-11-24-én külön jóváhagyta) |
+| **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0-t 2026-11-02-án, a C1-et 2026-11-04-én, a C2-t 2026-11-06-án, a C3-at 2026-11-08-án, a C4-et 2026-11-10-én, a C5-öt 2026-11-12-én, a C6-ot 2026-11-14-én és újraindítását 2026-11-15-én, a C7-et 2026-11-22-én, a C8-at 2026-11-24-én, a C9-et 2026-11-26-án külön jóváhagyta) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a kódot és a szöveget az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **Előzetes — a megerősítő eredmény kész.** A pilot (B0) és mind a nyolc megerősítő blokk (C1–C8) lefutott, és az előre rögzített elsődleges elemzés is (2026-11-24, 15. szakasz): **H1 elutasítva** (a 2,0 Å-nél egyenértékű, a 0,735 és az 1,5 Å-nél nem), **H2 igaz**; a H3 felderítő, a H4 leíró. **A B0 nem megerősítő adat.** Hátravan: a kiegészítő C9, a végleges érzékenységi vizsgálat és a szerző által ellenőrzött végleges jegyzőkönyv (AC-11.7). |
+| **Státusz** | **Előzetes — a megerősítő eredmény kész.** A pilot (B0) és mind a nyolc megerősítő blokk (C1–C8) lefutott, és az előre rögzített elsődleges elemzés is (2026-11-24, 15. szakasz): **H1 elutasítva** (a 2,0 Å-nél egyenértékű, a 0,735 és az 1,5 Å-nél nem), **H2 igaz**; a H3 felderítő, a H4 leíró. **A B0 nem megerősítő adat.** A kiegészítő C9 és a végleges érzékenységi vizsgálatok is elkészültek (2026-11-26, 16. szakasz): az elsődleges eredmény változatlan, a képet nem módosítják — **a hardveres mérések lezárva**. Hátravan: a szerző által ellenőrzött végleges jegyzőkönyv (AC-11.7). |
 
 ## 1. Mi futott le
 
@@ -1095,6 +1095,86 @@ A C6 elhagyása a képet nem javítja (a szórás nem csökken). A végleges ér
   regisztráció nincs (a rögzítés a `protocol-f11-frozen` git-címke); a 10 napos kalibrációs szünet (12.1) és a C6 85,8 órás kalibrációja.
 - **Következik:** a kiegészítő C9 (legkorábban 2026-11-26, külön jóváhagyással) és a végleges érzékenységi vizsgálat; a reziduum-elemzés (előre kimondott következő
   lépés); a végleges TR-F11 a szerző ellenőrzésével; utána README / CHANGELOG, `v1.1.0` és új Zenodo-verzió — mindez csak a szerző jóváhagyásával.
+- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+
+## 16. C9 — a kiegészítő blokk (2026-11-26) és a végleges érzékenységi vizsgálatok
+
+**Kiegészítő (`supplementary`) adat, nem megerősítő.** Az elsődleges elemzés (15. szakasz) a C9 után **bitre azonos** (az `analysis.json` `primary`
+része változatlan; TC-1125). Az érzékenységi vizsgálatok előre rögzítettek (2026-11-18), csak leírók, döntési szabályuk nincs; a 15.5 ideiglenes táblázatát
+ez a szakasz váltja fel. A protokoll-ujjlenyomat egyezik a `FROZEN`-nel; a futtató a 14.3 javításai utáni, feltöltött kód (`382a2d9`).
+
+### 16.1 Feltételek, kalibráció, költség
+
+Előzetes ellenőrzés (2026-11-26 07:39 és 08:01 UTC, csak olvasás): `ibm_kingston` aktív, 0 várakozó job; a pár **minden** életkor-paraméterét a C8
+(2026-11-24 09:36) után mérték újra → a kalibrációs-frissességi szabály teljesült; kvóta 426 / 600 s. Friss szárazfutás, majd a szerző külön jóváhagyása.
+
+| Paraméter (az [1, 2] pár) | C8 | C9 | Mérési időpont (C9, UTC) |
+|---|---|---|---|
+| kiolvasási hiba q1 / q2 | 0,72% / 1,29% | 0,70% / **1,45%** | 2026-11-26 07:47:07 |
+| T1 q1 / q2 | 233 / 299 µs | **361** / 322 µs | 01:00:32 |
+| T2 q1 / q2 | 301 / 122 µs | **641** / 115 µs | 01:00:38 / 01:00:40 |
+| cz-hiba [1, 2] | 0,101% | 0,104% | 02:01:47 |
+
+- **Kalibráció-életkor:** az első job indulása (08:09:59) − q1 T1 (01:00:32) = **~7,2 óra** (a legfrissebb blokk); a visszakeresett értékek egyeznek a pillanatképpel.
+- Modell-előrejelzés: kiolvasással 25,5 / 13,5 / 13,8 mHa, kiolvasás nélkül 7,2 / 3,2 / 2,7 mHa.
+
+| Szint | Job | Beküldve (UTC) | Futás kezdete | Vége | QPU-s |
+|---|---|---|---|---|---|
+| 1 (TREX) | `dc3uilds2omc738e9rfg` | 2026-11-26 08:09:57 | 08:09:59 | 08:10:33 | **24** |
+| 0 (nyers) | `dc3uiuts2omc738e9s0g` | 08:10:36 | 08:10:37 | 08:10:57 | **15** |
+
+- A szintek sorrendje a protokoll szerint **TREX először** (`level_order("C9") = [1, 0]`); a két job között 3 s (mint a C1–C8-nál). Kimenet:
+  [`c9.json`](../figures/data/f11/c9.json), [`c9.log`](../figures/data/f11/c9.log).
+- **Összesen 39 QPU-s** (kilencedszer ugyanannyi); kvóta 426 → **465 / 600 s (77,5%)**. A használati adat mindkét jobnál már az első olvasáskor végleges volt
+  (`usage_final: true`); részleges vagy ideiglenes fájl nem maradt. A kalibráció a blokk előtt és után azonos.
+
+### 16.2 A C9 eredménye (mHa a Full CI-hez; z = különbség / blokkon belüli ensemble hiba)
+
+| R (Å) | Nyers hardver | Modell (kiolvasással) | Különbség | z | TREX hardver | Modell (kiolvasás nélkül) | Különbség | z | Kiolvasási arány |
+|---|---|---|---|---|---|---|---|---|---|
+| 0,735 | 35,1 | 25,5 | **+9,6** | +3,3 | 6,4 | 7,2 | −0,9 | −0,3 | 1,57 |
+| 1,5 | 15,4 | 13,5 | **+2,0** | +0,8 | −1,6 | 3,2 | −4,8 | −1,9 | 1,65 |
+| 2,0 | 13,7 | 13,7 | **0,0** | 0,0 | 2,4 | 2,7 | −0,3 | −0,1 | 1,02 |
+
+**A hardver nyers hibája blokkonként** (mHa; a modell-előrejelzés a 0,735 Å-nél zárójelben):
+
+| R (Å) | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 |
+|---|---|---|---|---|---|---|---|---|---|
+| 0,735 | 54,8 (23,0) | 34,5 (24,3) | 33,8 (27,6) | 25,0 (22,4) | 25,6 (33,8) | 29,9 (23,5) | 35,4 (32,5) | 32,2 (24,4) | 35,1 (25,5) |
+| 1,5 | 26,7 | 16,0 | 15,8 | 14,1 | 7,9 | 19,1 | 15,9 | 16,2 | 15,4 |
+| 2,0 | 18,0 | 14,3 | 14,0 | 9,7 | 11,9 | 13,8 | 15,3 | 12,8 | 13,7 |
+
+- A 0,735 Å-nél a hardver nyers hibája ismét jóval nagyobb a modellénél (z = +3,3), a 2,0 Å-nél egyezik — a C8 mintája. Leíró megfigyelés: a C7–C9-ben a q1 T2
+  22 → 301 → 641 µs között változott, a modell-előrejelzés ennek megfelelően 32,5 → 24,4 → 25,5 mHa, a hardver nyers hibája viszont 35,4 → 32,2 → 35,1 mHa
+  maradt (utólagos, nem igazolt értelmezés; a reziduum-elemzés tárgya).
+- Az 1,5 Å-nél a TREX-szel enyhített hardver a Full CI alá került (−1,6 mHa): az enyhítés túllőhet; egyetlen blokk, statisztikai zajjal összeegyeztethető.
+
+### 16.3 A végleges érzékenységi vizsgálatok (csak leíró; a 15.5-öt felváltja)
+
+Δ = nyers hardver − kiolvasásos modell (mHa); 90%-os t-intervallum (a TOST-tal azonos számítás, döntés nélkül).
+
+| Vizsgálat | Blokkok | R (Å) | Átlag Δ | Szórás | 90% CI | ⊂ [−3,0; +3,0]? |
+|---|---|---|---|---|---|---|
+| **(a)** C1–C9 | 9 | 0,735 | +7,72 | 10,60 | [+1,15; +14,29] | nem |
+| | | 1,5 | +2,67 | 6,55 | [−1,39; +6,73] | nem |
+| | | 2,0 | −0,15 | 3,34 | [−2,22; +1,93] | igen |
+| **(b)** ≤ 48 h kalibráció (a C6 nélkül) | 8 | 0,735 | +7,89 | 11,32 | [+0,31; +15,47] | nem |
+| | | 1,5 | +2,13 | 6,79 | [−2,42; +6,68] | nem |
+| | | 2,0 | −0,36 | 3,51 | [−2,71; +2,00] | igen |
+
+- **Mindkét vizsgálat az elsődleges eredmény képét adja:** csak a 2,0 Å-nél fér a 90%-os intervallum a ±3,0 mHa-es sávba. A 0,735 Å-nél az intervallum mindkét
+  vizsgálatban **teljesen pozitív**: a modell az egyensúlyi geometrián rendszeresen alulbecsüli a nyers hardveres hibát (leíró).
+- **A C6 (85,8 órás kalibráció) kihagyása a képet nem változtatja**, tehát az eredményt nem az elavult kalibrációjú blokk okozza.
+- A TREX-oldal (mint a H3, felderítő), (a) / (b): 0,735 Å +0,57 [−2,00; +3,15] / +0,85 [−2,07; +3,76]; 1,5 Å +0,16 [−2,31; +2,62] / −0,36 [−2,98; +2,26];
+  2,0 Å −1,20 [−2,58; +0,18] / −1,42 [−2,94; +0,10].
+- Kalibráció-életkor (14.2 kiegészítve): C9 = 7,2 h; a (b) vizsgálatból egyedül a C6 esik ki.
+
+### 16.4 A hardveres mérések lezárása
+
+- A Fázis 11 QPU-felhasználása: B0 57 s + C1–C9 9 × 39 s = **408 s**; a gördülő 28 napos keret a teljes mérés alatt ≤ 80% maradt (a csúcs 465 / 600 s =
+  77,5%, ≥ 20% tartalékkal). Minden blokk a szerző külön jóváhagyásával, friss szárazfutás után futott; egy kísérlet megszakadt (C6, kvóta nem fogyott).
+- A terv szerinti további hardveres mérés **nincs**. Hátravan: a végleges, a szerző által ellenőrzött TR-F11 (AC-11.7, minden korlát kimondva), a reziduum-elemzés
+  (az előre kimondott következő lépés), README / CHANGELOG, `v1.1.0` és új Zenodo-verzió — a szerző jóváhagyásával.
 - Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
 
 *Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*
