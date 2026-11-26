@@ -11,6 +11,8 @@
 
 **Hivatkozás / Cite as:** Kormos, A. (2026). *VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard* (v1.1.0) [szoftver / software]. Zenodo. <https://doi.org/10.5281/zenodo.23886002> · [`CITATION.cff`](CITATION.cff) · BibTeX: [HU](#hivatkozás) / [EN](#citation)
 
+**Kapcsolat / Contact:** Kormos Attila — <kormosa@gmail.com> · biztonsági bejelentés / security reports: [`SECURITY.md`](SECURITY.md)
+
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
 ---
@@ -516,6 +518,7 @@ Ha a projektet használod, hivatkozz rá a [`CITATION.cff`](CITATION.cff) szerin
 a `v1.0.0` pontos pillanatképe: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003), a `v1.1.0`-é:
 [10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414)).
 A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
+**Kapcsolat:** Kormos Attila — <kormosa@gmail.com>.
 
 ```bibtex
 @software{vqebd,
@@ -1054,6 +1057,7 @@ If you use this project, please cite it according to [`CITATION.cff`](CITATION.c
 snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003), the `v1.1.0` snapshot:
 [10.5281/zenodo.24560414](https://doi.org/10.5281/zenodo.24560414)). The release procedure:
 [`docs/09_publishing.md`](docs/09_publishing.md) (in Hungarian).
+**Contact:** Attila Kormos — <kormosa@gmail.com>.
 
 ```bibtex
 @software{vqebd,
