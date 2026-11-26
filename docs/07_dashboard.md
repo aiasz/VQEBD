@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/07_dashboard.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 1.0.0 |
+| **Projektverzió** | 1.1.0 |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 7 — Dashboard |
 | **Háttér** | [`phase_07.md`](plan/phase_07.md) · [`ADR-0009`](adr/ADR-0009-dashboard-architektura.md) · [`TR-F07`](testing/TR-F07_dashboard.md) |

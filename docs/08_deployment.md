@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/08_deployment.md` |
 | **Dokumentum-verzió** | 1.0.0 |
 | **Dátum** | 2026-11-02 |
-| **Projektverzió** | 1.0.0 |
+| **Projektverzió** | 1.1.0 |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 8 — Konténerizáció összeszerelése |
 | **Háttér** | [`phase_08.md`](plan/phase_08.md) · [`TR-F08`](testing/TR-F08_konteneres_rendszer.md) |

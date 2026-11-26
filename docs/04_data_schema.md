@@ -5,7 +5,7 @@
 | **Dokumentum** | `docs/04_data_schema.md` |
 | **Dokumentum-verzió** | 1.1.0 |
 | **Dátum** | 2026-09-23 · 2026-09-25 (séma v2) |
-| **Projektverzió** | 1.0.0 |
+| **Projektverzió** | 1.1.0 |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) |
 | **Fázis** | 4 — Adatséma és tárolás |
 

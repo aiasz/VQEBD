@@ -3,12 +3,12 @@
 | | |
 |---|---|
 | **Azonosító** | TR-F11 |
-| **Dokumentum-verzió** | 1.0.0 (végleges, a szerző átnézte 2026-11-26-án; a 21. szakasz az átnézés kérdéseire adott felderítő válaszokat, a 0. szakasz az összefoglaló, a 17. a leíró reziduum-áttekintés, a 18. a korlátok, a 19. az elfogadási kritériumok, a 20. a következő lépések; a 16. szakasz a kiegészítő C9-et és a végleges érzékenységi vizsgálatokat, a 15. szakasz az elsődleges elemzést (H1–H4), a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
+| **Dokumentum-verzió** | 1.0.1 (végleges, a szerző átnézte 2026-11-26-án; a 22. szakasz a kiadás előtti átnézés helyesbítéseit, a 21. szakasz az átnézés kérdéseire adott felderítő válaszokat, a 0. szakasz az összefoglaló, a 17. a leíró reziduum-áttekintés, a 18. a korlátok, a 19. az elfogadási kritériumok, a 20. a következő lépések; a 16. szakasz a kiegészítő C9-et és a végleges érzékenységi vizsgálatokat, a 15. szakasz az elsődleges elemzést (H1–H4), a 14. szakasz a C9 előtti, hardver nélküli bővítést és a C1–C8 kalibráció-életkorát, a 13. szakasz a C8-at (a megerősítő mérés vége) és az IBM-válasz hivatkozását, a 12. a C7-et és a kalibrációs várakozást tartalmazza; a 6. szakasz a C1-et, a 7. a C2-t, a 8. a C3-at, a 9. a C4-et és a köztes leíró összesítést, a 10. a C5-öt, a 11. a C6-ot és a megszakadt első kísérletét tartalmazza) |
 | **Dátum** | 2026-11-02 (B0), 2026-11-04 (C1), 2026-11-06/07 (C2), 2026-11-08 (C3), 2026-11-10 (C4), 2026-11-12 (C5), 2026-11-14/16 (C6), 2026-11-22 (C7), 2026-11-24 (C8), 2026-11-26 (C9) |
 | **Terv / tesztterv** | [`phase_11.md`](../plan/phase_11.md), [`TP-F11_heron_modell.md`](TP-F11_heron_modell.md) |
 | **Kezdeményezte, irányította, engedélyezte** | Kormos Attila (a B0-t 2026-11-02-án, a C1-et 2026-11-04-én, a C2-t 2026-11-06-án, a C3-at 2026-11-08-án, a C4-et 2026-11-10-én, a C5-öt 2026-11-12-én, a C6-ot 2026-11-14-én és újraindítását 2026-11-15-én, a C7-et 2026-11-22-én, a C8-at 2026-11-24-én, a C9-et 2026-11-26-án külön jóváhagyta) |
 | **Szerző** | Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — a kódot és a szöveget az MI írta a szerző kérésére, lásd [`AI_DISCLOSURE.md`](../../AI_DISCLOSURE.md) |
-| **Státusz** | **Végleges (1.0.0, 2026-11-26) — a szerző átnézte.** A hardveres mérések lezárultak (B0 pilot, C1–C8 megerősítő, C9 kiegészítő blokk); az előre rögzített elsődleges elemzés: **H1 elutasítva** (csak a 2,0 Å-nél egyenértékű), **H2 igaz**, a H3 felderítő, a H4 leíró; az előre rögzített érzékenységi vizsgálatok a képet nem változtatják. **A B0 feltáró, a C9 kiegészítő adat.** Összefoglaló: 0. szakasz; korlátok: 18. szakasz; a szerzői átnézés kérdései (felderítő): 21. szakasz. |
+| **Státusz** | **Végleges (1.0.1, 2026-11-26) — a szerző átnézte; a kiadás előtti átnézés helyesbítései: 22. szakasz.** A hardveres mérések lezárultak (B0 pilot, C1–C8 megerősítő, C9 kiegészítő blokk); az előre rögzített elsődleges elemzés: **H1 elutasítva** (csak a 2,0 Å-nél egyenértékű), **H2 igaz**, a H3 felderítő, a H4 leíró; az előre rögzített érzékenységi vizsgálatok a képet nem változtatják. **A B0 feltáró, a C9 kiegészítő adat.** Összefoglaló: 0. szakasz; korlátok: 18. szakasz; a szerzői átnézés kérdései (felderítő): 21. szakasz. |
 
 ## 0. Összefoglaló — a Fázis 11 eredménye
 
@@ -25,26 +25,30 @@ qubitpáron ([1, 2]), blokkonként friss kalibrációs pillanatképpel és model
 
 | Hipotézis | Eredmény | Számok (mHa; 90% CI, ill. 95% CI) |
 |---|---|---|
-| **H1** *(elsődleges)*: a modell ±3,0 mHa-en belül jósolja a nyers hibát | **elutasítva** (1/3 geometria) | 0,735 Å: +7,5 [−0,1; +15,1] — nem; 1,5 Å: +2,8 [−1,9; +7,4] — nem; 2,0 Å: −0,2 [−2,6; +2,2] — igen |
+| **H1** *(elsődleges)*: kimutatható-e, hogy a modell átlagos eltérése a nyers hibától ±3,0 mHa-en belül van | **elutasítva** (1/3 geometria) | 0,735 Å: +7,5 [−0,1; +15,1] — nem mutatható ki; 1,5 Å: +2,8 [−1,9; +7,4] — nem mutatható ki (határozatlan); 2,0 Å: −0,2 [−2,6; +2,2] — kimutatva |
 | **H2**: a kiolvasási hiba modellezése lényeges | **igaz** | +252 mHa² [+131; +373]; mind a 8 blokkban a kiolvasásos modell a jobb |
 | **H3** *(felderítő)*: TREX-hardver ≈ kiolvasás nélküli modell | csak a 2,0 Å-nél egyenértékű | megerősítő állítást nem hoz |
 | **H4** *(leíró)*: pontosabb-e a friss kalibráció egy rögzítettnél | nem bizonyult pontosabbnak | 8-ból 6 blokkban a rögzített (B0) kalibráció egyezett jobban |
 
-- **Érzékenységi vizsgálatok** (előre rögzítve, leíró): mind a kilenc blokkal (C1–C9) és csak a legfeljebb 48 órás kalibrációjú blokkokkal (a C6 nélkül) is
-  ugyanez a kép — csak a 2,0 Å fér a sávba; a 0,735 Å-nél az intervallum mindkét esetben teljesen pozitív: a modell az egyensúlyi geometrián rendszeresen
-  **alulbecsüli** a gép nyers hibáját.
+- **Érzékenységi vizsgálatok** (2026-11-18-án, a C7–C9 előtt rögzítve; leíró, döntési szabály nélkül): mind a kilenc blokkal (C1–C9) és csak a legfeljebb
+  48 órás kalibrációjú blokkokkal (a C6 nélkül) is ugyanez a kép — csak a 2,0 Å fér a sávba. A 0,735 Å-nél a pontbecslés 9 blokkból 8-ban pozitív, és a
+  C9-cel együtt a 90%-os intervallum nem tartalmazza a nullát (leíró, nem előre rögzített összevetés); az elsődleges (C1–C8) intervallum a nullát tartalmazza.
 - **Az előre kimondott következmény:** negatív eredmény, **közlendő**; a 11.E (nagyobb rendszerek szimulálása a modellel) **elmarad**; a következő lépés az
   eltérések okainak elemzése (első, leíró áttekintés: 17. szakasz).
-- **Ami állítható:** ezen az eszközön, ezen a qubitpáron, a H₂ kétqubites VQE-jén, 2026 novemberében a közölt kalibrációból épített modell az előre rögzített
-  pontossággal **nem** jósolta meg a gép nyers hibáját (csak a leghosszabb, 2,0 Å-es kötésnél); a kiolvasási hiba modellezése nélküle sokkal rosszabb.
+- **Ami állítható:** ezen az eszközön, ezen a qubitpáron, a H₂ kétqubites VQE-jén, 2026 novemberében a közölt kalibrációból épített modellnél az előre
+  rögzített teszt szerint **nem sikerült kimutatni**, hogy a gép nyers hibájától való átlagos eltérése ±3,0 mHa-en belül van — csak a leghosszabb, 2,0 Å-es
+  kötésnél (ott is csak az átlagra: egy-egy blokk eltérése elérte a ±6 mHa-t); az 1,5 Å-nél az eredmény határozatlan. A kiolvasási hiba modellezése nélkül
+  a modell sokkal rosszabb.
 - **Ami nem állítható:** hogy a modell más gépen, qubitpáron vagy molekulán sem működne; hogy a kvantumgép „pontos” lenne (nyers hibája 8–55 mHa, a kémiai
   pontosság 1,6 mHa — a kísérlet a *zajmodellt* teszteli, nem a gépet); az eltérés oka.
-- **Korlátok:** 18. szakasz; **az elfogadási kritériumok:** 19. szakasz; **a szerzői átnézés kérdései** (felderítő): 21. szakasz. Az 1–14. szakasz a mérés időrendi naplója (blokkonként), a 15–16. a végleges elemzés.
+- **Korlátok:** 18. szakasz; **az elfogadási kritériumok:** 19. szakasz; **a szerzői átnézés kérdései** (felderítő): 21. szakasz; **a kiadás előtti
+  helyesbítések:** 22. szakasz. Az 1–14. szakasz a mérés időrendi naplója (blokkonként), a 15–16. a végleges elemzés.
 
 **Közérthetően.** A gép hivatalos „műszerlapjából” (kalibrációs adataiból) épített számítógépes másolat azt próbálta előre megmondani, mennyit fog tévedni a
-valódi kvantumgép. Átlagosan nem járt messze, de a gép napról napra többet ingadozott, és a másolat olyan adatokra reagált, amelyekre a gép nem; ezért a
-rövid kötésű molekulánál a jóslat nem volt elég pontos, a hosszú kötésnél igen. A „nem sikerült” itt is érvényes, előre vállalt eredmény: azt mutatja, hogy
-erre a feladatra a közölt kalibrációból épített modellre önmagában nem lehet hagyatkozni.
+valódi kvantumgép. A legnagyobb kötéshossznál a másolat átlagosan eltalálta a gép tévedését. A legkisebbnél átlagosan kevesebbet jósolt, mint amennyit a gép
+tévedett, és a napról napra mért eltérések is túl nagyok voltak ahhoz, hogy az előre kért ±3 mHa-es egyezést ki lehessen mutatni; a középsőnél az adat nem
+dönti el a kérdést. A „nem sikerült kimutatni” itt is érvényes, előre vállalt eredmény: erre a feladatra a közölt kalibrációból épített modellre önmagában
+nem lehet hagyatkozni.
 
 ## 1. Mi futott le
 
@@ -67,12 +71,12 @@ erre a feladatra a közölt kalibrációból épített modellre önmagában nem 
 
 - **Összesen 57 QPU-s**, pontosan a becsült (4,8 s/PUB nyers, 6,6 s/PUB TREX) — a költségmodell a mérésben is igazolódott.
 - **Kvóta (gördülő 28 nap, 600 s):** előtte 57 s, utána **114 s** használt, **486 s hátravan**. A 80%-os határ (480 s) alatt vagyunk.
-- A nyers job **33,6 percet** állt sorban (a falióra-idő 2018 s); a sorban állás nem számít QPU-időnek.
+- A nyers job **32,9 percet** állt sorban (a falióra-idő 2018 s ≈ 33,6 perc, a futással együtt); a sorban állás nem számít QPU-időnek. *(Helyesbítve, 22.4.)*
 - Hibás vagy félbehagyott job nem keletkezett; hardveres újrafuttatásra nem volt szükség.
 
 ### 1.2 Kalibráció
 
-A blokk előtti és utáni pillanatkép `last_update_date` mezője azonos: **2026-11-02T16:10:11Z**. A futás 17:38–17:40 UTC között volt,
+A blokk előtti és utáni pillanatkép `last_update_date` mezője azonos: **2026-11-02T16:10:11Z** *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*. A futás 17:38–17:40 UTC között volt,
 tehát ~1,5 órával a kalibráció után. Ha a kiolvasási hiba a kalibráció óta változott, azt a `properties()` pillanatkép nem mutatja
 (a frissítési gyakoriságot nem vizsgáltuk); a két pillanatkép azonossága tehát nem bizonyítja, hogy a hiba közben állandó volt.
 
@@ -159,7 +163,7 @@ pilot egy blokkja nem dönti el.)
   a `b0.json` a teljes mérést tartalmazza.
 - A 2.3 szakasz összehasonlítása és a z-értékek **nem előre kimondott** vizsgálatok, hanem a pilot utáni leíró számítások
   (a `b0.json` és a `hardver_pes.json` alapján; a különbség / √(σ₁² + σ₂²), a σ a blokkon belüli ensemble hiba).
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 6. C1 — az első megerősítő blokk (2026-11-04)
 
@@ -186,13 +190,13 @@ leíró jellegűek. A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`635216
   ez nem igazolt; a következő blokkok megerősítik vagy cáfolják. Ha igaz, minden blokk **~39 s**.
 - **Hatás az ütemtervre:** a maradék 7 blokk × 39 s = 273 s → a végén **~426 s (71%)**, a 80% (480 s) alatt, a tartalék ~174 s (29%).
   A korábbi terv 388 s-ot jósolt; a ≥ 20%-os tartalék teljesül, a ≥ 212 s-os nem (a 212 s a becsült költséggel számolt cél volt).
-- Sorban állás: a TREX job 20 percet, a nyers 5 másodpercet várt; QPU-időt nem fogyaszt.
+- Sorban állás: a TREX job 20 percet, a nyers ~2 másodpercet várt; QPU-időt nem fogyaszt.
 - **Korrekció a munkamenetből:** a futás közben tévesen "nyers" jobként írtam le az elsőként sorban álló jobot; az a protokoll
   szerint (`level_order("C1") = [1, 0]`) TREX volt. A kód a tervnek megfelelően működött.
 
 ### 6.2 Kalibráció
 
-A blokk előtti és utáni pillanatkép azonos (`last_update_date` 2026-11-04T07:49:27Z, a pillanatképek 08:03 és 08:35 UTC-kor). A
+A blokk előtti és utáni pillanatkép azonos (`last_update_date` 2026-11-04T07:49:27Z, a pillanatképek 08:03 és 08:35 UTC-kor) *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*. A
 B0-hoz (2026-11-02T16:10Z) képest **változott** az [1, 2] pár kalibrációja: kiolvasási hiba q1 1,09% → 0,68%, q2 0,92% → 1,07%;
 T1 q1 394 → 178 µs; cz-hiba 0,113% → 0,099%. A modell-előrejelzés ennek megfelelően máshol van, mint a B0-nál (0,735 Å:
 +25,9 → +23,0 mHa), tehát a modell reagál a kalibrációra. A szárazfutás (07:14Z kalibráció) és a valódi indítás (07:49Z) közti
@@ -220,7 +224,7 @@ változás az [1, 2] párra nem hatott (azonos előrejelzés), vagyis a köztes 
 
 | R (Å) | Hardver C1 | Modell C1 | Arány C1 | Hardver B0 | Modell B0 | Arány B0 |
 |---|---|---|---|---|---|---|
-| 0,735 | 39,2 | 14,8 | 2,65 | 32,9 | 16,8 | 1,96 |
+| 0,735 | 39,2 | 14,8 | 2,66 | 32,9 | 16,8 | 1,96 |
 | 1,5 | 17,5 | 8,2 | 2,13 | 14,1 | 9,5 | 1,49 |
 | 2,0 | 15,5 | 8,9 | 1,74 | 13,6 | 10,2 | 1,33 |
 
@@ -246,7 +250,7 @@ változás az [1, 2] párra nem hatott (azonos előrejelzés), vagyis a köztes 
 
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás); a TOST csak a megerősítő blokkok
   teljes sorozatán értékelhető (`scripts/analyze_heron.py`, C8 után).
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 7. C2 — a második megerősítő blokk (2026-11-06/07)
 
@@ -276,7 +280,8 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a fut�
 
 ### 7.2 Kalibráció
 
-A blokk előtti (08:30 UTC) és utáni (23:45 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-06T01:30:29Z**; a futás a
+A blokk előtti (08:30 UTC) és utáni (23:45 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-06T01:30:29Z** *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)* *(a job indulásakor, 23:34 UTC-kor érvényes kalibráció `last_update_date`-je 22:34 volt; a pár paraméterei
+változatlanok, 14.2)*; a futás a
 kalibrációhoz képest ~22 órával később volt. Mivel a job 15 órát várt, a kalibrációs pillanatkép és a mérés közt hosszabb idő telt
 el, mint a B0/C1-nél; hogy a kiolvasási hiba közben változott-e, a `properties()` nem mutatja. Az [1, 2] pár kalibrációja a C1-hez
 képest: kiolvasási hiba q1 0,68% → 0,88%, q2 1,07% → 0,98%; T1 q1 178 → 256 µs; a cz-hiba azonos (0,099%). A modell-előrejelzés
@@ -320,7 +325,7 @@ képest: kiolvasási hiba q1 0,68% → 0,88%, q2 1,07% → 0,98%; T1 q1 178 → 
 - **A kiolvasási hozzájárulás aránya** a C2-n kisebb (1,39–1,54) és egymáshoz közelebbi, mint a C1-en (1,74–2,66); mindhárom blokkban
   (B0, C1, C2) a hardveré a nagyobb (1,33–2,66 ×). A korábbi hipotézis (a tényleges kiolvasási hiba nagyobb a kalibrációsnál)
   tehát nem cáfolódott, de a mértéke blokkonként 1,3 és 2,7 között mozog; ez továbbra is hipotézis.
-- **A TREX-es egyezés a C2-n jobb**, mint a C1-en (|z| ≤ 1,9), de a 2,0 Å-nél a hardver a FCI **alá** esik (−0,1 mHa; a statisztikai
+- **A TREX-es egyezés a C2-n jobb**, mint a C1-en (|z| ≤ 1,9), de a 2,0 Å-nél a hardver az FCI **alá** esik (−0,1 mHa; a statisztikai
   hiba ±1,8 mHa): ez zajjal összeegyeztethető.
 - **Nem állítható:** a H1–H4 eldöntése; az ok; általánosítás más eszközre, qubitpárra vagy molekulára. A három blokk (B0 feltáró, C1, C2)
   eltérő nagyságú különbséget ad, ami éppen azt indokolja, hogy a protokoll 8 megerősítő blokkot ír elő.
@@ -333,7 +338,7 @@ képest: kiolvasási hiba q1 0,68% → 0,88%, q2 1,07% → 0,98%; T1 q1 178 → 
   teljes sorozatán értékelhető (`scripts/analyze_heron.py`, C8 után).
 - A 15 órás várakozás miatt a kalibráció-elavulás hatása a C2-n nem zárható ki; a kalibrációs pillanatkép időbélyege a `c2.json`-ban megvan,
   a végső elemzés (H4: blokkonkénti vs. rögzített kalibráció) ezt használhatja.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 8. C3 — a harmadik megerősítő blokk (2026-11-08)
 
@@ -364,7 +369,7 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a fut�
 
 ### 8.2 Kalibráció
 
-A blokk előtti (08:39 UTC) és utáni (08:53 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-08T08:12:30Z**; a mérés a
+A blokk előtti (08:39 UTC) és utáni (08:53 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-08T08:12:30Z** *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*; a mérés a
 kalibráció után 34–41 perccel készült, vagyis a pillanatkép és a mérés közt a lehető legkisebb volt az eltérés (a C2-nél ~22 óra).
 Az [1, 2] pár kalibrációja a C2-höz képest: kiolvasási hiba q1 0,88% → 0,73%, **q2 0,98% → 1,51%**; T1 q1 256 → 315 µs; a cz-hiba
 0,099% → 0,098%. A modell-előrejelzés ennek megfelelően magasabb (nyers 27,6 / 14,6 / 14,9 mHa).
@@ -414,12 +419,12 @@ Az [1, 2] pár kalibrációja a C2-höz képest: kiolvasási hiba q1 0,88% → 0
   (0,735 Å: 23,0 vs. 24,3 és 27,6), vagyis a C1 kiugró hibáját **a modell nem jelezte előre**.
 - **Az irány nem egyértelmű:** a nyers hibát a modell B0-n, C1-en és C2-n alulbecsülte; a C3-on 2,0 Å-nél kismértékben (−0,9 mHa)
   túlbecsülte. A korábbi, a C1/C2 alapján megfogalmazott „a modell rendszeresen alulbecsül" általánosítás **a C3-mal gyengül**; az
-  alulbecslés mértéke blokkonként 0,9-szeres és 5,1-szeres között változik, a 0,735 Å-nél +6,2…+31,8 mHa (B0: +14,1).
+  alulbecslés mértéke a 0,735 Å-nél +6,2…+31,8 mHa (B0: +14,1).
 - **A kiolvasási hozzájárulás aránya** a C3-on 1,15–1,58; a négy blokk (B0, C1, C2, C3) 1,15 és 2,66 között mozog. A hardver kiolvasási
   hozzájárulása mindig nagyobb a modellénél, de a C3 2,0 Å-nél már csak 15%-kal. A korábbi hipotézis (a tényleges kiolvasási
   hiba nagyobb a kalibrációsnál) tehát nem cáfolódott, de a mértéke blokkonként erősen változik; **továbbra is hipotézis**.
 - **A TREX-es hardver a kiolvasás nélküli modellnél jobb** a C3-on mindhárom pontban (−4,8 / −3,4 / −2,6 mHa; |z| ≤ 1,6). Négy blokkon
-  a TREX-es eltérés előjele vegyes (B0: negatív, C1: pozitív, C2: vegyes, C3: negatív), tehát nem egyirányú rendszerhiba.
+  a TREX-es eltérés előjele vegyes (B0: negatív, C1: vegyes, C2: vegyes, C3: negatív), tehát nem egyirányú rendszerhiba.
 - **Nem állítható:** a H1–H4 eldöntése; az ok; általánosítás más eszközre, qubitpárra vagy molekulára. A négy blokk (B0, C1, C2, C3)
   eltérő nagyságú különbséget ad, ami éppen azt indokolja, hogy a protokoll 8 megerősítő blokkot ír elő.
 - **Várható irány (nem előrejelzés):** a C2 és a C3 jobban egyezik, mint a C1; ha a hátralévő blokkok a C2–C3 szintjén maradnak, a
@@ -430,8 +435,9 @@ Az [1, 2] pár kalibrációja a C2-höz képest: kiolvasási hiba q1 0,88% → 0
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás); a TOST csak a megerősítő blokkok
   teljes sorozatán értékelhető (`scripts/analyze_heron.py`, C8 után).
 - A C3 a kalibráció után 34–41 perccel futott (a C2: ~22 óra, a C1: ~25 perc a pillanatképhez képest), tehát a kalibráció-elavulás
-  hatása itt a legkisebb; a C2 és C3 közel azonos nyers hardvereredménye ezzel *összhangban van*, de ezt két pont nem bizonyítja.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+  hatása itt a legkisebb *(helyesbítve, 22.3: ez a `last_update_date`-hez mérve igaz; a pár saját adatai szerint a C3 kalibrációja 30,4 órás volt, a
+  nyolc blokkból a negyedik legidősebb, 14.2)*; a C2 és C3 közel azonos nyers hardvereredménye ezzel *összhangban van*, de ezt két pont nem bizonyítja.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 9. C4 — a negyedik megerősítő blokk és a köztes leíró összesítés (2026-11-10)
 
@@ -459,7 +465,7 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a fut�
 
 ### 9.2 Kalibráció
 
-A blokk előtti (08:58 UTC) és utáni (09:01 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-10T08:43:26Z**; a mérés a
+A blokk előtti (08:58 UTC) és utáni (09:01 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-10T08:43:26Z** *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*; a mérés a
 kalibráció után 17–18 perccel készült. Az [1, 2] pár kalibrációja a C3-hoz képest: kiolvasási hiba **q1 0,73% → 0,39%** (az eddigi
 legkisebb), q2 1,51% → 1,32%; T1 q1 315 → 342 µs; **cz-hiba 0,098% → 0,079%** (az eddigi legkisebb). A modell-előrejelzés ennek
 megfelelően alacsonyabb (nyers 22,4 / 11,5 / 11,8 mHa).
@@ -518,7 +524,7 @@ megfelelően alacsonyabb (nyers 22,4 / 11,5 / 11,8 mHa).
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás).
 - A mérés a kalibráció után 17–18 perccel készült (C3: 34–41 perc, C2: ~22 óra, C1: ~25 perc), ezért a kalibráció-elavulás hatása a
   C4-en is kicsi.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ### 9.6 Köztes leíró összesítés (C1–C4, a terv szerinti „köztes elemzés")
 
@@ -539,7 +545,8 @@ közti szórás). **Nem TOST, nem konfidenciaintervallum, nem döntés**; a H1�
 - **Csökkenő tendencia a C1–C4 sorozatban:** a 0,735 Å-nél +31,8 → +10,2 → +6,2 → +2,7, a 2,0 Å-nél +6,1 → +1,6 → −0,9 → −2,1, az 1,5 Å-nél
   +14,9 → +3,4 → +1,2 → +2,6 (az utolsó lépésnél nem csökken). Négy ponton ez **nem bizonyít tendenciát**, és az ok nem ismert (jobb kalibráció,
   a hardver állapota, véletlen). Ha azonban a blokkok közt időbeli korreláció (sodródás) van, a blokkok nem függetlenek, ami a TOST feltevését
-  érinti; erre a végső elemzésnél (H4: blokkonkénti vs. rögzített kalibráció) figyelni kell, de a szabályokat nem módosítjuk.
+  érinti; erre a végső elemzésnél (H4: blokkonkénti vs. rögzített kalibráció) figyelni kell, de a szabályokat nem módosítjuk. *(Helyesbítés: a H4 nem
+  függetlenségi teszt; a függetlenséget az elemzés nem vizsgálta, 18.12.)*
 - **Amit ebből levonhatunk:** a pontbecslések a C2 óta közelednek a nullához, a C4-en mindhárom a ±3,0 mHa sávban van. **Amit nem:** hogy a H1
   teljesülne. A végső válaszhoz a C5–C8 is kell, és az, hogy a C4 szintje tartós-e, vagy egy kedvező kalibráció eseti hatása.
 - **Következmény a tervre:** a protokoll, a küszöb és a blokkok száma változatlan. A kvóta 270 / 600 s (45%); a hátralévő 4 blokk ~156 s,
@@ -569,7 +576,7 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a fut�
 
 ### 10.2 Kalibráció
 
-A blokk előtti (08:18 UTC) és utáni (08:25 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-12T07:58:36Z**; a mérés a kalibráció
+A blokk előtti (08:18 UTC) és utáni (08:25 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-12T07:58:36Z** *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*; a mérés a kalibráció
 után 20–27 perccel készült. A szárazfutás (08:10 UTC) még a 07:45:16Z kalibrációt látta, a valódi indítás (08:18 UTC) már a 07:58:36Z-t; a
 modell-előrejelzés mindkettőből azonos (33,83 / 18,03 / 18,39 mHa), vagyis a köztes frissítés az [1, 2] pár paramétereit nem érintette
 (ugyanez történt a C1-nél). Az [1, 2] pár kalibrációja a C4-hez képest: **kiolvasási hiba q1 0,39% → 1,66%** (az eddigi legnagyobb; a C4 volt a legkisebb),
@@ -641,13 +648,13 @@ modell magasabb hibát jósol (nyers 33,8 / 18,0 / 18,4 mHa, a C4-nél 22,4 / 11
 - Az átlag a 2,0 Å-nél a nullához közel esik, de ezt **az ellentétes előjelű eltérések kioltása** okozza, nem az egyedi egyezés; a blokkok közti szórás (4,6–14,7 mHa)
   többszöröse a küszöbnek (3,0 mHa). Az átlagra épülő egyenértékűség-teszt a szórás és az 5 blokk mellett széles intervallumot ad; a H1 teljesülése így
   **valószínűtlen**, de ezt a C8 utáni, előre rögzített teszt dönti el, nem ez a leíró összesítés. A küszöb nem módosítható.
-- A blokkok **függetlenségét** a negatív előjelváltás nem támasztja alá és nem is cáfolja; a H4 (blokkonkénti vs. rögzített kalibráció) elemzése a végső kiértékelésben történik.
+- A blokkok **függetlenségét** a negatív előjelváltás nem támasztja alá és nem is cáfolja; a H4 (blokkonkénti vs. rögzített kalibráció) elemzése a végső kiértékelésben történik. *(Helyesbítés: a H4 nem függetlenségi teszt, 18.12.)*
 
 ### 10.6 Megjegyzések
 
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás).
 - A korrelációs számítás **nem része** az előre rögzített elemzésnek; utólagos, feltáró jellegű, és a végleges TR-F11-ben is így jelöljük.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 11. C6 — a hatodik megerősítő blokk (2026-11-14 → 2026-11-16): az előjel újra pozitív; a megszakadt első kísérlet
 
@@ -658,7 +665,7 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a mér
 
 | Elem | Érték |
 |---|---|
-| Mi történt | 2026-11-14-én a szerző jóváhagyta a C6-ot (friss szárazfutás, kapu rendben), a nyers szint jobja (`dbsa6j0k09pc73avu44g`, 2026-11-14 18:07 UTC) a sorban maradt (**QUEUED, ~22 óra**, a gépen 246–267 várakozó job). Közben a **Docker Desktop leállt** (a futtató folyamat 137-es kóddal, külsőleg kilőve fejeződött be), a második (TREX) jobot a futtató még nem küldte be |
+| Mi történt | 2026-11-14-én a szerző jóváhagyta a C6-ot (friss szárazfutás, kapu rendben), a nyers szint jobja (`dbsa6j0k09pc73avu44g`, 2026-11-14 18:07 UTC) a sorban maradt (**QUEUED, legfeljebb ~21 óra**, a gépen 246–267 várakozó job). Közben a **helyi Docker-környezet leállt** (a futtató folyamat 137-es kóddal, külsőleg kilőve fejeződött be), a második (TREX) jobot a futtató még nem küldte be |
 | Következmény | **Nem keletkezett mérési adat, nem fogyott kvóta** (309 / 600 s változatlan) |
 | Intézkedés | A szerző döntése (a séma és a kísérlet egységessége az ütemtervnél fontosabb): a sorban álló jobot **lemondtam (CANCELLED)**, részleges blokkot vagy a protokolltól eltérő „befejező" szkriptet nem használtunk; a blokkot az **egész protokoll szerint újraindítottuk** (friss `--dry-run`, új külön jóváhagyás 2026-11-15-én) |
 | Napló | [`c6_megszakadt_1.log`](../figures/data/f11/c6_megszakadt_1.log) (a beküldés előtti állapotig tart) |
@@ -669,7 +676,7 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a mér
 | Elem | Érték |
 |---|---|
 | Blokk, geometriák | C6, R = 0,735; 1,5; 2,0 Å, nyers + TREX, a szintek sorrendje a protokoll szerint **nyers először** (`level_order("C6") = [0, 1]`), `ibm_kingston`, qubitpár **[1, 2]**, 8192 lövés |
-| Előzetes lépések | friss `--dry-run` (0 QPU-s, a kapu elengedett, 2026-11-15 16:10), a szerző külön jóváhagyása, az élő `usage()` kapu (309 s + 42,7 s ≤ 480 s) |
+| Előzetes lépések | friss `--dry-run` (0 QPU-s, a kapu elengedett, 2026-11-15 15:10 UTC), a szerző külön jóváhagyása, az élő `usage()` kapu (309 s + 42,7 s ≤ 480 s) |
 | Kimenet | [`c6.json`](../figures/data/f11/c6.json), [`c6.log`](../figures/data/f11/c6.log) |
 
 | Szint | Job | Beküldve (UTC) | Futás kezdete | Vége | QPU-s | Becslés |
@@ -686,7 +693,7 @@ A protokoll-ujjlenyomat egyezik a `FROZEN` fájllal (`63521603…e93c9`); a mér
 
 ### 11.3 Kalibráció
 
-A blokk előtti (2026-11-15 15:11 UTC) és utáni (2026-11-16 09:30 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-13T14:57:10Z**; vagyis az IBM által közölt
+A blokk előtti (2026-11-15 15:11 UTC) és utáni (2026-11-16 09:30 UTC) pillanatkép `last_update_date` mezője azonos: **2026-11-13T14:57:10Z** *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*; vagyis az IBM által közölt
 legutóbbi kalibráció a mérés idején ~66 órás volt (a C5-nél a mérés a kalibráció után 20–27 perccel készült). *(Javítva 2026-11-22-én: a `last_update_date` a pár frissességét nem mutatja. A 2026-11-19-én rögzített definíció szerint — az [1, 2] pár T1/T2/kiolvasás/cz paramétereinek legrégebbi mérési időpontja, itt a q1 T1, 2026-11-12 19:33:48 UTC — a C6 kalibráció-életkora az első job indulásakor (2026-11-16 09:23:49 UTC) **~85,8 óra** volt; lásd 12.2.)* A szárazfutás ugyanezt a kalibrációt látta, a
 modell-előrejelzés mindkét időpontban azonos. Hogy a közölt kalibráció valóban ennyire régi volt, vagy a közlés késett, **nem ismert**. Az [1, 2] pár kalibrációja a C5-höz képest:
 **kiolvasási hiba q1 1,66% → 0,44%**, q2 1,27% → 1,32%; T1 q1 259 → 341 µs; cz-hiba 0,103% → 0,097%; vagyis a C4-hez hasonló (kiolvasás q1 0,39%).
@@ -754,8 +761,8 @@ A modell nyers előrejelzése: 23,5 / 12,1 / 12,3 mHa (C5-nél 33,8 / 18,0 / 18,
 ### 11.7 Megjegyzések
 
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás). A korrelációs és az összesítő számítás nem része az előre rögzített elemzésnek.
-- Ütemterv: a C6 a 2026-11-16-i mérés után a C7 2026-11-18-ra, a C8 2026-11-20-ra esik (2 napos távolság); az ütemterv a blokkok időbeli szétválasztása miatt a sorban állás miatt tolódott.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Ütemterv: a C6 a 2026-11-16-i mérés után a C7 2026-11-18-ra, a C8 2026-11-20-ra esik (2 napos távolság); az ütemterv a sorban állás miatt tolódott, a blokkok közti 2 napos távolság megmaradt.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 12. C7 — a hetedik megerősítő blokk (2026-11-22): várakozás a kalibrációra, a nyers eltérés kicsi, a TREX-oldal negatív
 
@@ -789,7 +796,7 @@ ismert okú**.
   (a 48 órás érzékenységi határon belül); a kiolvasást 26 perccel a mérés előtt mérték. A C6-é ugyanígy számolva **~85,8 óra** (a 11.3 pont javítva). A C1–C5 életkorát
   a végső dokumentációban az IBM történeti adataiból rekonstruáljuk.
 - **A q1 T2 598 → 22 µs-ra esett** (a pár többi paramétere kisebb mértékben változott). A modell emiatt nagyobb dekoherenciát és nagyobb hibát jósol
-  (kiolvasással 32,5 / 16,3 / 16,2 mHa; kiolvasás nélkül 15,0 / 6,4 / 5,6 mHa — a C6-nál 23,5 / 12,1 / 12,3, illetve 8,5 / 3,8 / 3,2). A protokoll szerint a
+  (kiolvasással 32,5 / 16,3 / 16,1 mHa; kiolvasás nélkül 15,0 / 6,4 / 5,6 mHa — a C6-nál 23,5 / 12,1 / 12,3, illetve 8,5 / 3,8 / 3,2). A protokoll szerint a
   paraméterek értéke alapján a futás időpontját nem választhattuk meg; a C7 a szabály szerinti első lehetséges napon futott.
 
 ### 12.3 Mi futott le, és mibe került
@@ -801,7 +808,7 @@ ismert okú**.
 
 - A szintek sorrendje a protokoll szerint **TREX először** (`level_order("C7") = [1, 0]`); `ibm_kingston`, qubitpár [1, 2], 8192 lövés. Kimenet: [`c7.json`](../figures/data/f11/c7.json),
   [`c7.log`](../figures/data/f11/c7.log).
-- **Összesen 39 QPU-s** (hetedszer ugyanannyi); kvóta 348 → **387 / 600 s** (64,5%). Sorban állás 2 s; a blokk ~1 perc alatt lefutott. A kalibráció a blokk előtt és után azonos.
+- **Összesen 39 QPU-s** (hetedszer ugyanannyi); kvóta 348 → **387 / 600 s** (64,5%). Sorban állás 2 s; a blokk ~1 perc alatt lefutott. A blokk utáni pillanatkép azonos a blokk előttivel *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*.
 - Ütemterv: C8 a 2 napos távolság szerint **2026-11-24** (nyers először), utána a kiegészítő C9 (TREX először); 426 s, majd 465 s (77,5%).
 
 ### 12.4 Eredmény (mHa a Full CI-hez; z = különbség / blokkon belüli ensemble hiba)
@@ -855,7 +862,7 @@ ismert okú**.
 |---|---|---|---|---|---|
 | 0,735 | +31,8; +10,2; +6,2; +2,7; −8,2; +6,4; +3,0 | **+7,4** | 12,2 | +0,6 | 4,7 |
 | 1,5 | +14,9; +3,4; +1,2; +2,6; −10,1; +7,0; −0,3 | **+2,7** | 7,6 | +0,2 | 3,6 |
-| 2,0 | +6,1; +1,6; −0,9; −2,1; −6,5; +1,5; −0,8 | **−0,2** | 3,9 | −1,8 | 2,2 |
+| 2,0 | +6,1; +1,6; −0,9; −2,1; −6,5; +1,5; −0,8 | **−0,1** | 3,9 | −1,7 | 2,2 |
 
 - A blokkok közti szórás (3,9–12,2 mHa) továbbra is a küszöb (3,0 mHa) többszöröse; a H1 teljesülése **valószínűtlen**, de ezt a C8 utáni, előre rögzített teszt dönti el, nem
   ez a leíró összesítés. A küszöb nem módosítható.
@@ -863,7 +870,7 @@ ismert okú**.
 ### 12.7 Megjegyzések
 
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás). A korrelációs és az összesítő számítás nem része az előre rögzített elemzésnek.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 13. C8 — a nyolcadik, utolsó megerősítő blokk (2026-11-24): a megerősítő mérés teljes
 
@@ -884,10 +891,10 @@ Előzetes ellenőrzés (2026-11-24 09:28 UTC, csak olvasás): `ibm_kingston` akt
 | sx/x hiba q1 / q2 (nem része az életkornak) | 0,015% / 0,014% | 0,018% / 0,015% | — |
 
 - **Kalibráció-életkor** (a 2026-11-19-i definíció): C8 = az első job indulása (2026-11-24 09:36:01 UTC) − a legrégebbi paraméter (q1 T1, 2026-11-23 22:52:01) =
-  **~10,7 óra**; a kiolvasást ~43 perccel a mérés előtt mérték. (A pár dátumait 09:28-kor olvastuk; a `last_update_date` a blokk előtt és után azonos, 09:11:14.)
+  **~10,7 óra**; a kiolvasást ~43 perccel a mérés előtt mérték. (A pár dátumait 09:28-kor olvastuk; a blokk előtti pillanatkép `last_update_date`-je 09:11:14; a blokk utáni a gyorsítótárból származott, 22.1.)
   Az eddigi életkorok: C6 ~85,8 h, C7 ~37,3 h, C8 ~10,7 h; a C1–C5-öt a végső dokumentációban rekonstruáljuk.
 - **A q1 T2 a C7-es 22 µs-ról 301 µs-ra állt vissza.** A modell-előrejelzés ennek megfelelően kisebb: kiolvasással 24,4 / 12,8 / 13,1 mHa, kiolvasás nélkül
-  7,5 / 3,3 / 2,8 mHa (a C7-nél 32,5 / 16,3 / 16,2, illetve 15,0 / 6,4 / 5,6).
+  7,5 / 3,3 / 2,8 mHa (a C7-nél 32,5 / 16,3 / 16,1, illetve 15,0 / 6,4 / 5,6).
 
 ### 13.2 Mi futott le, és mibe került
 
@@ -898,8 +905,8 @@ Előzetes ellenőrzés (2026-11-24 09:28 UTC, csak olvasás): `ibm_kingston` akt
 
 - A szintek sorrendje a protokoll szerint **nyers először** (`level_order("C8") = [0, 1]`); `ibm_kingston`, qubitpár [1, 2], 8192 lövés. Kimenet:
   [`c8.json`](../figures/data/f11/c8.json), [`c8.log`](../figures/data/f11/c8.log).
-- **Összesen 39 QPU-s** (nyolcadszor ugyanannyi); kvóta 387 → **426 / 600 s** (71%). Sorban állás ~2 s; a blokk ~1 perc alatt lefutott. A kalibráció a blokk előtt
-  és után azonos.
+- **Összesen 39 QPU-s** (nyolcadszor ugyanannyi); kvóta 387 → **426 / 600 s** (71%). Sorban állás ~2 s; a blokk ~1 perc alatt lefutott. A blokk utáni
+  pillanatkép azonos a blokk előttivel *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*.
 - ¹ **Rögzítési eltérés (az eredményt nem érinti):** a `c8.json` és a `c8.log` a TREX jobnál `quantum_seconds = 0`-t rögzített: a futtató a job metrikáit közvetlenül
   a befejezés után olvasta ki, amikor az IBM a használati adatot még nem véglegesítette. Utólagos, csak olvasó lekérdezés (2026-11-24, `job.usage()` és `job.metrics()`,
   `status: complete`): **24 s**; a kvóta-különbség (387 → 426 s = 39 s) ezt megerősíti. A nyers kimeneti fájlokat utólag **nem módosítottuk**; az elemzés ezt a mezőt
@@ -989,7 +996,7 @@ Előzetes ellenőrzés (2026-11-24 09:28 UTC, csak olvasás): `ibm_kingston` akt
 ### 13.8 Megjegyzések
 
 - A z-értékek leíró számítások (a blokkon belüli statisztikai hiba, **nem** a blokk-közi szórás). A korrelációs és az összesítő számítás nem része az előre rögzített elemzésnek.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 14. A C9 előtti, hardver nélküli bővítés és a C1–C8 kalibráció-életkora (2026-11-24)
 
@@ -1027,6 +1034,8 @@ Egy teszt azt is rögzíti, hogy egy kiegészítő blokk — szélsőséges ért
   módosítható, és a határ a vizsgálatba beletartozik.
 - A C2 nyers jobját 2026-11-06 08:33-kor küldtük be, de 15 órát állt sorban, és csak 23:34-kor indult (7. szakasz); ezért volt a kalibráció a
   mérés idején ilyen idős.
+- *Helyesbítés (22.3):* a 6–11. szakasz kalibráció-frissességi megjegyzései a `last_update_date`-hez mértek; a pár saját adatai szerinti életkort ez a
+  táblázat adja. Az időpontok itt másodpercre csonkolva szerepelnek (a 8.1 és a 10.1 kerekít).
 
 ### 14.3 Független kódellenőrzés és javítások a C9 előtt (2026-11-26)
 
@@ -1072,7 +1081,7 @@ elsődleges eredményt nem változtathatja (TC-1125).
   vizsgálható, és ez az eredmény változatlanul közölve marad.
 - **Mi okozza leíróan az elutasítást:** elsősorban a blokkok közti szórás (11,3 / 7,0 / 3,6 mHa). Nyolc blokknál még nulla átlag mellett is csak ~4,5 mHa
   alatti szórásnál férne a 90%-os intervallum a ±3,0 mHa-es sávba (t₀,₉₅; ₇ ≈ 1,895); ez csak a 2,0 Å-nél teljesült. A 0,735 Å-nél az átlag is nagy: a modell
-  átlagosan ~7,5 mHa-lel alulbecsüli a nyers hibát (az intervallum alsó széle −0,09, a nullát éppen tartalmazza).
+  átlagosan ~7,5 mHa-val alulbecsüli a nyers hibát (az intervallum alsó széle −0,09, a nullát éppen tartalmazza).
 
 ### 15.2 H2: lényeges-e a kiolvasási hiba modellezése
 
@@ -1123,15 +1132,15 @@ A C6 elhagyása a képet nem javítja (a szórás nem csökken). A végleges ér
 ### 15.6 Mi állítható, és mi nem
 
 - **Állítható:** ezen az eszközön (`ibm_kingston`, [1, 2] qubitpár), a H₂ kétqubites VQE-jén, 2026. november 4. és 24. között a *közölt* kalibrációból épített
-  Heron-zajmodell a nyers hardveres hibát az előre rögzített ±3,0 mHa pontossággal **nem** jósolta meg (csak a 2,0 Å-nél); a kiolvasási hiba modellezése
-  lényeges (H2).
+  Heron-zajmodellnél az előre rögzített teszt szerint **nem sikerült kimutatni**, hogy a nyers hardveres hibától való átlagos eltérése ±3,0 mHa-en belül
+  van (csak a 2,0 Å-nél; az 1,5 Å-nél az eredmény határozatlan); a kiolvasási hiba modellezése lényeges (H2).
 - **Nem állítható:** hogy a modell más eszközön, qubitpáron vagy molekulán sem működne; az eltérés oka (a 13.4 és a 15.4 csak lehetséges magyarázat); hogy egy
   másik küszöb mellett „megfelelne” (a küszöb nem módosítható).
 - **Korlátok** (a végleges jegyzőkönyvben részletesen, AC-11.7): egy eszköz, 2 qubit, H₂, 8 blokk; a terv és az elemzés MI-vel készült, nem lektorált; külső
   regisztráció nincs (a rögzítés a `protocol-f11-frozen` git-címke); a 10 napos kalibrációs szünet (12.1) és a C6 85,8 órás kalibrációja.
-- **Következik:** a kiegészítő C9 (legkorábban 2026-11-26, külön jóváhagyással) és a végleges érzékenységi vizsgálat; a reziduum-elemzés (előre kimondott következő
+- **Következik** *(a 2026-11-24-i állapot; azóta: 16., 20–22. szakasz)*: a kiegészítő C9 (legkorábban 2026-11-26, külön jóváhagyással) és a végleges érzékenységi vizsgálat; a reziduum-elemzés (előre kimondott következő
   lépés); a végleges TR-F11 a szerző ellenőrzésével; utána README / CHANGELOG, `v1.1.0` és új Zenodo-verzió — mindez csak a szerző jóváhagyásával.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 16. C9 — a kiegészítő blokk (2026-11-26) és a végleges érzékenységi vizsgálatok
 
@@ -1152,7 +1161,7 @@ Előzetes ellenőrzés (2026-11-26 07:39 és 08:01 UTC, csak olvasás): `ibm_kin
 | cz-hiba [1, 2] | 0,101% | 0,104% | 02:01:47 |
 
 - **Kalibráció-életkor:** az első job indulása (08:09:59) − q1 T1 (01:00:32) = **~7,2 óra** (a legfrissebb blokk); a visszakeresett értékek egyeznek a pillanatképpel.
-- Modell-előrejelzés: kiolvasással 25,5 / 13,5 / 13,8 mHa, kiolvasás nélkül 7,2 / 3,2 / 2,7 mHa.
+- Modell-előrejelzés: kiolvasással 25,5 / 13,5 / 13,7 mHa, kiolvasás nélkül 7,2 / 3,2 / 2,7 mHa.
 
 | Szint | Job | Beküldve (UTC) | Futás kezdete | Vége | QPU-s |
 |---|---|---|---|---|---|
@@ -1162,7 +1171,7 @@ Előzetes ellenőrzés (2026-11-26 07:39 és 08:01 UTC, csak olvasás): `ibm_kin
 - A szintek sorrendje a protokoll szerint **TREX először** (`level_order("C9") = [1, 0]`); a két job között 3 s (mint a C1–C8-nál). Kimenet:
   [`c9.json`](../figures/data/f11/c9.json), [`c9.log`](../figures/data/f11/c9.log).
 - **Összesen 39 QPU-s** (kilencedszer ugyanannyi); kvóta 426 → **465 / 600 s (77,5%)**. A használati adat mindkét jobnál már az első olvasáskor végleges volt
-  (`usage_final: true`); részleges vagy ideiglenes fájl nem maradt. A kalibráció a blokk előtt és után azonos.
+  (`usage_final: true`); részleges vagy ideiglenes fájl nem maradt. A blokk utáni pillanatkép azonos a blokk előttivel *(nem informatív: a blokk utáni pillanatkép a gyorsítótárból származott, 22.1)*.
 
 ### 16.2 A C9 eredménye (mHa a Full CI-hez; z = különbség / blokkon belüli ensemble hiba)
 
@@ -1199,7 +1208,8 @@ Előzetes ellenőrzés (2026-11-26 07:39 és 08:01 UTC, csak olvasás): `ibm_kin
 | | | 2,0 | −0,36 | 3,51 | [−2,71; +2,00] | igen |
 
 - **Mindkét vizsgálat az elsődleges eredmény képét adja:** csak a 2,0 Å-nél fér a 90%-os intervallum a ±3,0 mHa-es sávba. A 0,735 Å-nél az intervallum mindkét
-  vizsgálatban **teljesen pozitív**: a modell az egyensúlyi geometrián rendszeresen alulbecsüli a nyers hardveres hibát (leíró).
+  vizsgálatban teljesen pozitív (a C9-cel együtt; az elsődleges C1–C8 intervallum a nullát tartalmazza): leíróan a modell az egyensúlyi geometrián
+  többnyire alulbecsüli a nyers hardveres hibát (a pontbecslés 9 blokkból 8-ban pozitív); ez nem előre rögzített összevetés.
 - **A C6 (85,8 órás kalibráció) kihagyása a képet nem változtatja**, tehát az eredményt nem az elavult kalibrációjú blokk okozza.
 - A TREX-oldal (mint a H3, felderítő), (a) / (b): 0,735 Å +0,57 [−2,00; +3,15] / +0,85 [−2,07; +3,76]; 1,5 Å +0,16 [−2,31; +2,62] / −0,36 [−2,98; +2,26];
   2,0 Å −1,20 [−2,58; +0,18] / −1,42 [−2,94; +0,10].
@@ -1209,9 +1219,9 @@ Előzetes ellenőrzés (2026-11-26 07:39 és 08:01 UTC, csak olvasás): `ibm_kin
 
 - A Fázis 11 QPU-felhasználása: B0 57 s + C1–C9 9 × 39 s = **408 s**; a gördülő 28 napos keret a teljes mérés alatt ≤ 80% maradt (a csúcs 465 / 600 s =
   77,5%, ≥ 20% tartalékkal). Minden blokk a szerző külön jóváhagyásával, friss szárazfutás után futott; egy kísérlet megszakadt (C6, kvóta nem fogyott).
-- A terv szerinti további hardveres mérés **nincs**. Hátravan: a végleges, a szerző által ellenőrzött TR-F11 (AC-11.7, minden korlát kimondva), a reziduum-elemzés
+- A terv szerinti további hardveres mérés **nincs**. Hátravan *(a 16. szakasz írásakor; azóta: 20–22. szakasz)*: a végleges, a szerző által ellenőrzött TR-F11 (AC-11.7, minden korlát kimondva), a reziduum-elemzés
   (az előre kimondott következő lépés), README / CHANGELOG, `v1.1.0` és új Zenodo-verzió — a szerző jóváhagyásával.
-- Az eredményt az MI számolta és értelmezte; a szerző ellenőrzése a végleges TR-F11 előtt szükséges.
+- Az eredményt az MI számolta és értelmezte; a szerző a végleges jegyzőkönyvet 2026-11-26-án átnézte (21–22.).
 
 ## 17. Leíró reziduum-áttekintés (felderítő, utólagos — nem része az előre rögzített elemzésnek)
 
@@ -1236,7 +1246,7 @@ okot nem állít. Reziduum = nyers hardver − kiolvasásos modell (mHa), C1–C
 
 ### 17.2 Megfigyelések (0,735 / 1,5 / 2,0 Å)
 
-1. **A modell ingadozását főleg a q1 közölt kiolvasási hibája hajtja, a gépét nem.** r(modell, q1 kiolvasás) = +0,87 / +0,90 / +0,90 (ez mechanikus: a
+1. **A modell ingadozását főleg a q1 közölt kiolvasási hibája hajtja; a gépé ezt nem követi egyértelműen.** r(modell, q1 kiolvasás) = +0,87 / +0,90 / +0,90 (ez mechanikus: a
    modell ezt az értéket használja), r(gép, q1 kiolvasás) = −0,16 / −0,58 / +0,01. Ezért a reziduum a q1 kiolvasási hibájával negatívan korrelál
    (−0,47 / −0,73 / −0,59; a C1 nélkül −0,71 / −0,91 / −0,71). Példa: a C5-nél (q1 kiolvasás 1,66%) a modell 33,8 mHa-t jósolt, a gép 25,6 mHa-t adott.
 2. **A kiolvasás hozzájárulása (nyers − TREX) a gépen átlagosan nagyobb, mint a modellben** (24,6 vs. 17,4 / 12,3 vs. 9,8 / 11,6 vs. 10,6 mHa), és
@@ -1245,6 +1255,8 @@ okot nem állít. Reziduum = nyers hardver − kiolvasásos modell (mHa), C1–C
    8,7 mHa (a C1 nélkül 4,2), a modellé 4,2 mHa.
 4. **A kalibráció életkora** a reziduummal nem mutat egyértelmű kapcsolatot (r = −0,13 / +0,13 / +0,18).
 5. **A C1** (az első megerősítő blokk, +31,8 mHa a 0,735 Å-nél) erősen befolyásolja a korrelációkat; nélküle több előjel megfordul.
+6. **Más paraméterek is:** a reziduum a q2 T2-vel (+0,58 / +0,72 / +0,62; a C1 nélkül +0,42 / +0,64 / +0,47) és a q2 T1-gyel (+0,40 / +0,55 / +0,43)
+   legalább olyan erősen korrelál, mint a q1 kiolvasási hibájával — a felderítő korrelációk tehát nem jelölnek ki egyetlen okot. *(Kiegészítve, 22.3.)*
 
 **Lehetséges, nem igazolt értelmezés:** a közölt kiolvasási hiba (különösen a q1-é) nem azt a kiolvasási hibát írja le, amely a futás idején a mi
 áramkörünkre hatott (eltérő mérési feltételek, egyidejű kiolvasás, időbeli ingadozás) — összhangban az IBM-oktatóanyag megjegyzésével a közölt és a
@@ -1255,30 +1267,36 @@ saját mérésű értékek eltéréséről (13.6). Ez a következő fázis lehet
 1. **Egy eszköz, egy qubitpár:** `ibm_kingston` (Heron r2), fizikai qubitek [1, 2]; 2 qubit, 4 CZ-kapu. Az eredmény nem általánosítható más eszközre,
    qubitpárra vagy nagyobb áramkörre (R2, R7).
 2. **Egy molekula, három geometria:** H₂, R = 0,735 / 1,5 / 2,0 Å, egy ansatz, a θ\*-pontban (a θ-scan és a H5 elhagyva, döntés 4.).
-3. **Kis minta:** 8 megerősítő (+ 1 kiegészítő) blokk 24 nap alatt. A kapott blokk-közi szórás mellett a 0,735 és az 1,5 Å-nél még tökéletes átlagos
+3. **Kis minta:** 8 megerősítő (+ 1 kiegészítő) blokk 22 nap alatt (C1–C9; a B0 pilottal 24 nap). A kapott blokk-közi szórás mellett a 0,735 és az 1,5 Å-nél még tökéletes átlagos
    egyezés esetén sem lett volna elég 8 blokk (≈ 4,5 mHa alatti szórás kellett volna); a minta nagyságát a QPU-keret korlátozta.
-4. **A modell a közölt kalibrációból épül.** A közölt értékek mérési módszere és időpontja eltérhet a futásétól (13.6); a Kingston 10 napig nem kapott új
-   kalibrációt (12.1), a C6 85,8 órás kalibrációval futott — az érzékenységi vizsgálat szerint ez a képet nem változtatja (16.3).
+4. **A modell a közölt kalibrációból épül.** A közölt értékek mérési módszere és időpontja eltérhet a futásétól (13.6); a Kingston párunk adatait 10 napig nem mérték
+   újra (vagy nem közölték, 12.1), a C6 85,8 órás kalibrációval futott — az érzékenységi vizsgálat szerint ez a képet nem változtatja (16.3).
 5. **A TREX-et a modell nem szimulálja:** a H3 csak közelítés (R3).
 6. **MI-vel készült munka, nem lektorált:** a terv, a kód, az elemzés és a szöveg MI-vel (Claude, Anthropic) készült a szerző irányításával; a kód ~80%-át a
    szerző saját bevallása szerint soronként átnézte (`AI_DISCLOSURE.md`); független emberi statisztikus nem vett részt (R6 javaslata nem teljesült); a 14.3
    kódellenőrzése is MI-vel történt.
 7. **Nincs külső előzetes regisztráció** (OSF, döntés 5.): a rögzítés a `protocol-f11-frozen` git-címke és a `FROZEN` ujjlenyomat. A mérések közben
-   rögzített kiegészítések (kalibrációs-frissességi szabály, életkor-definíció, a C9) mindig az érintett adatok **előtt** készültek, és az elsődleges
-   elemzést nem érintik.
+   rögzített kiegészítések (kalibrációs-frissességi szabály, életkor-definíció, a C9) a további, még nem mért adatok **előtt** készültek, de a C1–C6
+   ismeretében (a C6 elavult kalibrációja volt az ok); az elsődleges elemzést nem érintik, az érzékenységi vizsgálatok ezért csak leírók.
 8. **A futtató módosult a mérési szakaszban** (14.1, 14.3): a mérés logikája, a protokoll és az elsődleges elemzés nem; a C8 TREX jobjának QPU-ideje hibásan
    rögzült (13.2, az eredményt nem érinti).
 9. **A gép nyers hibája (8–55 mHa) messze a kémiai pontosság (1,6 mHa) fölött van:** a kísérlet a zajmodellt teszteli, nem a gép pontosságát; a pontos
    referenciát a klasszikus Full CI adja.
 10. **A 17. és a 21. szakasz utólagos, felderítő:** okot nem állít; a megfigyelések új, előre rögzített vizsgálatot igényelnek.
 11. **A modell a kiolvasási hibát szimmetrikusnak vette:** az IBM backend-objektuma az Aer zajmodelljének csak az átlagos `readout_error`-t adja át, a 0→1 és az 1→0 tévesztés külön értékét nem. A felderítő ellentényes számítás szerint ez a 0,735 Å-es átlagos eltérésből ~1,3 mHa-t magyaráz (21.2).
+12. **A blokkok függetlenségét, az időbeli sodródást és a normalitást** az elemzés nem vizsgálta (n = 8, a C1 kiugró); a TOST ezeket feltételezi. A 9.6 és a
+    10.5 utalása, hogy ezt a H4 kezeli, téves volt: a H4 nem függetlenségi teszt.
+13. **A blokkon belüli kalibrációváltozás figyelése (R1) nem működött:** a blokk utáni pillanatkép a gyorsítótárból származott (22.1); a modell bemenetét a
+    történeti rekonstrukció igazolja (14.2, 16.1).
+14. **Kisebb modellezési részletek:** a modell 8193 lövéssel számolt 8192 helyett (a `BackendEstimatorV2` kerekítése), és a mérési bázisváltó kapukat
+    zajmentesen adta hozzá (becsült hatás ≲ 0,1 mHa) — mindkettő elhanyagolható a δ = 3,0 mHa-hez képest.
 
 ## 19. Az elfogadási kritériumok állapota (`phase_11.md` 6. fejezet)
 
 | AC | Állapot |
 |---|---|
 | AC-11.1 | ✅ a modell bitre azonos a felderítő útvonallal, a kiolvasás kapcsolható (`phase_11.md` 6.1) |
-| AC-11.2 | ✅ minden blokkhoz pillanatkép a blokk előtt és után, a modell ebből épült; a történeti rekonstrukció mind a 9 blokknál egyezik (14.2, 16.1) |
+| AC-11.2 | ✅ minden blokkhoz pillanatkép a blokk előtt, a modell ebből épült; a történeti rekonstrukció mind a 9 blokknál egyezik (14.2, 16.1). A blokk utáni pillanatkép a gyorsítótárból származott, ezért nem informatív (22.1) |
 | AC-11.3 | ✅ az elemzés szintetikus adaton tesztelve a mérések előtt; a kiegészítő blokk az elsődleges eredményt nem változtatja (TC-1125) |
 | AC-11.4 | ✅ egyetlen blokk sem lépte át a 80%-ot (csúcs 465 / 600 s = 77,5%); a kapu tesztelt (TC-1107–TC-1109, TC-1123, TC-1127) |
 | AC-11.5 | ✅ a `protocol-f11-frozen` címke megelőzte az első hardveres blokkot (`phase_11.md` 6.1) |
@@ -1293,7 +1311,7 @@ saját mérésű értékek eltéréséről (13.6). Ez a következő fázis lehet
   1. saját, futás előtti karakterizálás (különösen a kiolvasásé) és az ebből épített modell összevetése a közölt kalibrációs modellel — az IBM-oktatóanyag
      módszere (13.6), Qiskit ≥ 2.0, tehát új környezet;
   2. a 0,735 Å-es eltérés forrásának célzott vizsgálata szimulációban (mely zajkomponens hiányzik a modellből: koherens hiba, áthallás, szivárgás);
-  3. más qubitpár vagy eszköz — a QPU-keret korlátai mellett (a gördülő keretből a B0 57 s-a 2026-11-30-án, a C1 39 s-a 12-02-án kerül ki).
+  3. más qubitpár vagy eszköz — a QPU-keret korlátai mellett (a gördülő keretből 2026-11-30-án a Fázis 5.H és a B0 57–57 s-a, összesen 114 s, 12-02-án a C1 39 s-a kerül ki).
 
 ## 21. A szerzői átnézés kérdései (2026-11-26) — felderítő válaszok
 
@@ -1317,13 +1335,14 @@ változatok erre épülnek.
 2. **Számít-e a szintek sorrendje?** Nyers reziduum, nyers először (C2, C4, C6, C8) ↔ TREX először (C1, C3, C5, C7, C9): +6,8 / +4,1 / +0,2 ↔ +8,5 / +1,5 / −0,4
    mHa (a C1 nélkül +2,6 / −1,8 / −2,0); TREX-reziduum: +2,2 / +1,9 / −0,8 ↔ −0,8 / −1,2 / −1,6 mHa. A TREX-oldali ~3 mHa-es különbség 4, ill. 5 blokk és
    3–5 mHa szórás mellett nem választható el a zajtól — szisztematikus sorrendhatás nem mutatható ki (a váltakoztatás éppen ezt védi). Pontosítás: a második
-   job a C2-nél 133 s, a C6-nál 116 s, a C3-nál 327 s múlva indult, a többi blokkban 5–8 s múlva.
-3. **Miért reagált a modell ~8 mHa-lel a q1 T2 változására (C7 → C8), ha az áramkör rövid?** Az ISA-áramkör 15 RZ, 12 SX és 4 CZ kapu, becsült hossza
+   job a C2-nél 133 s, a C6-nál 116 s, a C3-nál 327 s múlva indult, a többi blokkban 4,6–8,2 s múlva.
+3. **Miért reagált a modell ~8 mHa-val a q1 T2 változására (C7 → C8), ha az áramkör rövid?** Az ISA-áramkör 15 RZ, 12 SX és 4 CZ kapu, becsült hossza
    **0,50 µs** (CZ: 68 ns); a kiolvasás 2,18 µs. A modell a kiolvasási műveletre kvantumhibát **nem** tesz (zajjal terhelt műveletek: `cz`, `id`, `reset`,
    `sx`, `x`, `xslow`; a kiolvasásra csak kiolvasási hiba), tehát nem a kiolvasási ablak dekoherenciája okozza. **Ellentényes számítás:** ha a C7 modelljében
    csak a q1 T2-jét cseréljük a C8-asra (22 → 301 µs), a 0,735 Å-es előrejelzés 32,5 → **24,3** mHa (a C8 tényleges modellje 24,4) — a C7–C8 közti
-   modellugrás egésze ebből az egy paraméterből jön; a q1 kiolvasási hibájának cseréje csak 32,5 → 29,8 mHa. Valószínű mechanizmus: a 0,5 µs a 22 µs-nak
-   ~2%-a, a kapuk közti fázisvesztés azonban a későbbi kapuk után betöltöttségi hibává alakul, és a 0,735 Å-nél a Z-tagok együtthatója ±0,40 Ha, így már ~1%
+   nettó modellugrás ≈ a T2-csere hatása (a többi paraméter változásának hatásai közel kioltják egymást; a q1 kiolvasási hibájának cseréje önmagában
+   32,5 → 29,8 mHa). Valószínű mechanizmus: a 0,5 µs a 22 µs-nak
+   ~2%-a, a kapuk alatti fázisvesztés azonban a későbbi kapuk után betöltöttségi hibává alakul, és a 0,735 Å-nél a Z-tagok együtthatója ±0,40 Ha, így már ~1%
    betöltöttség-hiba ~8 mHa. A gép nyers hibája közben alig változott (35,4 → 32,2 mHa): ez arra utal (nem igazolt), hogy a közölt 22 µs nem a futás alatti
    koherenciát írta le (vö. 13.6).
 4. **Tartalmaz-e a kalibráció külön 0→1 és 1→0 tévesztést, és számít-e?** A blokkfájl pillanatképe csak az átlagos `readout_error`-t tárolta; a történeti
@@ -1332,7 +1351,7 @@ változatok erre épülnek.
    az 1→0 tévesztés **kilenc blokkból nyolcban nagyobb** (pl. C5: 2,44% ↔ 0,88%, C1: 1,07% ↔ 0,29%; a C4-ben egyenlő). A 0,735 Å-es ideális állapot 98,8%-ban
    |01⟩, azaz a fizikai q1 |1⟩-ben van — tehát éppen az 1→0 tévesztésre érzékeny. Aszimmetrikus kiolvasással a reziduum: 0,735 Å +7,72 → **+6,46** mHa
    (90% CI [+0,31; +12,60]); 1,5 Å +2,67 → +2,21; 2,0 Å −0,15 → −0,35. Az irány jó, de a 0,735 Å-es torzításnak csak ~1/6-át magyarázza.
-5. **Összefügg-e a sorban állás a reziduummal?** A nyers job várakozása a C2-nél 15,0, a C6-nál 18,2 óra volt, a többi blokkban legfeljebb ~20 perc.
+5. **Összefügg-e a sorban állás a reziduummal?** A nyers job várakozása a C2-nél 15,0, a C6-nál 18,2 óra volt, a többi blokkban legfeljebb 5,4 perc (C3); a TREX-jobok közül a C1-é várt a legtovább, 20 percet.
    r(várakozás, TREX-reziduum) = +0,06 / +0,28 / −0,01; r(várakozás, nyers reziduum) = +0,03 / +0,24 / +0,30 — összefüggés nem látszik.
 6. **Mely Pauli-tagok számítanak, és miért egyezik a 2,0 Å?** A kétqubites (paritás, kétqubites redukció) H₂-Hamilton-operátor tagjai: II, IZ, ZI, ZZ, XX (YY
    nincs). A C8 kalibrációjával modellezett hiba tagonként:
@@ -1343,9 +1362,13 @@ változatok erre épülnek.
    | 1,5 | ±0,129 | −0,004 | +0,230 | 87,4% / 12,6% | +4,8 / +7,5 |
    | 2,0 | ±0,061 | −0,001 | +0,259 | 71,2% / 28,8% | +0,9 / +11,5 |
 
-   A 0,735 Å-nél a modellhiba ~90%-a a Z-tagokból (betöltöttség és kiolvasás), a 2,0 Å-nél ~93%-a az XX-tagból (koherencia) jön. Leíró magyarázat: az
-   egyensúlyi geometrián az energia a Z-bázisú betöltöttségen és a kiolvasáson múlik — ahol a közölt kalibráció a leggyengébb (4., 7. pont) —, a disszociációs
-   határ felé a kapuhibák és a koherencia, amelyet a modell jól ad. A hardver tagonkénti eltérése nem mérhető vissza (1. pont).
+   *(A tagonkénti bontás egyetlen, mintavételezett szimulációból készült; összege 22,6 / 12,4 / 12,5 mHa a mentett 24,4 / 12,8 / 13,1 mHa-es modellel
+   szemben.)*
+
+   A 0,735 Å-nél a modellhiba ~90%-a a Z-tagokból, a 2,0 Å-nél ~93%-a az XX-tagból jön — ez a Hamilton-együtthatókat tükrözi, nem a hibaforrást: az
+   XX-tagot is terheli a kiolvasási hiba (a (1 − 2p₁)(1 − 2p₂) ≈ 0,96-os tényező a 2,0 Å-es XX-hibából ~9 mHa-t ad a 11,5-ből). *(Helyesbítve, 22.3: a
+   korábbi „koherencia” értelmezés téves volt.)* A 2,0 Å-es egyezés leíró oka a 17.2/2: ott a gép és a modell kiolvasási része egyezik (11,6 ↔ 10,6 mHa),
+   a 0,735 Å-nél nem (24,6 ↔ 17,4). A hardver tagonkénti eltérése nem mérhető vissza (1. pont).
 7. **Mennyit javítana egy futás előtt mért kiolvasási mátrix?** Új mérés nélkül nem számszerűsíthető. **Felső becslés:** ha a modell a gép saját kiolvasási
    hatását használná (nyers − TREX), a reziduum a TREX-reziduum lenne: 0,735 Å **+0,57** mHa, 90% CI [−2,00; +3,15] (most +7,72 [+1,15; +14,29]); 1,5 Å +0,16
    [−2,31; +2,62]; 2,0 Å −1,20 [−2,58; +0,18]. Feltétele, hogy a TREX a kiolvasási hibát torzítás nélkül eltávolítja. A 0,735 Å-es torzítás nagy része
@@ -1361,5 +1384,67 @@ változatok erre épülnek.
   az 1. és a 6. kérdés közvetlenül mérhető lenne); (b) aszimmetrikus kiolvasás a modellben; (c) futás előtti saját kiolvasási mátrix az [1, 2] páron —
   hipotézis: a 0,735 Å-es torzítás nagy része eltűnik (7. pont); (d) a T2-érzékenység kezelése (saját T2-mérés vagy a bizonytalanság bevitele a modellbe);
   (e) a szintek sorrendjének váltakoztatása és a várakozási idők rögzítése marad.
+
+## 22. A kiadás előtti átnézés (2026-11-26): helyesbítések és javítások
+
+A szerző kérésére a `v1.1.0` kiadása előtt három független MI-ellenőrzés futott: a jegyzőkönyv számainak újraszámolása az adatfájlokból, a nyilvános szövegek
+és a `v1.0.0` óta változott kód átnézése. **A mért adat, az előre rögzített elemzés és a H1–H4 döntése nem változott** (az `analysis.json` elsődleges része
+bájtra azonos; minden blokkérték, a 15–17. és a 21. szakasz számai reprodukálódnak). A helyesbített mondatok a helyükön jelölve vannak.
+
+### 22.1 A „blokk utáni” kalibrációs pillanatkép a gyorsítótárból származott
+
+- A `calibration_snapshot` a `backend.properties()`-t paraméter nélkül hívta; a qiskit-ibm-runtime 0.41 ekkor a gyorsítótárazott tulajdonságokat adja vissza
+  (`refresh=False`). Ezért **mind a 10 blokkban** a „blokk utáni” pillanatkép a blokk előttinek a másolata (csak a `captured_utc` tér el), és a jegyzőkönyv „a
+  kalibráció a blokk előtt és után azonos” megállapításai nem informatívak. Példa: a C2-nél a két pillanatkép 15 óra különbséggel készült, és az IBM közben
+  (22:34 UTC) frissítette a kalibrációt.
+- **Az eredményt nem érinti:** a modell a blokk előtti pillanatképből épült, és a történeti rekonstrukció (14.2, 16.1) mind a 9 blokknál igazolja, hogy a jobok
+  indulásakor a pár ugyanazon paraméterei voltak érvényben. Ami elveszett: a blokkon belüli kalibrációváltozás közvetlen figyelése (R1, 18.13) — a blokkok
+  ~1 perc alatt lefutottak, a két hosszú várakozású blokkot (C2, C6) a rekonstrukció lefedi.
+- **Javítás (a jövőre):** `calibration_snapshot(…, refresh=True)`, teszttel (TC-1130).
+
+### 22.2 További kódjavítások (a mért adatot nem érintik)
+
+- Valódi futtatás csak a protokoll gépével, lövésszámával, seedjével és ismétlésszámával indul (a parancssori kapcsolók nem írhatják felül); a seed és az
+  ismétlésszám a blokkfájlba is bekerül. A meglévő 10 blokk mind `ibm_kingston`, 8192 lövés, [1, 2]; a protokoll seedjét és ismétlésszámát a modell
+  0,00 mHa-es újraépíthetősége (21.1) igazolja.
+- Az elemző szkript a bemenetet ellenőrzi (egyedi blokknevek, a név és a `kind` egyezése, a gép / lövésszám / qubitpár, véges értékek, azonos geometriák), és
+  a megerősítő sorozat teljességét a C1…C8 halmazon vizsgálja; az `analyze` (az elsődleges elemzés) változatlan.
+- Mindkét szint transzpilálása a rögzített párra és azonos ISA-áramkörre kell, hogy kerüljön (eddig csak az elsőt ellenőrizte); egy korábbi, megszakadt
+  kísérlet részleges mentése mellett nem indul új futtatás.
+- A modell lövésszáma és a bázisváltó kapuk: 18.14.
+
+### 22.3 Helyesbített megfogalmazások
+
+- **TOST:** a nem teljesülő egyenértékűség azt jelenti, hogy **nem sikerült kimutatni** a ±3,0 mHa-en belüli átlagos egyezést — nem azt, hogy a modell
+  bizonyítottan téved; az 1,5 Å-nél (+2,76 mHa, a pontbecslés a sávon belül) az eredmény határozatlan. A 2,0 Å-es egyenértékűség az *átlagos* eltérésre
+  vonatkozik; egy-egy blokk eltérése ennél nagyobb volt (C1 +6,1, C5 −6,5 mHa). A 0. és a 15.6, valamint a nyilvános szövegek ennek megfelelően javítva.
+- **„Rendszeresen alulbecsüli”** (0., 16.3): túlzás volt; az elsődleges 0,735 Å-es intervallum a nullát tartalmazza, teljesen pozitív csak a C9-cel együtt,
+  és ez nem előre rögzített összevetés.
+- **21.2/6:** a Z–XX megoszlás a Hamilton-együtthatókat tükrözi; az XX-tagot is terheli a kiolvasási hiba; a „koherencia” értelmezés téves volt.
+- **17.2:** a q2 T2-vel és T1-gyel való korrelációk kiegészítve; a „gépét nem” megfogalmazás túlzás volt.
+- **18.7:** a 48 órás határt és az életkor-definíciót a C1–C6 ismeretében rögzítettük (a további adatok előtt); **18.12:** a függetlenség és a sodródás nem
+  vizsgált.
+- **21.2/3:** a C7–C8 modellugrás „egésze” helyett a nettó hatás; „a kapuk közti” helyett „a kapuk alatti” fázisvesztés.
+- **6–11. szakasz:** a kalibráció-frissességi megjegyzések a `last_update_date`-hez mértek; a pár saját adatai szerinti életkort a 14.2 adja (például a C3 30,4
+  órás volt, nem a legfrissebb).
+
+### 22.4 Számszerű és időponti helyesbítések
+
+| Hely | Korábban | Helyesen |
+|---|---|---|
+| 1.1, a B0 nyers jobja | 33,6 perc sorban állás | 32,9 perc (a 33,6 perc a falióra-idő) |
+| 6.1, a C1 nyers jobja | 5 s várakozás | ~2 s |
+| 6.3, a C1 kiolvasási aránya (0,735 Å) | 2,65 | 2,66 |
+| 8.4 | „C1: pozitív”; „0,9-szeres és 5,1-szeres” | „C1: vegyes”; az arány nem reprodukálható, törölve |
+| 11.1, a C6 első kísérlete | ~22 óra sorban | legfeljebb ~21 óra |
+| 11.2, a C6 szárazfutása | 16:10 (időzóna nélkül) | 15:10 UTC |
+| 12.2 és 13.1, a C7 modellje (2,0 Å) | 16,2 mHa | 16,1 mHa |
+| 12.6, C1–C7, 2,0 Å | átlag −0,2; TREX-átlag −1,8 | −0,1; −1,7 |
+| 16.1, a C9 modellje (2,0 Å) | 13,8 mHa | 13,7 mHa |
+| 18.3 | 24 nap | 22 nap (C1–C9; a B0-val 24) |
+| 20., a kvóta visszatöltődése | a B0 57 s-a 11-30-án | 11-30-án a Fázis 5.H és a B0 57–57 s-a (114 s) |
+| 21.2/2 | 5–8 s | 4,6–8,2 s |
+| 21.2/5 | „a többi blokkban legfeljebb ~20 perc” | a nyers jobok legfeljebb 5,4 percet (C3), a C1 TREX-jobja 20 percet vártak |
+| nyelvi | „a FCI”, „mHa-lel” | „az FCI”, „mHa-val” |
 
 *Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic) — MIT licenc*

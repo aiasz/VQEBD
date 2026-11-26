@@ -5,8 +5,8 @@
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![Verzió](https://img.shields.io/badge/verzió-1.1.0-blue.svg)](CHANGELOG.md)
-[![Fázis](https://img.shields.io/badge/fázis-9%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-878%20zöld-brightgreen.svg)](docs/testing/TR-F09_publikalas.md)
+[![Fázis](https://img.shields.io/badge/fázis-0–9%20%2B%2011%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-890%20zöld-brightgreen.svg)](CHANGELOG.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
 **Hivatkozás / Cite as:** Kormos, A. (2026). *VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard* (v1.1.0) [szoftver / software]. Zenodo. <https://doi.org/10.5281/zenodo.23886002> · [`CITATION.cff`](CITATION.cff) · BibTeX: [HU](#hivatkozás) / [EN](#citation)
@@ -86,7 +86,7 @@ A Mitiq (GPL-3.0) opcionális, a Docker-image nem tartalmazza ([`NOTICE`](NOTICE
 
 ### ⚠️ A projekt állapota
 
-A projekt **`v1.1.0`**: a Fázis 0–9 (`v1.0.0`, az első publikált kiadás) és a Fázis 11 (a Heron-zajmodell validálása valódi hardveren, negatív eredménnyel) lezárult; hátra a Fázis 10 (közösségi visszacsatolás) és a Fázis 12 terve.
+A projekt **`v1.1.0`**: a Fázis 0–9 (`v1.0.0`, az első publikált kiadás) és a Fázis 11 (a Heron-zajmodell validálása valódi hardveren, negatív eredménnyel) lezárult; hátra a Fázis 10 (közösségi visszacsatolás) és a következő fázis (javaslatok: TR-F11 20–21.).
 A VQE-mag működik három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
@@ -376,22 +376,23 @@ Részletek: [`docs/08_deployment.md`](docs/08_deployment.md), [`TR-F08`](docs/te
 ### Fázis 11 — a Heron-zajmodell validálása valódi hardveren (negatív eredmény)
 
 Megjósolja-e az IBM által **közölt** kalibrációs adatokból épített zajmodell a valódi `ibm_kingston` gép hibáját a H₂ kétqubites VQE-jén? A
-szabályokat a mérések **előtt** rögzítettük (`protocol-f11-frozen`): a modell akkor „jó”, ha a gép nyers hibája és a modell közti átlagos eltérés
-minden vizsgált kötéshossznál bizonyíthatóan ±3,0 mHa-en belül van (90%-os TOST). 1 pilot + 8 megerősítő + 1 kiegészítő blokk, 2026. nov. 2–26.,
-fix qubitpár [1, 2], összesen 408 QPU-másodperc.
+szabályokat a mérések **előtt** rögzítettük (`protocol-f11-frozen`; belső rögzítés, külső előregisztráció nélkül): a modell akkor „jó”, ha statisztikailag
+kimutatható, hogy a gép nyers hibája és a modell által jósolt hiba közti átlagos eltérés minden vizsgált kötéshossznál ±3.0 mHa-en belül van (90%-os
+TOST). 1 pilot, 8 megerősítő és 1 kiegészítő blokk, 2026. nov. 2–26., fix qubitpár [1, 2], összesen 408 QPU-másodperc.
 
-| R (Å) | Átlagos eltérés (gép − modell, C1–C8) | 90% CI | ±3,0 mHa-en belül? |
+| R (Å) | Átlagos eltérés (gép − modell, C1–C8) | 90% CI | ±3.0 mHa-en belül kimutatható? |
 |---|---|---|---|
 | 0.735 | +7.5 mHa | [−0.1; +15.1] | nem |
-| 1.5 | +2.8 mHa | [−1.9; +7.4] | nem |
+| 1.5 | +2.8 mHa | [−1.9; +7.4] | nem (határozatlan) |
 | 2.0 | −0.2 mHa | [−2.6; +2.2] | igen |
 
-- **H1 (elsődleges): elutasítva** — az előre kimondott következmény szerint negatív eredmény, közölve; a modellre épülő nagyobb szimulációk (11.E)
-  elmaradnak.
-- **H2: igaz** — a kiolvasási hiba modellezése nélkül a modell sokkal rosszabb (mind a 8 blokkban).
-- Az előre rögzített érzékenységi vizsgálatok (mind a 9 blokk; csak a ≤ 48 órás kalibrációjú blokkok) a képet nem változtatják.
-- **Korlát:** egy eszköz, egy qubitpár, H₂, 8 (+1) blokk; MI-vel készített terv és elemzés, nem lektorált. A gép nyers hibája (8–55 mHa) a kémiai
-  pontosság fölött van — a kísérlet a zajmodellt teszteli, nem a gép pontosságát.
+- **H1 (elsődleges): elutasítva** — a ±3.0 mHa-en belüli átlagos egyezést csak a 2.0 Å-nél sikerült kimutatni; az előre kimondott következmény szerint
+  negatív eredmény, közölve; a modellre épülő nagyobb szimulációk (11.E) elmaradnak.
+- **H2: teljesült** — a kiolvasási hiba modellezése nélkül a modell sokkal rosszabb (mind a 8 blokkban).
+- A leíró érzékenységi vizsgálatok (2026-11-18-án, a C7–C9 előtt rögzítve: mind a 9 blokk; csak a ≤ 48 órás kalibrációjú blokkok) a képet nem változtatják.
+- **Korlát:** egy eszköz, egy qubitpár, H₂, 8 (+1) blokk; MI-vel készített terv és elemzés, nem lektorált, külső előregisztráció nélkül; a modell a
+  kiolvasási hibát szimmetrikusnak vette (az aszimmetria a 0.735 Å-es eltérésből ~1.3 mHa-t magyaráz). A gép nyers hibája (8–55 mHa) a kémiai pontosság
+  fölött van — a kísérlet a zajmodellt teszteli, nem a gép pontosságát.
 
 Részletek: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (végleges).
 
@@ -401,7 +402,7 @@ Részletek: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/te
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # Docker-image építése
-make test       # teljes tesztkészlet (772 teszt, 1 kihagyott)
+make test       # teljes tesztkészlet (891 teszt, 1 kihagyott)
 ```
 
 Az első kvantumszámítás futtatása:
@@ -530,10 +531,10 @@ A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
 ### MI-felhasználás
 
 A projekt **MI-vel készített kísérlet**, amelyet Kormos Attila kezdeményezett és irányított: ő adta az ötletet, a célokat, a
-döntéseket, az IBM-hozzáférést és az MI-használat költségét, jóváhagyta a lépéseket (a hardveres futtatásokat blokkonként
+döntéseket (egyes kérdéseket, például a Fázis 11-ét, az MI szakirodalmi áttekintése vetett fel), az IBM-hozzáférést és az MI-használat költségét, jóváhagyta a lépéseket (a hardveres futtatásokat blokkonként
 külön), és hozta a kiadási döntéseket. A kódot, a terveket és a szöveget a Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code)
 írta meg az ő kérésére és utasításai szerint; a futtatásokat és az elemzést is a Claude végezte el, a szerző engedélyével. Ami **nem** történt meg: független szakértői lektorálás, külső replikáció, a hivatkozott művek teljes szövegének
-emberi átolvasása; a hardveres eredmények pontonként egyetlen futásúak. A tudományos újdonságot nem állítjuk
+emberi átolvasása; a Fázis 2 és az 5.H hardveres eredményei pontonként egyetlen futásúak, a Fázis 11 geometriánként 8 (+1) blokkot mért egy eszközön. A tudományos újdonságot nem állítjuk
 ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)). A teljes, pontos nyilatkozat, a dokumentált MI-hibákkal
 és egy cikkbe szánt szövegjavaslattal: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
@@ -615,7 +616,7 @@ Mitiq (GPL-3.0) is optional and not part of the Docker image ([`NOTICE`](NOTICE)
 
 ### ⚠️ Project Status
 
-The project is **`v1.1.0`**: Phases 0–9 (`v1.0.0`, the first published release) and Phase 11 (validating the Heron noise model on real hardware, with a negative result) are complete; Phase 10 (community feedback) and the Phase 12 plan remain.
+The project is **`v1.1.0`**: Phases 0–9 (`v1.0.0`, the first published release) and Phase 11 (validating the Heron noise model on real hardware, with a negative result) are complete; Phase 10 (community feedback) and the next phase (proposals: TR-F11 §§20–21) remain.
 The VQE core works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5) and ISA-level Zero-Noise Extrapolation error
@@ -912,22 +913,23 @@ Details: [`docs/08_deployment.md`](docs/08_deployment.md), [`TR-F08`](docs/testi
 ### Phase 11 — Validating the Heron Noise Model on Real Hardware (Negative Result)
 
 Does a noise model built from IBM's **published** calibration data predict the error of the real `ibm_kingston` device on the two-qubit H₂ VQE? The
-rules were fixed **before** measuring (`protocol-f11-frozen`): the model counts as "good" if the mean difference between the raw hardware error and
-the model is demonstrably within ±3.0 mHa at every bond length tested (90% TOST). 1 pilot + 8 confirmatory + 1 supplementary block, 2–26 Nov 2026,
-fixed qubit pair [1, 2], 408 QPU seconds in total.
+rules were fixed **before** measuring (`protocol-f11-frozen`; an internal record, no external pre-registration): the model counts as "good" if it can be
+shown statistically that the mean difference between the raw hardware error and the error predicted by the model is within ±3.0 mHa at every bond
+length tested (90% TOST). 1 pilot, 8 confirmatory and 1 supplementary blocks, 2–26 Nov 2026, fixed qubit pair [1, 2], 408 QPU seconds in total.
 
-| R (Å) | Mean difference (hardware − model, C1–C8) | 90% CI | Within ±3.0 mHa? |
+| R (Å) | Mean difference (hardware − model, C1–C8) | 90% CI | Shown within ±3.0 mHa? |
 |---|---|---|---|
 | 0.735 | +7.5 mHa | [−0.1; +15.1] | no |
-| 1.5 | +2.8 mHa | [−1.9; +7.4] | no |
+| 1.5 | +2.8 mHa | [−1.9; +7.4] | no (inconclusive) |
 | 2.0 | −0.2 mHa | [−2.6; +2.2] | yes |
 
-- **H1 (primary): rejected** — as stated in advance, a negative result that is reported; the larger simulations built on the model (11.E) are
-  dropped.
+- **H1 (primary): rejected** — equivalence within ±3.0 mHa was shown only at 2.0 Å; as pre-specified, this negative result is reported, and the larger
+  simulations built on the model (11.E) are dropped.
 - **H2: supported** — without modelling the readout error the model is much worse (in all 8 blocks).
-- The pre-specified sensitivity analyses (all 9 blocks; only blocks with calibration ≤ 48 h old) do not change the picture.
-- **Limitations:** one device, one qubit pair, H₂, 8 (+1) blocks; plan and analysis made with AI, not peer-reviewed. The raw hardware error
-  (8–55 mHa) is far above chemical accuracy — the experiment tests the noise model, not the accuracy of the device.
+- The descriptive sensitivity analyses (fixed on 2026-11-18, before C7–C9: all 9 blocks; only blocks with calibration ≤ 48 h old) do not change the picture.
+- **Limitations:** one device, one qubit pair, H₂, 8 (+1) blocks; plan and analysis made with AI, not peer-reviewed, no external pre-registration; the
+  model treated the readout error as symmetric (the asymmetry explains ~1.3 mHa of the 0.735 Å difference). The raw hardware error (8–55 mHa) is far
+  above chemical accuracy — the experiment tests the noise model, not the accuracy of the device.
 
 Details: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testing/TR-F11_heron_modell.md) (final; both in Hungarian).
 
@@ -937,7 +939,7 @@ Details: [`docs/plan/phase_11.md`](docs/plan/phase_11.md), [`TR-F11`](docs/testi
 git clone https://github.com/aiasz/VQEBD.git
 cd VQEBD
 make build      # build the Docker image
-make test       # full test suite (772 tests, 1 skipped)
+make test       # full test suite (891 tests, 1 skipped)
 ```
 
 Running the first quantum computation:
@@ -1066,11 +1068,11 @@ snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). T
 ### AI Use
 
 The project is an **AI-assisted experiment**, initiated and directed by Attila Kormos: the author provided the idea, goals,
-decisions, IBM access and the cost of the AI use, approved the steps (hardware runs block by block, separately) and made the
+decisions (some questions, such as Phase 11's, were raised by the AI's literature review), IBM access and the cost of the AI use, approved the steps (hardware runs block by block, separately) and made the
 release decisions. The code, plans and text were written by Claude (Sonnet 5.5, Opus 5, Opus 5.5; Claude Code) at the author's
 request and following the author's instructions; the runs and the analysis were carried out by Claude with the author's
 permission. What has **not** happened: independent expert review, external replication, human reading of the cited works in
-full; the hardware results are single runs per point. No scientific novelty is claimed
+full; the Phase 2 and 5.H hardware results are single runs per point, and Phase 11 measured 8 (+1) blocks per geometry on one device. No scientific novelty is claimed
 ([`docs/10_literature_positioning.md`](docs/10_literature_positioning.md), in Hungarian). The full, exact statement, with the documented AI errors
 and a suggested text for a paper: [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).
 
