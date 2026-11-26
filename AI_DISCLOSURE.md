@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Projekt** | VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard |
-| **Nyilatkozat verziója** | 1.1.0 (2026-11-02) |
-| **Vonatkozik** | a `v1.0.0` kiadásra (Zenodo DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002)) és minden későbbi verzióra, amíg ez a fájl módosítatlan |
+| **Nyilatkozat verziója** | 1.2.0 (2026-11-26) |
+| **Vonatkozik** | a `v1.0.0` és a `v1.1.0` kiadásra (Zenodo koncepció-DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002)) és minden későbbi verzióra, amíg ez a fájl módosítatlan |
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
@@ -46,6 +46,8 @@ A commitok `Co-Authored-By` sorai alapján (43 commit a `v1.0.0`-ig, 2026-09-22 
 **Claude Opus 5** (3), **Claude Opus 5.5** (2). **15 korai commit nem tartalmaz ilyen sort**, ezért ott a modell nincs a
 történetben rögzítve; a dokumentumok szerzői sora egységesen „Szerző: Kormos Attila · Megvalósítás MI-eszközzel: Claude (Anthropic)" (a konkrét
 modellt nem nevezi meg, mert az nem minden commitra rekonstruálható). A pontos modell-hozzárendelés így nem rekonstruálható teljesen.
+A `v1.0.0` és a `v1.1.0` között (34 commit, a kiadási committal együtt, 2026-11-02 … 2026-11-26) minden commit tartalmaz ilyen sort:
+**Claude Sonnet 5.5** (24), **Claude Opus 5.5** (10).
 
 ### Mi NEM történt meg (és mi nem ellenőrzött)
 
@@ -62,6 +64,9 @@ modellt nem nevezi meg, mert az nem minden commitra rekonstruálható). A pontos
    nem vonható le belőlük.
 6. **A tudományos újdonságot nem állítjuk.** Ismert módszerek reprodukálható együttes mérése; az őszinte értékelés a
    [`docs/10_literature_positioning.md`](docs/10_literature_positioning.md)-ban olvasható.
+7. **A Fázis 11 (`v1.1.0`)** tervét, kódját, statisztikai elemzését és jegyzőkönyvét is az MI írta; a hipotéziseket, a küszöböt és minden hardveres
+   blokkot a szerző hagyta jóvá. **Független emberi statisztikus nem vett részt**, és a C9 előtti kódellenőrzést (TR-F11 14.3) is MI végezte (egy
+   külön MI-ügynök) — ez nem emberi lektorálás. Külső előregisztráció nincs; a rögzítés a `protocol-f11-frozen` git-címke.
 
 ### Dokumentált MI-hibák és javításuk
 
@@ -73,6 +78,11 @@ Az MI hibázott, és a hibák egy részét a saját ellenőrzései tárták fel.
 - **CI piros volt a v0.9.0 óta** egy rosszul írt teszt miatt, amit helyben nem vettünk észre (TR-F09 4. pont).
 - **Hibás licenc-felismerés** a `LICENSE` fájl miatt; **hibás `pyarrow` rögzítés**; **téves qubitszámok** a dokumentációban;
   egy **téves forrásmegjelölés** (a TREX-cikk folyóirata). Mind javítva, a CHANGELOG-ban és a jegyzőkönyvekben.
+
+- **Fázis 11 (`v1.1.0`):** a C8 egyik jobjának QPU-ideje hibásan (0 s) rögzült (TR-F11 13.2); a C9 előtti független MI-kódellenőrzés a futtatóban
+  adatvesztést okozható hibákat talált, a C9 előtt javítva (14.3); a C6 kalibráció-életkora először tévesen (66 h helyett 85,8 h) szerepelt (11.3);
+  egy konfidencia-határ dupla kerekítéssel +7,5 lett +7,4 helyett (javítva); **a modell a kiolvasási hibát szimmetrikusnak vette** — ezt az MI a
+  protokoll befagyasztása előtt nem vette észre, a szerző átnézési kérdése nyomán derült ki (TR-F11 18.11, 21.).
 
 Az MI-vel készült szöveg további, itt fel nem tárt hibákat is tartalmazhat.
 
@@ -148,6 +158,10 @@ naming a specific model, because that cannot be reconstructed for every commit).
 5. **The hardware results** are single runs per point on one device, for one small molecule (H₂). No general conclusion follows.
 6. **No scientific novelty is claimed.** It is a reproducible joint measurement of known methods; the candid assessment is in
    [`docs/10_literature_positioning.md`](docs/10_literature_positioning.md).
+7. **Phase 11 (`v1.1.0`):** its plan, code, statistical analysis and report were also written by the AI; the hypotheses, the threshold and every
+   hardware block were approved by the author. **No independent human statistician was involved**, and the code review before C9 (TR-F11 14.3)
+   was also done by AI (a separate AI agent) — this is not a human review. There is no external pre-registration; the protocol was fixed by
+   the `protocol-f11-frozen` git tag.
 
 ### Documented AI errors and their fixes
 
@@ -159,6 +173,11 @@ The AI made mistakes, some of which its own checks uncovered. They are public:
 - **CI was red since v0.9.0** because of a badly written test that was not noticed locally (TR-F09 item 4).
 - A **wrong license detection** due to the `LICENSE` file; a **wrong `pyarrow` pin**; **wrong qubit counts** in the docs; one
   **wrong source attribution** (the journal of the TREX paper). All fixed, recorded in the CHANGELOG and test reports.
+
+- **Phase 11 (`v1.1.0`):** the QPU time of one C8 job was recorded wrongly (0 s; TR-F11 13.2); the independent AI code review before C9 found
+  bugs in the runner that could have lost data, fixed before C9 (14.3); the calibration age of C6 was first stated wrongly (66 h instead of
+  85.8 h; 11.3); one confidence bound was double-rounded to +7.5 instead of +7.4 (fixed); **the model treated the readout error as
+  symmetric** — the AI did not notice this before the protocol was frozen; it emerged from the author's review questions (TR-F11 18.11, 21.).
 
 AI-generated text may contain further errors not uncovered here.
 

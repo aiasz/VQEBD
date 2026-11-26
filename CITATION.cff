@@ -6,8 +6,8 @@ cff-version: 1.2.0
 title: "VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard"
 message: "Ha ezt a szoftvert használod, kérjük, az alábbiak szerint hivatkozz rá. Figyelem: a kísérletet a szerző kezdeményezte és irányította, a szoftvert és a dokumentáció szövegét MI (Anthropic Claude) írta meg a szerző kérésére; független lektorálás nem történt (AI_DISCLOSURE.md). / Please cite as below. Note: the experiment was initiated and directed by the author; the software and the documentation text were written by AI (Anthropic Claude) at the author's request; no independent review has taken place (AI_DISCLOSURE.md)."
 type: software
-version: 1.0.0
-date-released: "2026-11-02"
+version: 1.1.0
+date-released: "2026-11-26"
 license: MIT
 doi: "10.5281/zenodo.23886002"   # Zenodo koncepció-DOI: a projekt minden verziójára (a v1.0.0 verzió-DOI-ja: 10.5281/zenodo.23886003)
 identifiers:
@@ -37,6 +37,10 @@ abstract: >-
   mitigation) are compared under identical conditions. Results are stored in a
   schema-versioned database that records the full software environment, produced by an
   automated, failure-tolerant pipeline, and shown in an interactive dashboard.
+  Version 1.1.0 adds a pre-specified validation (Phase 11) of a noise model built from
+  IBM's published Heron calibration against the real ibm_kingston device (H2, fixed
+  qubit pair, 8 confirmatory blocks): the primary equivalence hypothesis (TOST, 3.0 mHa)
+  was rejected, a negative result that is reported in full.
   (Magyarul: konténerizált, reprodukálható benchmark-rendszer kis molekulák VQE-alapú
   alapállapoti energiájának számítására, hibaenyhítési stratégiák összehasonlításával,
   szimulátoron és valódi IBM-hardveren; az eredményeket sémaverziózott adatbázisban

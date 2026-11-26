@@ -4,12 +4,12 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23886002.svg)](https://doi.org/10.5281/zenodo.23886002)
 [![Licenc: MIT](https://img.shields.io/badge/licenc-MIT-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
-[![Verzió](https://img.shields.io/badge/verzió-1.0.0-blue.svg)](CHANGELOG.md)
+[![Verzió](https://img.shields.io/badge/verzió-1.1.0-blue.svg)](CHANGELOG.md)
 [![Fázis](https://img.shields.io/badge/fázis-9%2F10%20lezárva-brightgreen.svg)](docs/plan/00_master_plan.md)
-[![Tesztek](https://img.shields.io/badge/tesztek-838%20zöld-brightgreen.svg)](docs/testing/TR-F09_publikalas.md)
+[![Tesztek](https://img.shields.io/badge/tesztek-878%20zöld-brightgreen.svg)](docs/testing/TR-F09_publikalas.md)
 [![Platformok](https://img.shields.io/badge/platformok-Qiskit%20%7C%20Cirq%20%7C%20qsim%20%7C%20IBM%20Heron%20%7C%20SQLite-blueviolet.svg)](docs/01m_multiplatform.md)
 
-**Hivatkozás / Cite as:** Kormos, A. (2026). *VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard* (v1.0.0) [szoftver / software]. Zenodo. <https://doi.org/10.5281/zenodo.23886002> · [`CITATION.cff`](CITATION.cff) · BibTeX: [HU](#hivatkozás) / [EN](#citation)
+**Hivatkozás / Cite as:** Kormos, A. (2026). *VQEBD — Variational Quantum Eigensolver Benchmark & Dashboard* (v1.1.0) [szoftver / software]. Zenodo. <https://doi.org/10.5281/zenodo.23886002> · [`CITATION.cff`](CITATION.cff) · BibTeX: [HU](#hivatkozás) / [EN](#citation)
 
 **🇭🇺 [Magyar](#magyar) | 🇬🇧 [English](#english)**
 
@@ -86,7 +86,7 @@ A Mitiq (GPL-3.0) opcionális, a Docker-image nem tartalmazza ([`NOTICE`](NOTICE
 
 ### ⚠️ A projekt állapota
 
-A projekt **`v1.0.0`**, az első publikált kiadás: a Fázis 0–9 lezárult, hátra a Fázis 10 (közösségi visszacsatolás).
+A projekt **`v1.1.0`**: a Fázis 0–9 (`v1.0.0`, az első publikált kiadás) és a Fázis 11 (a Heron-zajmodell validálása valódi hardveren, negatív eredménnyel) lezárult; hátra a Fázis 10 (közösségi visszacsatolás) és a Fázis 12 terve.
 A VQE-mag működik három platformon (Qiskit, Cirq, qsim), véges lövésszámmal (L3a), kalibrációs
 zajmodellen (L3b), éles fizikai méréssel az IBM 156-qubites Heron QPU-ján
 (`ibm_kingston`, L5), ISA-szintű Zero-Noise Extrapolation hibaenyhítéssel (L4, a
@@ -130,7 +130,7 @@ pontosságot (`TR-F05`), a hardveres görbén csak egy pont egyeztethető vele (
 | **8** | **Konténeres rendszer, a dashboard egyparancsos indítása** | ✅ **Lezárva** (`v0.11.0`) |
 | **9** | **Dokumentáció, validálás, publikálás (Zenodo DOI)** | ✅ **Lezárva** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Közösségi visszacsatolás | ⬜ Tervezett |
-| **11** | **A kalibrációból épített Heron-zajmodell validálása valódi hardveren** | ✅ **Mérések lezárva** (2026-11-26) — negatív eredmény (H1 elutasítva); a kiadás a szerző jóváhagyására vár |
+| **11** | **A kalibrációból épített Heron-zajmodell validálása valódi hardveren** | ✅ **Lezárva** (`v1.1.0`) — negatív eredmény (H1 elutasítva) |
 
 ### Mit old meg ez a projekt?
 
@@ -346,7 +346,7 @@ ezért egy tiszta klónon a verziózott JSON-okból is megjeleníti az adatot.
 
 ```bash
 docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
-  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.0.0 \
+  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.1.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 
@@ -407,14 +407,14 @@ make test       # teljes tesztkészlet (772 teszt, 1 kihagyott)
 Az első kvantumszámítás futtatása:
 
 ```bash
-docker run --rm vqebd:1.0.0 python -m vqebd
+docker run --rm vqebd:1.1.0 python -m vqebd
 ```
 
 Make nélkül (pl. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:1.0.0 .
-docker run --rm vqebd:1.0.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:1.1.0 .
+docker run --rm vqebd:1.1.0 python -m vqebd
 ```
 
 A **dashboard** indítása (egyparancsos, a saját gépen): lásd a *Fázis 8* szakaszt fent, vagy `make dashboard`.
@@ -520,7 +520,7 @@ A kiadás menete: [`docs/09_publishing.md`](docs/09_publishing.md).
   author  = {Kormos, Attila},
   title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
   year    = {2026},
-  version = {1.0.0},
+  version = {1.1.0},
   doi     = {10.5281/zenodo.23886002},
   url     = {https://github.com/aiasz/VQEBD},
   license = {MIT}
@@ -615,7 +615,7 @@ Mitiq (GPL-3.0) is optional and not part of the Docker image ([`NOTICE`](NOTICE)
 
 ### ⚠️ Project Status
 
-The project is **`v1.0.0`**, the first published release: Phases 0–9 are complete; Phase 10 (community feedback) remains.
+The project is **`v1.1.0`**: Phases 0–9 (`v1.0.0`, the first published release) and Phase 11 (validating the Heron noise model on real hardware, with a negative result) are complete; Phase 10 (community feedback) and the Phase 12 plan remain.
 The VQE core works across three platforms (Qiskit, Cirq, qsim), with finite-shot noise (L3a),
 calibration device noise (L3b), physical hardware measurement on IBM's 156-qubit
 Heron QPU (`ibm_kingston`, L5) and ISA-level Zero-Noise Extrapolation error
@@ -660,7 +660,7 @@ limitations are stated openly in the test reports, e.g.: no noisy-simulation con
 | **8** | **Container system, one-command dashboard launch** | ✅ **Completed** (`v0.11.0`) |
 | **9** | **Documentation, validation, publication (Zenodo DOI)** | ✅ **Completed** (`v1.0.0`) — DOI: [10.5281/zenodo.23886002](https://doi.org/10.5281/zenodo.23886002) |
 | 10 | Community feedback | ⬜ Planned |
-| **11** | **Validating the calibration-built Heron noise model on real hardware** | ✅ **Measurements completed** (2026-11-26) — negative result (H1 rejected); the release awaits the author's approval |
+| **11** | **Validating the calibration-built Heron noise model on real hardware** | ✅ **Completed** (`v1.1.0`) — negative result (H1 rejected) |
 
 ### What Does This Project Solve?
 
@@ -880,7 +880,7 @@ record list), so on a clean clone it also shows the versioned JSON data.
 
 ```bash
 docker run --rm -p 8501:8501 -v "$PWD:/repo" -w /repo -e PYTHONPATH=/repo/src \
-  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.0.0 \
+  -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.1.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 
@@ -943,14 +943,14 @@ make test       # full test suite (772 tests, 1 skipped)
 Running the first quantum computation:
 
 ```bash
-docker run --rm vqebd:1.0.0 python -m vqebd
+docker run --rm vqebd:1.1.0 python -m vqebd
 ```
 
 Without Make (e.g. Windows PowerShell):
 
 ```powershell
-docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:1.0.0 .
-docker run --rm vqebd:1.0.0 python -m vqebd
+docker build --platform linux/amd64 -f docker/Dockerfile -t vqebd:1.1.0 .
+docker run --rm vqebd:1.1.0 python -m vqebd
 ```
 
 To start the **dashboard** (one command, on your own machine): see the *Phase 8* section above, or `make dashboard`.
@@ -1056,7 +1056,7 @@ snapshot: [10.5281/zenodo.23886003](https://doi.org/10.5281/zenodo.23886003)). T
   author  = {Kormos, Attila},
   title   = {{VQEBD} -- Variational Quantum Eigensolver Benchmark \& Dashboard},
   year    = {2026},
-  version = {1.0.0},
+  version = {1.1.0},
   doi     = {10.5281/zenodo.23886002},
   url     = {https://github.com/aiasz/VQEBD},
   license = {MIT}

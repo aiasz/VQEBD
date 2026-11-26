@@ -11,6 +11,25 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 
 ## [Unreleased] — Nem kiadott
 
+### Tervezett
+- **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
+- **D3** — szimulátoros GitHub Actions ütemezés.
+- Külön, kisebb dashboard-image; a körméret (és CX-szám) tárolása (séma v4); platformonkénti bontás a dashboardon;
+  böngészős képernyőképek; telepítés másik gépen vagy VM-en; valódi, független külső telepítési próba.
+- **Fázis 10** — közösségi visszacsatolás (bejelentések, Metriq-beküldés, új ciklusok).
+- **Fázis 12** — terv (javaslatok: TR-F11 20–21.): saját, futás előtti kiolvasási kalibráció, aszimmetrikus kiolvasás a
+  modellben, Pauli-tagonkénti értékek és bitstringek mentése, a T2-érzékenység kezelése.
+
+---
+
+## [1.1.0] — 2026-11-26
+
+**Fázis 11 — a kalibrációból épített Heron-zajmodell validálása valódi hardveren: negatív eredmény.** MI-vel készített kísérlet: a szerző kezdeményezte, irányította és blokkonként engedélyezte; a kódot, a tervet, az elemzést és a dokumentációt az MI (Claude, Anthropic) írta — lásd [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md). *AI-assisted work; see `AI_DISCLOSURE.md`. Phase 11 pre-specified a test of whether a noise model built from IBM's published calibration predicts the raw hardware error of the two-qubit H₂ VQE on `ibm_kingston` within ±3.0 mHa; the primary hypothesis was rejected (equivalence only at 2.0 Å).*
+
+Az előre rögzített protokoll (`protocol-f11-frozen`, 2026-11-02) szerint 1 pilot + 8 megerősítő + 1 kiegészítő blokk futott (2026. nov. 2–26., `ibm_kingston`, fix qubitpár [1, 2], 408 QPU-s, a keret végig ≤ 80%). **H1 elutasítva** (0,735 Å +7,48 mHa, 90% CI [−0,09; +15,05]; 1,5 Å +2,76 [−1,93; +7,45]; 2,0 Å −0,16 [−2,56; +2,23] — csak ez egyenértékű), **H2 igaz** (a kiolvasási hiba modellezése lényeges); a 11.E az előre kimondott szabály szerint elmarad. Jegyzőkönyv: [`TR-F11`](docs/testing/TR-F11_heron_modell.md) 1.0.0; terv: [`phase_11.md`](docs/plan/phase_11.md).
+
+**Ismert korlátok:** egy eszköz, egy qubitpár, H₂, 8 (+1) blokk; a terv, a kód és az elemzés MI-vel készült, nem lektorált, külső előregisztráció nincs (a rögzítés a git-címke); a modell a kiolvasási hibát szimmetrikusnak vette (TR-F11 18.).
+
 ### Hozzáadva
 - **Zenodo DOI** a `v1.0.0` kiadáshoz: koncepció-DOI [`10.5281/zenodo.23886002`](https://doi.org/10.5281/zenodo.23886002) (a projekt minden verziójára), verzió-DOI [`10.5281/zenodo.23886003`](https://doi.org/10.5281/zenodo.23886003) (a `v1.0.0` pillanatképe). A `CITATION.cff` (`doi`, `identifiers`) és a README (jelvény, hivatkozási blokk, HU és EN) tartalmazza. A Zenodo-rekord szerzője: Kormos, Attila; licenc: MIT.
 
@@ -45,13 +64,6 @@ A `MINOR` verzió minden lezárt projektfázisnál lép
 ### Módosítva
 - **Egységes szerzői jelölés (2026-11-07)**: a szerző mindenhol Kormos Attila; a megvalósítást végző MI-eszköz külön, „Megvalósítás MI-eszközzel: Claude (Anthropic)" jelöléssel szerepel. A `LICENSE` copyright-sora és a `pyproject.toml` szerzői listája már csak Kormos Attilát nevezi meg; a `vqebd.AUTHORS` csak a szerzőt tartalmazza, az új `vqebd.IMPLEMENTED_WITH` jelöli az MI-eszközt; a README lábléce, az `AI_DISCLOSURE.md` és a kapcsolódó dokumentumok ennek megfelelően frissültek. A kiadott `v1.0.0` tartalma és a Zenodo-rekord nem változott. A `.github/workflows/ci.yml` fejléce még a régi sort tartalmazza (a `workflow` jogosultság hiányzik).
 - A **GitHub Release `v1.0.0` jegyzete** (2026-11-02) az MI-jelölést a legelső bekezdésben tartalmazza (HU/EN, az `AI_DISCLOSURE.md`-re hivatkozva). A **Zenodo-rekord (`10.5281/zenodo.23886003`) leírását** a szerző ugyanezzel a jelöléssel egészítette ki (2026-11-02; a leírás elején HU/EN, a régi szöveg változatlan; a rekord szerzőlistája változatlanul csak Kormos Attila). Új verzió-DOI nem készült.
-
-### Tervezett
-- **K8** — a qsim platformtűrés méret-függő pontosítása (több mérési pont után).
-- **D3** — szimulátoros GitHub Actions ütemezés.
-- Külön, kisebb dashboard-image; a körméret (és CX-szám) tárolása (séma v4); platformonkénti bontás a dashboardon;
-  böngészős képernyőképek; telepítés másik gépen vagy VM-en; valódi, független külső telepítési próba.
-- **Fázis 10** — közösségi visszacsatolás (bejelentések, Metriq-beküldés, új ciklusok).
 
 ---
 

@@ -123,7 +123,7 @@ Nem szükséges (a dashboard a saját gépen fut), de a követelmények:
 |---|---|---|
 | A konténerek leállítása és eltávolítása | `docker compose -f docker/docker-compose.yml down` | **megmarad** (`vqebd-data`) |
 | A konténerek **és az adat** törlése | `docker compose -f docker/docker-compose.yml down -v` | **TÖRLŐDIK** az ütemező adatbázisa és naplója |
-| Az image törlése | `docker rmi vqebd:1.0.0` | — |
+| Az image törlése | `docker rmi vqebd:1.1.0` | — |
 
 ## 9. Hibaelhárítás
 

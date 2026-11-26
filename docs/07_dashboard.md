@@ -39,7 +39,7 @@ dashboardnak nincs hitelesítése. Leállítás: `docker compose -f docker/docke
 
 ```bash
 docker run --rm -p 127.0.0.1:8501:8501 -v "$PWD:/repo" -w /repo \
-  -e PYTHONPATH=/repo/src -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.0.0 \
+  -e PYTHONPATH=/repo/src -e VQEBD_DASHBOARD_ROOT=/repo vqebd:1.1.0 \
   python -m streamlit run dashboard/app.py --server.address 0.0.0.0
 ```
 

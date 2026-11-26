@@ -137,5 +137,5 @@ for r in records:
 ### Exportálás CSV / JSON formátumba
 
 ```bash
-docker run --rm -v "${PWD}:/repo" vqebd:1.0.0 python scripts/export_results.py
+docker run --rm -v "${PWD}:/repo" vqebd:1.1.0 python scripts/export_results.py
 ```
