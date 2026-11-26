@@ -79,6 +79,49 @@ def _parse_utc(text: str) -> dt.datetime:
     return dt.datetime.fromisoformat(text.replace("Z", "+00:00"))
 
 
+_EXPECTED_KIND = {"B0": "pilot", "C9": "supplementary"}
+_SECTIONS = (
+    ("hardware_mha", "raw"),
+    ("hardware_mha", "trex"),
+    ("model_mha", "readout"),
+    ("model_mha", "no_readout"),
+)
+
+
+def validate_blocks(blocks: list[dict[str, Any]]) -> list[str]:
+    """A bemenet épsége — a hibák listája (üres, ha minden rendben).
+
+    Egyedi blokknevek; a ``kind`` a névből következik (B0 pilot, C1…C8 megerősítő, C9 kiegészítő);
+    a protokoll gépe, lövésszáma és qubitpárja (ha a fájl rögzíti); a pilot és a megerősítő blokkok
+    négy adatsora azonos geometriákon, véges értékekkel. Egy hibás *kiegészítő* blokk az
+    elsődleges elemzést nem állítja meg (az érzékenységi rész kezeli).
+    """
+    errors: list[str] = []
+    names = [str(b.get("block")) for b in blocks]
+    errors += [f"ismétlődő blokknév: {n}" for n in sorted({n for n in names if names.count(n) > 1})]
+    for b in blocks:
+        name = str(b.get("block"))
+        expected = _EXPECTED_KIND.get(name, "confirmatory" if name[:1] == "C" else None)
+        if b.get("kind") != expected:
+            errors.append(f"{name}: a kind ({b.get('kind')}) nem egyezik a névvel ({expected})")
+        for key in ("backend", "shots", "physical_qubits"):
+            if key in b and b[key] != PROTOCOL[key]:
+                errors.append(f"{name}: {key} = {b[key]} ≠ a protokoll {PROTOCOL[key]}")
+        if b.get("kind") not in ("pilot", "confirmatory"):
+            continue
+        try:
+            geoms = [sorted(b[s][k]) for s, k in _SECTIONS]
+            values = [float(v) for s, k in _SECTIONS for v in b[s][k].values()]
+        except (KeyError, TypeError, ValueError, AttributeError) as exc:
+            errors.append(f"{name}: hiányos vagy hibás adatsor ({exc!r})")
+            continue
+        if any(g != geoms[0] for g in geoms):
+            errors.append(f"{name}: a négy adatsor geometriái eltérnek")
+        if not all(math.isfinite(v) for v in values):
+            errors.append(f"{name}: nem véges érték az adatsorokban")
+    return errors
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Fázis 11 elemzés")
     parser.add_argument("--data-dir", type=Path, default=Path("docs/figures/data/f11"))
@@ -93,6 +136,10 @@ def main(argv: list[str] | None = None) -> int:
             f"FIGYELEM: a(z) {stale} blokk más protokollal készült — nem elemezhető együtt",
             file=sys.stderr,
         )
+        return 2
+    problems = validate_blocks(blocks)
+    if problems:
+        print("A bemenet hibás — az elemzés nem fut:\n  " + "\n  ".join(problems), file=sys.stderr)
         return 2
     try:
         primary = analyze(
@@ -115,7 +162,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FIGYELEM: az érzékenységi vizsgálat nem készült el: {exc!r}", file=sys.stderr)
         sensitivity = {"error": repr(exc)}
     expected = int(PROTOCOL["confirmatory_blocks"])
-    complete = primary["n_confirmatory_blocks"] == expected
+    confirmatory = {str(b.get("block")) for b in blocks if b.get("kind") == "confirmatory"}
+    complete = confirmatory == {f"C{i}" for i in range(1, expected + 1)}
     if not complete:
         print(
             f"FIGYELEM: {primary['n_confirmatory_blocks']} megerősítő blokk a tervezett {expected} "

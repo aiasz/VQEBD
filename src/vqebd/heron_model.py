@@ -3,7 +3,8 @@
 A modul a ``phase_11.md`` 5. fejezetének C1–C4 elemeit adja, **kvóta nélkül** (csak olvasás a
 szolgáltatótól és helyi szimuláció):
 
-- :func:`build_simulator` — ``AerSimulator.from_backend``; a kiolvasási hiba be-/kikapcsolható;
+- :func:`build_simulator` — ``NoiseModel.from_backend`` + ``AerSimulator``; a kiolvasási hiba
+  be-/kikapcsolható;
 - :func:`model_samples` — a modell energiabecslései **kiolvasást is modellező** becslővel
   (``BackendEstimatorV2``; az Aer ``EstimatorV2`` nem modellezi a kiolvasási hibát, ADR-0003
   1. kiegészítés), minden ismétléshez más szimulátor-seeddel;
@@ -70,7 +71,7 @@ def protocol_fingerprint(protocol: dict[str, Any] | None = None) -> str:
 
 
 def model_seeds(base_seed: int, count: int) -> list[int]:
-    """``count`` különböző szimulátor-seed, determinisztikusan a ``base_seed``-ből.
+    """``count`` szimulátor-seed (gyakorlatilag különbözők), determinisztikusan a ``base_seed``-ből.
 
     Az ismétlésenként **más** seed kötelező: egyetlen közös seed minden ismétlésnél azonos
     "lövészajt" adna (a v0.7.1-ben javított hiba).
@@ -121,7 +122,9 @@ def model_samples(
         observable: Az ISA-layoutra már leképezett observable.
         parameters: A paraméterek (θ*).
         simulator: :func:`build_simulator` eredménye.
-        shots: A hardveres lövésszám (a becslő precíziója ``1/sqrt(shots)``).
+        shots: A hardveres lövésszám (a becslő precíziója ``1/sqrt(shots)``). A
+            ``BackendEstimatorV2`` ebből ``ceil(1/precision²)`` lövést számol, ami lebegőpontos
+            kerekítés miatt ``shots + 1`` is lehet (8192 → 8193); a hatás elhanyagolható.
         seeds: Ismétlésenként egy szimulátor-seed (:func:`model_seeds`).
     """
     from qiskit.primitives import BackendEstimatorV2
@@ -140,14 +143,21 @@ def model_samples(
     return values
 
 
-def calibration_snapshot(backend: Any, physical_qubits: Sequence[int]) -> dict[str, Any]:
+def calibration_snapshot(
+    backend: Any, physical_qubits: Sequence[int], *, refresh: bool = True
+) -> dict[str, Any]:
     """A használt qubitek kalibrációs pillanatképe (csak olvasás, QPU-idő nélkül).
 
     Tartalma: a backend neve, a kalibráció ``last_update_date``-je, a pillanatkép UTC ideje,
     qubitenként T1, T2 (s), kiolvasási hiba, ``sx`` és ``x`` kapuhiba, valamint a használt qubitek
     közötti ``cz`` kapuhibák.
+
+    ``refresh=True`` (alapértelmezés): a szolgáltatótól **újra** lekérdez. A ``v1.1.0`` előtt a
+    hívás paraméter nélküli volt, és a qiskit-ibm-runtime a gyorsítótárazott tulajdonságokat adta
+    vissza, így a Fázis 11 „blokk utáni” pillanatképe a blokk előttinek a másolata lett
+    (TR-F11 22.).
     """
-    props = backend.properties()
+    props = backend.properties(refresh=refresh)
     qubits = sorted({int(q) for q in physical_qubits})
     per_qubit: dict[str, dict[str, float]] = {}
     for q in qubits:

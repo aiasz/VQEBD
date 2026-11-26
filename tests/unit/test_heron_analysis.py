@@ -338,3 +338,48 @@ def test_a_broken_supplementary_block_cannot_block_the_primary_result(
     out = json.loads(captured.out)
     assert out["primary"]["H1"]["decision"] == "equivalent" and out["confirmatory_complete"]
     assert "error" in out["sensitivity"] and "érzékenységi" in captured.err
+
+
+def _broken(kind: str) -> list[dict[str, Any]]:
+    blocks = _blocks(shift=0.0)
+    if kind == "duplicate":
+        blocks[1]["block"] = "C1"
+    elif kind == "kind":
+        blocks[2]["kind"] = "supplementary"
+    elif kind == "nan":
+        blocks[3]["hardware_mha"]["raw"]["1.5"] = float("nan")
+    elif kind == "shots":
+        blocks[4]["shots"] = 1024
+    elif kind == "geometry":
+        del blocks[5]["model_mha"]["no_readout"]["2.0"]
+    return blocks
+
+
+@pytest.mark.parametrize("kind", ["duplicate", "kind", "nan", "shots", "geometry"])
+def test_analyze_script_refuses_an_inconsistent_input(
+    analyze_script: ModuleType, tmp_path: Path, capsys: pytest.CaptureFixture[str], kind: str
+) -> None:
+    blocks = _broken(kind)
+    if kind == "duplicate":  # azonos név → külön fájlnév kell, hogy mindkettő beolvasódjon
+        for i, b in enumerate(blocks):
+            record = {
+                **b,
+                "protocol_fingerprint": protocol_fingerprint(),
+                "runs": [{"timestamps": {"running": _running("C1")}}],
+            }
+            (tmp_path / f"c{i + 1}.json").write_text(json.dumps(record), encoding="utf-8")
+    else:
+        _write_blocks(tmp_path, blocks)
+    assert analyze_script.main(["--data-dir", str(tmp_path)]) == 2
+    assert "hibás" in capsys.readouterr().err
+
+
+def test_analyze_script_refuses_a_block_from_another_protocol(
+    analyze_script: ModuleType, tmp_path: Path
+) -> None:
+    blocks = _blocks(shift=0.0)
+    _write_blocks(tmp_path, blocks)
+    stale = json.loads((tmp_path / "c3.json").read_text(encoding="utf-8"))
+    stale["protocol_fingerprint"] = "0" * 64
+    (tmp_path / "c3.json").write_text(json.dumps(stale), encoding="utf-8")
+    assert analyze_script.main(["--data-dir", str(tmp_path)]) == 2

@@ -132,8 +132,17 @@ def test_calibration_snapshot_reads_only_the_used_qubits() -> None:
         readout_error=lambda q: 0.01,
         gate_error=lambda g, q: 1e-3 if g != "cz" else 2e-3,
     )
-    backend = SimpleNamespace(name="ibm_test", properties=lambda: props)
+    refreshes: list[bool] = []
+
+    def properties(refresh: bool = False) -> Any:
+        refreshes.append(refresh)
+        return props
+
+    backend = SimpleNamespace(name="ibm_test", properties=properties)
     snap = calibration_snapshot(backend, [2, 1, 2])
+    assert refreshes == [
+        True
+    ]  # mindig friss lekérdezés (a gyorsítótár a v1.1.0 előtt hibát okozott)
     assert snap["physical_qubits"] == [1, 2]
     assert set(snap["qubits"]) == {"1", "2"}
     assert set(snap["cz_errors"]) == {"1-2", "2-1"}
@@ -427,6 +436,7 @@ def _stub_submission(
     *,
     snapshot_fails_after: int | None = None,
     fail_level: int | None = None,
+    wrong_qubits_level: int | None = None,
 ) -> None:
     snapshots = {"n": 0}
 
@@ -440,6 +450,9 @@ def _stub_submission(
         def __init__(self, *args: Any, resilience_level: int, initial_layout: Any, **kw: Any):
             self.level = resilience_level
             self.physical_qubits = sorted(int(q) for q in initial_layout)
+            if resilience_level == wrong_qubits_level:
+                self.physical_qubits = [3, 4]
+            self.isa_circuit = SimpleNamespace(count_ops=lambda: {"cz": 4, "sx": 12, "rz": 15})
             self.backend = SimpleNamespace(name=kw["backend_name"])
             self.last_job_id: str | None = None
 
@@ -499,6 +512,7 @@ def test_c9_submission_keeps_the_c1_c8_rhythm_and_records_the_final_usage(
     assert trex["usage_final"] is True and raw["usage_final"] is True
     assert raw["quantum_seconds"] == 15 and "quantum_seconds_initial" not in raw
     assert set(saved["hardware_mha"]) == {"raw", "trex"}
+    assert saved["seed"] == PROTOCOL["seed"] and saved["model_repeats"] == PROTOCOL["model_repeats"]
 
     assert not (tmp_path / "c9.partial.json").exists()  # a részleges mentés törölve
     assert not (tmp_path / ".c9.json.tmp").exists()  # az atomi írás nem hagy szemetet
@@ -587,3 +601,41 @@ def test_finalize_fills_a_missing_timestamp_even_if_the_usage_stays_non_final(
     assert runner.finalize_usage(service, runs, attempts=2, sleep=lambda _: None) is True
     assert runs[0]["timestamps"]["running"] == "2026-11-26T08:00:02Z"
     assert runs[0]["usage_final"] is False and runs[0]["quantum_seconds"] is None
+
+
+@pytest.mark.parametrize(
+    "override",
+    [["--shots", "1024"], ["--seed", "1"], ["--model-repeats", "2"], ["--backend", "ibm_fez"]],
+)
+def test_a_real_run_refuses_any_override_of_the_frozen_protocol(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path, override: list[str]
+) -> None:
+    service = _FakeJobService({})
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log)
+    with pytest.raises(RuntimeError, match="befagyasztott protokoll"):
+        runner.main(["--block", "C9", "--data-dir", str(tmp_path), *override])
+    assert log == []  # nem indult job
+
+
+def test_a_real_run_refuses_while_a_partial_record_exists(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    service = _FakeJobService({})
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log)
+    (tmp_path / "c9.partial.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="megszakadt"):
+        runner.main(["--block", "C9", "--data-dir", str(tmp_path)])
+    assert log == [] and (tmp_path / "c9.partial.json").exists()
+
+
+def test_both_levels_must_be_transpiled_onto_the_fixed_pair(
+    runner: ModuleType, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    service = _FakeJobService({})
+    log: list[tuple[int, dict[str, int]]] = []
+    _stub_submission(runner, monkeypatch, tmp_path, service, log, wrong_qubits_level=0)
+    with pytest.raises(RuntimeError, match="szint transzpilálása"):
+        runner.main(["--block", "C9", "--dry-run", "--data-dir", str(tmp_path)])
+    assert log == []

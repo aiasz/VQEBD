@@ -85,6 +85,31 @@ def check_confirmatory_complete(data_dir: Path) -> None:
         )
 
 
+def check_protocol_arguments(args: argparse.Namespace) -> None:
+    """Valódi futtatás csak a befagyasztott protokoll értékeivel (kapcsolóval nem írható felül)."""
+    expected = {
+        "backend": PROTOCOL["backend"],
+        "shots": PROTOCOL["shots"],
+        "seed": PROTOCOL["seed"],
+        "model_repeats": PROTOCOL["model_repeats"],
+    }
+    differs = {k: getattr(args, k) for k, v in expected.items() if getattr(args, k) != v}
+    if differs:
+        raise RuntimeError(
+            f"a(z) {differs} eltér a befagyasztott protokolltól ({expected}) — beküldés megtagadva"
+        )
+
+
+def check_no_partial(out: Path) -> None:
+    """Megtagadja a futtatást, ha egy korábbi, megszakadt kísérlet részleges mentése megvan."""
+    partial = partial_path(out)
+    if partial.exists():
+        raise RuntimeError(
+            f"a(z) {partial} egy korábbi, megszakadt kísérlet részleges mentése — előbb őrizd meg "
+            "(pl. cN_megszakadt_K.partial.json néven), utána indítható újra"
+        )
+
+
 def check_not_measured(out: Path) -> None:
     """Megtagadja a beküldést, ha a blokk kimenete már létezik (pl. elírt blokknév)."""
     if out.exists():
@@ -271,6 +296,8 @@ def main(argv: list[str] | None = None) -> int:
     out = args.data_dir / f"{args.block.lower()}.json"
     if args.dry_run and out.exists():
         print(f"FIGYELEM: a(z) {out} már létezik — valódi futtatás felülírást nem engedne")
+    if args.dry_run and partial_path(out).exists():
+        print(f"FIGYELEM: a(z) {partial_path(out)} megvan — valódi futtatás előbb az őrzését kérné")
     required = estimated_qpu_seconds(len(bonds))
     gate_required = estimated_qpu_seconds(len(bonds), safety=PROTOCOL["gate_safety_factor"])
     print(f"Blokk {args.block} ({kind}): {len(bonds)} geometria × (nyers + TREX), R = {bonds} Å")
@@ -297,7 +324,9 @@ def main(argv: list[str] | None = None) -> int:
     if not args.dry_run:
         assert_hardware_allowed()
         check_frozen(args.data_dir)
+        check_protocol_arguments(args)
         check_not_measured(out)
+        check_no_partial(out)
 
     def make(level: int) -> IBMQpuEnergyEvaluator:
         return IBMQpuEnergyEvaluator(
@@ -314,8 +343,17 @@ def main(argv: list[str] | None = None) -> int:
     first = next(iter(evaluators.values()))
     qubits = first.physical_qubits
     print(f"Fizikai qubitek: {qubits} (a protokollban előre rögzítve)")
-    if qubits != sorted(layout):
-        raise RuntimeError(f"a transzpilálás eltért a rögzített qubitpártól: {qubits} ≠ {layout}")
+    for (
+        level,
+        evaluator,
+    ) in evaluators.items():  # mindkét szint ugyanarra a párra, azonos áramkörrel
+        if evaluator.physical_qubits != sorted(layout):
+            raise RuntimeError(
+                f"a(z) {level}. szint transzpilálása eltért a rögzített qubitpártól: "
+                f"{evaluator.physical_qubits} ≠ {layout}"
+            )
+        if dict(evaluator.isa_circuit.count_ops()) != dict(first.isa_circuit.count_ops()):
+            raise RuntimeError(f"a(z) {level}. szint ISA-áramköre eltér az elsőétől")
 
     snapshot_before = calibration_snapshot(first.backend, qubits)
     print(f"Kalibráció: {snapshot_before['last_update_date']}")
@@ -382,6 +420,8 @@ def main(argv: list[str] | None = None) -> int:
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "backend": args.backend,
         "shots": args.shots,
+        "seed": args.seed,
+        "model_repeats": args.model_repeats,
         "physical_qubits": qubits,
         "quota_before": usage,
         "quota_after": None if raw_usage_after is None else quota_summary(raw_usage_after),

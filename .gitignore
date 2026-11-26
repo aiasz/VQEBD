@@ -153,3 +153,6 @@ celerybeat.pid
 .webassets-cache
 instance/
 .flaskenv
+
+# --- Helyi, gépfüggő naplók (pl. böngésző-összeomlási napló) ---------------
+debug.log

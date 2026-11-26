@@ -196,8 +196,8 @@ def with_hardware(blocks: dict[int, dict[str, Any]]) -> dict[str, Any]:
         targets[i] = target
         asym = {
             q: (
-                _qprop(props, q, "prob_meas1_prep0") or 0.0,
-                _qprop(props, q, "prob_meas0_prep1") or 0.0,
+                _qprop(props, q, "prob_meas1_prep0"),
+                _qprop(props, q, "prob_meas0_prep1"),
             )
             for q in layout
         }
@@ -206,7 +206,9 @@ def with_hardware(blocks: dict[int, dict[str, Any]]) -> dict[str, Any]:
             "prob_meas0_prep1": {str(q): asym[q][1] for q in layout},
             "model_saved": b["model_mha"]["readout"],
             "model_rebuilt": model_errors(simulator(target)),
-            "model_asymmetric_readout": model_errors(simulator(target, asym)),
+            "model_asymmetric_readout": model_errors(simulator(target, asym))  # type: ignore[arg-type]
+            if all(None not in pair for pair in asym.values())
+            else None,  # hiányzó aszimmetrikus érték: nem pótoljuk nullával
             "hw_raw": b["hardware_mha"]["raw"],
         }
         print(f"C{i}: kész", flush=True)
